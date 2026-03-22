@@ -1,5 +1,5 @@
-import { LandingPage } from '@/components/landing/landing-page';
+import { DashboardPage } from '@/components/landing/dashboard-page';
 
 export default function LocalePage() {
-  return <LandingPage />;
+  return <DashboardPage />;
 }
