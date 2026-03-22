@@ -16,7 +16,9 @@
     "selectScenario": "Selecione um cenário de mercado:",
     "tryAnother": "Testar outro cenário",
     "finishReturn": "Finalizar e voltar →",
-    "currentAnswer": "resposta atual"
+    "currentAnswer": "resposta atual",
+    "progressLine": "{completed} de {total} cenários concluídos",
+    "moduleProgress": "{completed}/{total} concluídos"
   },
   "locale": {
     "switch": "EN",
