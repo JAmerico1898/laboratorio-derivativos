@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx:*)",
+      "Bash(mkdir:*)",
+      "Read(//c/jose_americo/laboratorio-derivativos/**)",
+      "Bash(cp -r nextjs-temp/src nextjs-temp/public nextjs-temp/package.json nextjs-temp/package-lock.json nextjs-temp/tsconfig.json nextjs-temp/next.config.ts nextjs-temp/next-env.d.ts nextjs-temp/postcss.config.mjs nextjs-temp/.eslintrc.json nextjs-temp/.gitignore .)",
+      "Bash(cp -r nextjs-temp/node_modules .)",
+      "Bash(rm -rf nextjs-temp)",
+      "Bash(npm install:*)",
+      "Bash(npm cache:*)"
+    ]
+  }
+}
