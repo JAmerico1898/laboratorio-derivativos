@@ -1,0 +1,25 @@
+{
+  "app": {
+    "badge": "COPPEAD / UFRJ — MBA",
+    "title": "Derivativos Lab",
+    "subtitle": "Tome decisões reais com derivativos. Escolha um tema e navegue pela árvore de decisão.",
+    "footer": "Laboratório de Derivativos — Prof. José Américo",
+    "cumulativeScore": "Pontuação Acumulada",
+    "backHome": "← Início",
+    "prevStep": "← Etapa anterior",
+    "score": "Pontuação",
+    "context": "Contexto",
+    "correct": "✓ Correto",
+    "canImprove": "✗ Pode melhorar",
+    "prevAnswer": "Resposta anterior",
+    "keepOrChange": "— você pode manter ou escolher outra opção.",
+    "selectScenario": "Selecione um cenário de mercado:",
+    "tryAnother": "Testar outro cenário",
+    "finishReturn": "Finalizar e voltar →",
+    "currentAnswer": "resposta atual"
+  },
+  "locale": {
+    "switch": "EN",
+    "label": "English"
+  }
+}

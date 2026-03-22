@@ -1,0 +1,25 @@
+{
+  "app": {
+    "badge": "COPPEAD / UFRJ — MBA",
+    "title": "Derivatives Lab",
+    "subtitle": "Make real decisions with derivatives. Choose a topic and navigate the decision tree.",
+    "footer": "Derivatives Laboratory — Prof. José Américo",
+    "cumulativeScore": "Cumulative Score",
+    "backHome": "← Home",
+    "prevStep": "← Previous step",
+    "score": "Score",
+    "context": "Context",
+    "correct": "✓ Correct",
+    "canImprove": "✗ Can improve",
+    "prevAnswer": "Previous answer",
+    "keepOrChange": "— you can keep it or choose another option.",
+    "selectScenario": "Select a market scenario:",
+    "tryAnother": "Try another scenario",
+    "finishReturn": "Finish and return →",
+    "currentAnswer": "current answer"
+  },
+  "locale": {
+    "switch": "PT",
+    "label": "Português"
+  }
+}
