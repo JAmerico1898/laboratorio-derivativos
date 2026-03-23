@@ -31,7 +31,6 @@ export function PayoffChart({
   xLabel,
   overrideFixingPnL,
 }: PayoffChartProps) {
-  // Expand range to include both forwardRate and fixingRate
   let min = forwardRate * 0.85;
   let max = forwardRate * 1.15;
   if (fixingRate) {
@@ -40,7 +39,6 @@ export function PayoffChart({
   }
   const range = max - min;
   const step = range / 60;
-  const tolerance = range / 50; // proportional tolerance for dot matching
 
   const data: { fixing: number; pnl: number; zero: number }[] = [];
   for (let fixing = min; fixing <= max; fixing += step) {
@@ -63,13 +61,23 @@ export function PayoffChart({
         : (fixingRate - forwardRate) * notional;
   }
 
+  // Find the single closest data point to fixingRate
+  let closestIdx = -1;
+  if (fixingRate) {
+    let minDist = Infinity;
+    for (let i = 0; i < data.length; i++) {
+      const dist = Math.abs(data[i].fixing - fixingRate);
+      if (dist < minDist) { minDist = dist; closestIdx = i; }
+    }
+  }
+
   return (
     <div style={{ width: "100%", height: 320 }}>
       <ResponsiveContainer>
         <AreaChart data={data} margin={{ top: 40, right: 20, left: 20, bottom: 10 }}>
           <defs>
             <linearGradient id="pnlGreen" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={COLORS.green} stopOpacity={0.4} />
+              <stop offset="0%" stopColor={COLORS.green} stopOpacity={0.3} />
               <stop offset="100%" stopColor={COLORS.green} stopOpacity={0} />
             </linearGradient>
           </defs>
@@ -150,8 +158,9 @@ export function PayoffChart({
                 payload={props.payload as { fixing: number }}
                 fixingRate={fixingRate}
                 fixingPnL={fixingPnL}
-                tolerance={tolerance}
                 overridePnL={overrideFixingPnL}
+                index={props.index as number}
+                targetIndex={closestIdx}
               />
             )}
             activeDot={{ r: 4, fill: COLORS.accent, stroke: COLORS.text }}

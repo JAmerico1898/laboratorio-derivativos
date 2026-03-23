@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-fixed-dim": "#9eccf0",
+              "on-error-container": "#93000a",
+              "outline-variant": "#bfc9c4",
+              "primary-container": "#134866",
+              "error": "#ba1a1a",
+              "tertiary-fixed-dim": "#88d982",
+              "on-surface": "#191c1d",
+              "surface-container-lowest": "#ffffff",
+              "surface": "#f8f9fa",
+              "background": "#f8f9fa",
+              "secondary": "#006b5f",
+              "primary": "#00314a",
+              "error-container": "#ffdad6",
+              "on-tertiary": "#ffffff",
+              "secondary-fixed": "#8df5e4",
+              "on-background": "#191c1d",
+              "inverse-surface": "#2e3132",
+              "surface-container-low": "#f3f4f5",
+              "tertiary-container": "#004f11",
+              "on-tertiary-fixed": "#002204",
+              "tertiary-fixed": "#a3f69c",
+              "on-secondary-fixed": "#00201c",
+              "on-primary-fixed": "#001e2f",
+              "secondary-fixed-dim": "#70d8c8",
+              "primary-fixed": "#cae6ff",
+              "on-tertiary-fixed-variant": "#005312",
+              "surface-bright": "#f8f9fa",
+              "on-primary-container": "#89b6d9",
+              "surface-container-high": "#e7e8e9",
+              "tertiary": "#003608",
+              "surface-variant": "#e1e3e4",
+              "outline": "#707975",
+              "on-surface-variant": "#3f4945",
+              "on-secondary": "#ffffff",
+              "surface-dim": "#d9dadb",
+              "on-tertiary-container": "#72c26e",
+              "on-primary-fixed-variant": "#184b6a",
+              "on-error": "#ffffff",
+              "on-secondary-container": "#007165",
+              "inverse-on-surface": "#f0f1f2",
+              "on-primary": "#ffffff",
+              "inverse-primary": "#9eccf0",
+              "surface-tint": "#346383",
+              "surface-container": "#edeeef",
+              "secondary-container": "#8df5e4",
+              "on-secondary-fixed-variant": "#005048",
+              "surface-container-highest": "#e1e3e4"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-surface font-body text-on-surface selection:bg-secondary-container selection:text-on-secondary-container min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="bg-slate-50/80 backdrop-blur-md text-teal-900 flex justify-between items-center px-6 py-4 w-full sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<button class="active:scale-95 duration-200 hover:bg-slate-100 p-2 rounded-full transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-teal-900" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline font-bold text-2xl tracking-tight">Swaps</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="active:scale-95 duration-200 hover:bg-slate-100 p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined text-teal-900" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<main class="max-w-6xl mx-auto px-6 py-12">
+<!-- Hero Section/Intro -->
+<div class="mb-12">
+<span class="font-label text-xs font-semibold uppercase tracking-[0.2em] text-secondary mb-3 block">Módulo Acadêmico</span>
+<h2 class="font-headline text-4xl font-extrabold text-primary mb-4 leading-tight">Cenários de Mercado e <br/><span class="text-secondary">Estratégias de Redução de Risco</span></h2>
+<div class="h-1 w-24 bg-secondary rounded-full"></div>
+</div>
+<!-- Scenarios Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Card 1 -->
+<div class="group relative flex flex-col bg-amber-50/60 rounded-xl overflow-hidden shadow-[0px_12px_32px_rgba(25,28,29,0.04)] hover:shadow-[0px_20px_40px_rgba(180,100,0,0.08)] transition-all duration-300 border border-amber-100/50">
+<div class="p-8 flex flex-col h-full">
+<div class="flex justify-between items-start mb-6">
+<span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold uppercase tracking-wider">Intermediário</span>
+<span class="material-symbols-outlined text-amber-700/40 group-hover:text-amber-700 transition-colors" data-icon="currency_exchange">currency_exchange</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-primary mb-4 group-hover:text-secondary transition-colors">Swap CDI × Pré — Empresa com Dívida Flutuante</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-8 flex-grow">
+                        Você é CFO da Infralog S.A., uma empresa de logística que captou um empréstimo de R$ 200 milhões a CDI + 2,00% a.a. com vencimento em 2 anos. O cenário macro sugere alta de juros. Proteja o fluxo de caixa.
+                    </p>
+<button class="w-full py-3 px-6 bg-primary text-on-primary rounded-xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
+                        Iniciar Simulação
+                        <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group relative flex flex-col bg-amber-50/60 rounded-xl overflow-hidden shadow-[0px_12px_32px_rgba(25,28,29,0.04)] hover:shadow-[0px_20px_40px_rgba(180,100,0,0.08)] transition-all duration-300 border border-amber-100/50">
+<div class="p-8 flex flex-col h-full">
+<div class="flex justify-between items-start mb-6">
+<span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold uppercase tracking-wider">Intermediário</span>
+<span class="material-symbols-outlined text-amber-700/40 group-hover:text-amber-700 transition-colors" data-icon="payments">payments</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-primary mb-4 group-hover:text-secondary transition-colors">Swap Cambial — Dívida em Dólar</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-8 flex-grow">
+                        Você é tesoureiro(a) da Siderúrgica Nacional S.A., que emitiu um bond de USD 100 milhões a taxa fixa de 5,50% a.a. em dólar com vencimento em 3 anos. O risco de desvalorização cambial ameaça o balanço.
+                    </p>
+<button class="w-full py-3 px-6 bg-primary text-on-primary rounded-xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
+                        Iniciar Simulação
+                        <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group relative flex flex-col bg-red-50/60 rounded-xl overflow-hidden shadow-[0px_12px_32px_rgba(25,28,29,0.04)] hover:shadow-[0px_20px_40px_rgba(180,0,0,0.08)] transition-all duration-300 border border-red-100/50">
+<div class="p-8 flex flex-col h-full">
+<div class="flex justify-between items-start mb-6">
+<span class="px-3 py-1 rounded-full bg-red-100 text-red-800 text-[10px] font-bold uppercase tracking-wider">Avançado</span>
+<span class="material-symbols-outlined text-red-700/40 group-hover:text-red-700 transition-colors" data-icon="monitoring">monitoring</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-primary mb-4 group-hover:text-tertiary transition-colors">Swap Direcional — Fundo Multimercado</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-8 flex-grow">
+                        Você é gestor(a) de um fundo multimercado com PL de R$ 800 milhões. Sua convicção é de que o Copom vai cortar a Selic agressivamente nos próximos 18 meses. Monte a ponta ativa correta.
+                    </p>
+<button class="w-full py-3 px-6 bg-primary text-on-primary rounded-xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
+                        Iniciar Simulação
+                        <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group relative flex flex-col bg-purple-50/60 rounded-xl overflow-hidden shadow-[0px_12px_32px_rgba(25,28,29,0.04)] hover:shadow-[0px_20px_40px_rgba(100,0,180,0.08)] transition-all duration-300 border border-purple-100/50">
+<div class="p-8 flex flex-col h-full">
+<div class="flex justify-between items-start mb-6">
+<span class="px-3 py-1 rounded-full bg-purple-100 text-purple-800 text-[10px] font-bold uppercase tracking-wider">Super Desafio</span>
+<span class="material-symbols-outlined text-purple-700/40 group-hover:text-purple-700 transition-colors" data-icon="warning">warning</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-primary mb-4 group-hover:text-primary transition-colors">Super Desafio — Swap com Risco de Crédito (CVA)</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-8 flex-grow">
+                        Você é head de tesouraria do Banco Meridional. Uma empresa de rating BB pede um swap CDI × Pré de R$ 300 milhões por 3 anos. Calcule o Credit Valuation Adjustment e ajuste o spread da operação.
+                    </p>
+<button class="w-full py-3 px-6 bg-primary text-on-primary rounded-xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
+                        Iniciar Simulação
+                        <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-white shadow-[0px_-8px_24px_rgba(0,49,74,0.08)] rounded-t-2xl">
+<div class="flex flex-col items-center justify-center bg-teal-50 text-teal-800 rounded-xl px-4 py-1 active:translate-y-0.5 duration-150">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+<span class="font-label text-[10px] font-semibold uppercase tracking-widest mt-1">Modules</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 px-4 py-1 hover:text-teal-600 transition-colors active:translate-y-0.5 duration-150">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+<span class="font-label text-[10px] font-semibold uppercase tracking-widest mt-1">Analysis</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 px-4 py-1 hover:text-teal-600 transition-colors active:translate-y-0.5 duration-150">
+<span class="material-symbols-outlined" data-icon="trending_up">trending_up</span>
+<span class="font-label text-[10px] font-semibold uppercase tracking-widest mt-1">Market</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 px-4 py-1 hover:text-teal-600 transition-colors active:translate-y-0.5 duration-150">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label text-[10px] font-semibold uppercase tracking-widest mt-1">Profile</span>
+</div>
+</nav>
+</body></html>

@@ -1,0 +1,132 @@
+"use client";
+
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
+
+export function ContactForm() {
+  const t = useTranslations("app");
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("sending");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), message }),
+      });
+
+      if (res.ok) {
+        setStatus("sent");
+        setName("");
+        setEmail("");
+        setMessage("");
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    }
+  };
+
+  return (
+    <div className="bg-surface text-on-surface font-sans antialiased min-h-screen">
+      {/* Background orbs */}
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -right-1/4 -top-1/4 h-1/2 w-1/2 rounded-full bg-primary/5 blur-[120px]" />
+        <div className="absolute bottom-0 left-0 h-1/3 w-1/3 rounded-full bg-secondary/5 blur-[100px]" />
+      </div>
+
+      <main className="mx-auto max-w-xl px-6 pb-20 pt-12">
+        {/* Back */}
+        <div className="mb-10">
+          <button
+            onClick={() => router.push("/")}
+            className="flex items-center gap-2 text-primary font-semibold hover:opacity-70 transition-opacity cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-xl">arrow_back</span>
+            <span className="text-xs font-bold uppercase tracking-widest">{t("backToModules")}</span>
+          </button>
+        </div>
+
+        <h1 className="font-heading text-3xl font-extrabold text-primary mb-2 sm:text-4xl">
+          {t("contactTitle")}
+        </h1>
+        <p className="text-on-surface-variant mb-8">{t("contactSubtitle")}</p>
+
+        {status === "sent" ? (
+          <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-6 text-center">
+            <span className="material-symbols-outlined text-4xl text-emerald-600 mb-2">check_circle</span>
+            <p className="text-lg font-bold text-emerald-700">{t("contactSent")}</p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            {/* Name */}
+            <div>
+              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+                {t("contactName")}
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={t("contactNamePlaceholder")}
+                className="w-full rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-on-surface placeholder:text-outline focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors"
+              />
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+                {t("contactEmail")}
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t("contactEmailPlaceholder")}
+                className="w-full rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-on-surface placeholder:text-outline focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors"
+              />
+            </div>
+
+            {/* Message */}
+            <div>
+              <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+                {t("contactMessage")} <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                required
+                rows={5}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder={t("contactMessagePlaceholder")}
+                className="w-full rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-on-surface placeholder:text-outline focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors resize-y"
+              />
+            </div>
+
+            {status === "error" && (
+              <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+                {t("contactError")}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={status === "sending"}
+              className="bg-primary text-on-primary rounded-xl px-6 py-3 font-bold text-sm transition-colors hover:bg-primary-container active:scale-95 disabled:opacity-50 cursor-pointer"
+            >
+              {status === "sending" ? t("contactSending") : t("contactSubmit")}
+            </button>
+          </form>
+        )}
+      </main>
+    </div>
+  );
+}

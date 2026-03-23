@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Laboratório de Derivativos - Derivativos Embutidos</title>
+<!-- Google Fonts: Manrope & Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-on-surface": "#f0f1f2",
+              "on-background": "#191c1d",
+              "on-tertiary-fixed-variant": "#005312",
+              "on-secondary-fixed-variant": "#005048",
+              "secondary-container": "#8df5e4",
+              "primary-fixed-dim": "#9eccf0",
+              "surface-bright": "#f8f9fa",
+              "surface-container-low": "#f3f4f5",
+              "secondary-fixed": "#8df5e4",
+              "outline-variant": "#bfc9c4",
+              "outline": "#707975",
+              "tertiary-fixed": "#a3f69c",
+              "surface": "#f8f9fa",
+              "primary-fixed": "#cae6ff",
+              "on-error": "#ffffff",
+              "on-primary-fixed-variant": "#184b6a",
+              "surface-dim": "#d9dadb",
+              "surface-container-high": "#e7e8e9",
+              "on-secondary": "#ffffff",
+              "on-tertiary-container": "#72c26e",
+              "error": "#ba1a1a",
+              "tertiary-fixed-dim": "#88d982",
+              "on-secondary-container": "#007165",
+              "on-primary-fixed": "#001e2f",
+              "on-error-container": "#93000a",
+              "on-primary": "#ffffff",
+              "surface-tint": "#346383",
+              "secondary-fixed-dim": "#70d8c8",
+              "primary": "#00314a",
+              "on-primary-container": "#89b6d9",
+              "inverse-surface": "#2e3132",
+              "secondary": "#006b5f",
+              "error-container": "#ffdad6",
+              "on-surface-variant": "#3f4945",
+              "tertiary": "#003608",
+              "background": "#f8f9fa",
+              "tertiary-container": "#004f11",
+              "surface-container": "#edeeef",
+              "on-secondary-fixed": "#00201c",
+              "on-tertiary": "#ffffff",
+              "on-surface": "#191c1d",
+              "surface-variant": "#e1e3e4",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-fixed": "#002204",
+              "surface-container-highest": "#e1e3e4",
+              "primary-container": "#134866",
+              "inverse-primary": "#9eccf0"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      /* Custom background gradients for difficulty levels */
+      .bg-difficulty-intermediate { background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%); }
+      .bg-difficulty-advanced { background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%); }
+      .bg-difficulty-challenge { background: linear-gradient(135deg, #F3E5F5 0%, #E1BEE7 100%); }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface">
+<!-- TopAppBar -->
+<header class="bg-cyan-950 dark:bg-slate-950 text-cyan-50 dark:text-cyan-100 font-manrope font-bold tracking-tight docked full-width top-0 shadow-none z-40 fixed w-full h-16 flex items-center justify-between px-6">
+<div class="flex items-center gap-4">
+<button class="hover:bg-cyan-800/50 transition-colors active:scale-95 transition-transform p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="text-lg font-bold">Derivativos Embutidos</h1>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<nav class="flex gap-6 text-sm">
+<a class="text-cyan-200 hover:text-cyan-100 transition-colors" href="#">Laboratório</a>
+<a class="text-cyan-400 hover:text-cyan-100 transition-colors" href="#">Mercado</a>
+<a class="text-cyan-400 hover:text-cyan-100 transition-colors" href="#">Progresso</a>
+</nav>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-7xl mx-auto">
+<!-- Content Header -->
+<div class="mb-10">
+<h2 class="font-headline text-3xl font-extrabold text-primary tracking-tight mb-2">Cenários de Simulação</h2>
+<p class="text-on-surface-variant max-w-2xl leading-relaxed">
+                Explore a complexidade dos instrumentos financeiros estruturados através de modelos quantitativos e análise de componentes derivativos integrados.
+            </p>
+</div>
+<!-- Grid of Scenario Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Scenario 1: Intermediate -->
+<div class="bg-difficulty-intermediate rounded-xl p-6 flex flex-col justify-between min-h-[280px] hover:shadow-lg transition-shadow border-none">
+<div>
+<div class="flex justify-between items-start mb-4">
+<span class="bg-white/60 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-amber-800">Intermediário</span>
+<span class="material-symbols-outlined text-amber-700">science</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-primary mb-3">COE de Principal Garantido</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">Análise de estruturação composta por título de renda fixa zero-cupom e opções de compra (call) sobre ativos de risco.</p>
+</div>
+<button class="mt-6 w-full h-12 bg-primary text-on-primary font-semibold rounded-xl hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    Iniciar Simulação
+                    <span class="material-symbols-outlined text-sm">play_arrow</span>
+</button>
+</div>
+<!-- Scenario 2: Intermediate -->
+<div class="bg-difficulty-intermediate rounded-xl p-6 flex flex-col justify-between min-h-[280px] hover:shadow-lg transition-shadow border-none">
+<div>
+<div class="flex justify-between items-start mb-4">
+<span class="bg-white/60 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-amber-800">Intermediário</span>
+<span class="material-symbols-outlined text-amber-700">payments</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-primary mb-3">Opção de Pré-pagamento em Empréstimo</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">Avaliação do derivativo americano implícito que permite ao devedor liquidar a dívida antes do vencimento original.</p>
+</div>
+<button class="mt-6 w-full h-12 bg-primary text-on-primary font-semibold rounded-xl hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    Iniciar Simulação
+                    <span class="material-symbols-outlined text-sm">play_arrow</span>
+</button>
+</div>
+<!-- Scenario 3: Intermediate -->
+<div class="bg-difficulty-intermediate rounded-xl p-6 flex flex-col justify-between min-h-[280px] hover:shadow-lg transition-shadow border-none">
+<div>
+<div class="flex justify-between items-start mb-4">
+<span class="bg-white/60 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-amber-800">Intermediário</span>
+<span class="material-symbols-outlined text-amber-700">account_balance</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-primary mb-3">Callable Bond — Risco de Reinvestimento</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">Estudo de títulos com cláusula de recompra pelo emissor e o impacto da volatilidade das taxas de juros no yield-to-call.</p>
+</div>
+<button class="mt-6 w-full h-12 bg-primary text-on-primary font-semibold rounded-xl hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    Iniciar Simulação
+                    <span class="material-symbols-outlined text-sm">play_arrow</span>
+</button>
+</div>
+<!-- Scenario 4: Advanced -->
+<div class="bg-difficulty-advanced rounded-xl p-6 flex flex-col justify-between min-h-[280px] hover:shadow-lg transition-shadow border-none">
+<div>
+<div class="flex justify-between items-start mb-4">
+<span class="bg-white/60 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-red-800">Avançado</span>
+<span class="material-symbols-outlined text-red-700">currency_exchange</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-primary mb-3">Indexação Cambial Implícita</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">Desmembramento de contratos comerciais com cláusulas de ajuste baseadas em paridade de moedas estrangeiras.</p>
+</div>
+<button class="mt-6 w-full h-12 bg-primary text-on-primary font-semibold rounded-xl hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    Iniciar Simulação
+                    <span class="material-symbols-outlined text-sm">play_arrow</span>
+</button>
+</div>
+<!-- Scenario 5: Advanced -->
+<div class="bg-difficulty-advanced rounded-xl p-6 flex flex-col justify-between min-h-[280px] hover:shadow-lg transition-shadow border-none">
+<div>
+<div class="flex justify-between items-start mb-4">
+<span class="bg-white/60 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-red-800">Avançado</span>
+<span class="material-symbols-outlined text-red-700">layers</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-primary mb-3">TRS Sintético via COE</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">Modelagem de Total Return Swaps embutidos em certificados de operações estruturadas para exposição a ativos sintéticos.</p>
+</div>
+<button class="mt-6 w-full h-12 bg-primary text-on-primary font-semibold rounded-xl hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    Iniciar Simulação
+                    <span class="material-symbols-outlined text-sm">play_arrow</span>
+</button>
+</div>
+<!-- Scenario 6: Advanced -->
+<div class="bg-difficulty-advanced rounded-xl p-6 flex flex-col justify-between min-h-[280px] hover:shadow-lg transition-shadow border-none">
+<div>
+<div class="flex justify-between items-start mb-4">
+<span class="bg-white/60 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-red-800">Avançado</span>
+<span class="material-symbols-outlined text-red-700">shield_with_heart</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-primary mb-3">Derivativo de Crédito Implícito (Step-up)</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">Simulação de gatilhos de taxa (step-up) vinculados a ratings de crédito ou eventos de liquidez do emissor.</p>
+</div>
+<button class="mt-6 w-full h-12 bg-primary text-on-primary font-semibold rounded-xl hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    Iniciar Simulação
+                    <span class="material-symbols-outlined text-sm">play_arrow</span>
+</button>
+</div>
+<!-- Scenario 7: Super Challenge -->
+<div class="bg-difficulty-challenge rounded-xl p-6 flex flex-col justify-between min-h-[280px] hover:shadow-lg transition-shadow border-none">
+<div>
+<div class="flex justify-between items-start mb-4">
+<span class="bg-white/60 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-purple-800">Super Desafio</span>
+<span class="material-symbols-outlined text-purple-700">bolt</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-primary mb-3">Cap/Floor de Juros em Empréstimo</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">Estruturação de colares (collars) de juros para proteção contra flutuações extremas em taxas flutuantes de financiamento.</p>
+</div>
+<button class="mt-6 w-full h-12 bg-primary text-on-primary font-semibold rounded-xl hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    Iniciar Simulação
+                    <span class="material-symbols-outlined text-sm">play_arrow</span>
+</button>
+</div>
+<!-- Scenario 8: Super Challenge -->
+<div class="bg-difficulty-challenge rounded-xl p-6 flex flex-col justify-between min-h-[280px] hover:shadow-lg transition-shadow border-none">
+<div>
+<div class="flex justify-between items-start mb-4">
+<span class="bg-white/60 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-purple-800">Super Desafio</span>
+<span class="material-symbols-outlined text-purple-700">dynamic_form</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-primary mb-3">Debênture Conversível</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">Modelagem de opções de conversão em ações, integrando análise de crédito e precificação de equity derivatives.</p>
+</div>
+<button class="mt-6 w-full h-12 bg-primary text-on-primary font-semibold rounded-xl hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    Iniciar Simulação
+                    <span class="material-symbols-outlined text-sm">play_arrow</span>
+</button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only Layout Logic) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 pb-safe bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-100 dark:border-slate-800 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50 md:hidden">
+<a class="flex flex-col items-center justify-center text-teal-700 dark:text-teal-400 bg-teal-50/50 dark:bg-teal-900/20 rounded-xl px-3 py-1 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">science</span>
+<span class="font-inter text-[10px] font-semibold uppercase tracking-wider">Laboratório</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-300 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">trending_up</span>
+<span class="font-inter text-[10px] font-semibold uppercase tracking-wider">Mercado</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-300 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="font-inter text-[10px] font-semibold uppercase tracking-wider">Progresso</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-300 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-inter text-[10px] font-semibold uppercase tracking-wider">Perfil</span>
+</a>
+</nav>
+</body></html>

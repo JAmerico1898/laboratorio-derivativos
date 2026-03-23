@@ -1,13 +1,31 @@
 "use client";
 
+import { useMemo } from "react";
 import { calculateResult } from "@/lib/calculations/generic";
-import { COLORS } from "@/lib/constants";
 import { useScenarioPlayer } from "@/hooks/use-scenario-player";
 import { ResultPanel } from "@/components/results/result-panel";
 import { ScoreBar } from "./score-bar";
 import { MarkdownText } from "@/components/shared/markdown-text";
 import type { Scenario, Choice } from "@/types/scenario";
 import type { CompletedScenario } from "@/types/results";
+
+/**
+ * Seeded pseudo-random shuffle so correct answer isn't always first.
+ * Stable per step ID — same order on every render.
+ */
+function seededShuffle<T>(arr: T[], seed: string): T[] {
+  const copy = [...arr];
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) {
+    h = (Math.imul(31, h) + seed.charCodeAt(i)) | 0;
+  }
+  for (let i = copy.length - 1; i > 0; i--) {
+    h = (Math.imul(h, 1664525) + 1013904223) | 0;
+    const j = ((h >>> 0) % (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
 
 interface ScenarioPlayerProps {
   scenario: Scenario;
@@ -36,6 +54,14 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
     getHedgeRatio,
   } = useScenarioPlayer(scenario, onFinish);
 
+  // Shuffle choices so the correct answer isn't always in the same position
+  const shuffledChoices = useMemo(() => {
+    if (currentStep?.type === "choice") {
+      return seededShuffle(currentStep.choices, currentStep.id);
+    }
+    return [];
+  }, [currentStep]);
+
   // Max possible score from choice steps
   const maxPS = scenario
     ? scenario.steps
@@ -47,117 +73,52 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
     : 0;
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: COLORS.bg,
-        color: COLORS.text,
-        fontFamily: "'Segoe UI', 'Helvetica Neue', sans-serif",
-        padding: "0 16px",
-      }}
-    >
+    <div className="bg-surface text-on-surface font-sans antialiased min-h-screen px-4 relative overflow-hidden">
+      {/* Decorative background gradient orbs */}
+      <div className="fixed top-[-200px] left-[-100px] w-[500px] h-[500px] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
+      <div className="fixed bottom-[-150px] right-[-80px] w-[400px] h-[400px] rounded-full bg-secondary/5 blur-[100px] pointer-events-none" />
+
       <div
-        style={{
-          maxWidth: 720,
-          margin: "0 auto",
-          paddingTop: 24,
-          paddingBottom: 48,
-          transition: "opacity 0.3s",
-          opacity: fadeIn ? 1 : 0,
-        }}
+        className={`max-w-[720px] mx-auto pt-6 pb-12 transition-opacity duration-300 ${fadeIn ? "opacity-100" : "opacity-0"}`}
       >
         {/* ── Top bar ── */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 20,
-          }}
-        >
-          <div style={{ display: "flex", gap: 8 }}>
+        <div className="flex justify-between items-center mb-5">
+          <div className="flex gap-2">
             <button
               onClick={onBack}
-              style={{
-                background: "none",
-                border: `1px solid ${COLORS.border}`,
-                color: COLORS.textMuted,
-                padding: "6px 14px",
-                borderRadius: 8,
-                cursor: "pointer",
-                fontSize: 13,
-              }}
+              className="bg-transparent border border-outline-variant text-on-surface-variant px-3.5 py-1.5 rounded-lg cursor-pointer text-[13px]"
             >
               ← Início
             </button>
             {(stepIndex > 0 || showResult) && (
               <button
                 onClick={goBack}
-                style={{
-                  background: "none",
-                  border: `1px solid ${COLORS.accent}40`,
-                  color: COLORS.accent,
-                  padding: "6px 14px",
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  fontSize: 13,
-                  transition: "all 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = COLORS.accentDim;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "none";
-                }}
+                className="bg-transparent border border-secondary/40 text-secondary px-3.5 py-1.5 rounded-lg cursor-pointer text-[13px] transition-all hover:bg-secondary/10"
               >
                 ← Etapa anterior
               </button>
             )}
           </div>
-          <div style={{ textAlign: "right" }}>
-            <div
-              style={{
-                fontSize: 11,
-                color: COLORS.textDim,
-                textTransform: "uppercase",
-                letterSpacing: 1,
-              }}
-            >
+          <div className="text-right">
+            <div className="text-[11px] text-outline uppercase tracking-wider">
               Pontuação
             </div>
-            <div style={{ width: 150 }}>
+            <div className="w-[150px]">
               <ScoreBar score={score} maxScore={maxPS} />
             </div>
           </div>
         </div>
 
         {/* ── Title + instrument badge ── */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            marginBottom: 8,
-            flexWrap: "wrap",
-          }}
-        >
-          <h2 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>{scenario.title}</h2>
-          <span
-            style={{
-              padding: "3px 10px",
-              borderRadius: 6,
-              fontSize: 11,
-              fontWeight: 600,
-              background: COLORS.accentDim,
-              color: COLORS.accent,
-            }}
-          >
+        <div className="flex items-center gap-2.5 mb-2 flex-wrap">
+          <h2 className="text-2xl font-extrabold m-0 font-heading">{scenario.title}</h2>
+          <span className="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-secondary/10 text-secondary">
             {scenario.instrument}
           </span>
         </div>
 
         {/* ── Step progress bars ── */}
-        <div style={{ display: "flex", gap: 4, marginBottom: 24 }}>
+        <div className="flex gap-1 mb-6">
           {scenario.steps.map((s, i) => {
             const isCurrent = i === stepIndex;
             const canClick = i <= stepIndex;
@@ -165,87 +126,38 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
               <div
                 key={s.id}
                 onClick={() => canClick && goToStep(i)}
-                style={{
-                  flex: 1,
-                  height: canClick ? 6 : 4,
-                  borderRadius: 3,
-                  background:
-                    i < stepIndex ? COLORS.accent : isCurrent ? COLORS.gold : COLORS.border,
-                  transition: "all 0.3s",
-                  cursor: canClick ? "pointer" : "default",
-                  opacity: canClick ? 1 : 0.5,
-                }}
-                onMouseEnter={(e) => {
-                  if (canClick) e.currentTarget.style.opacity = "0.7";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.opacity = canClick ? "1" : "0.5";
-                }}
+                className={`flex-1 rounded-sm transition-all ${
+                  canClick ? "h-1.5 cursor-pointer opacity-100 hover:opacity-70" : "h-1 cursor-default opacity-50"
+                } ${
+                  i < stepIndex
+                    ? "bg-secondary"
+                    : isCurrent
+                      ? "bg-amber-500"
+                      : "bg-surface-container-high"
+                }`}
               />
             );
           })}
         </div>
 
         {/* ── Context panel ── */}
-        <div
-          style={{
-            padding: "20px 24px",
-            borderRadius: 14,
-            background: COLORS.card,
-            border: `1px solid ${COLORS.border}`,
-            marginBottom: 20,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 11,
-              color: COLORS.accent,
-              textTransform: "uppercase",
-              letterSpacing: 1.5,
-              marginBottom: 8,
-            }}
-          >
+        <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-6 mb-5">
+          <div className="text-xs font-bold uppercase tracking-wider text-secondary mb-2">
             Contexto
           </div>
-          <p style={{ fontSize: 15, lineHeight: 1.7, margin: 0 }}>
+          <p className="text-[15px] leading-relaxed m-0">
             <MarkdownText text={scenario.context.narrative} />
           </p>
-          <div
-            style={{
-              marginTop: 16,
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))",
-              gap: 8,
-            }}
-          >
+          <div className="mt-4 grid grid-cols-[repeat(auto-fit,minmax(110px,1fr))] gap-2">
             {(scenario.context.displayFields || []).map(([label, val]) => (
               <div
                 key={label}
-                style={{
-                  padding: "8px 12px",
-                  borderRadius: 8,
-                  background: COLORS.accentDim,
-                  textAlign: "center",
-                }}
+                className="rounded-lg bg-secondary/10 p-2 text-center"
               >
-                <div
-                  style={{
-                    fontSize: 10,
-                    color: COLORS.textMuted,
-                    textTransform: "uppercase",
-                    letterSpacing: 1,
-                  }}
-                >
+                <div className="text-[10px] text-on-surface-variant uppercase tracking-wider">
                   {label}
                 </div>
-                <div
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: COLORS.accent,
-                    fontFamily: "'JetBrains Mono', monospace",
-                  }}
-                >
+                <div className="text-sm font-bold text-secondary font-mono">
                   {val}
                 </div>
               </div>
@@ -256,21 +168,14 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
         {/* ── Feedback banner from previous step ── */}
         {prevChoice && (
           <div
-            style={{
-              padding: "14px 20px",
-              borderRadius: 12,
-              background: prevChoice.correct ? COLORS.greenDim : COLORS.redDim,
-              border: `1px solid ${prevChoice.correct ? COLORS.green : COLORS.red}30`,
-              marginBottom: 20,
-              fontSize: 14,
-              lineHeight: 1.6,
-            }}
+            className={`px-5 py-3.5 rounded-xl mb-5 text-sm leading-relaxed ${
+              prevChoice.correct
+                ? "bg-emerald-50 border border-emerald-200"
+                : "bg-red-50 border border-red-200"
+            }`}
           >
             <span
-              style={{
-                fontWeight: 700,
-                color: prevChoice.correct ? COLORS.green : COLORS.red,
-              }}
+              className={`font-bold ${prevChoice.correct ? "text-emerald-600" : "text-red-600"}`}
             >
               {prevChoice.correct ? "✓ Correto" : "✗ Pode melhorar"} —{" "}
             </span>
@@ -280,20 +185,9 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
 
         {/* ── Revisit banner ── */}
         {currentStepChoice && (
-          <div
-            style={{
-              padding: "12px 20px",
-              borderRadius: 12,
-              background: COLORS.cardHover,
-              border: `1px dashed ${COLORS.accent}40`,
-              marginBottom: 16,
-              fontSize: 13,
-              lineHeight: 1.6,
-              color: COLORS.textMuted,
-            }}
-          >
+          <div className="bg-surface-container-low border border-dashed border-secondary/30 rounded-xl px-5 py-3 mb-4 text-[13px] leading-relaxed text-on-surface-variant">
             Resposta anterior:{" "}
-            <strong style={{ color: COLORS.accent }}>{currentStepChoice.label}</strong> — você
+            <strong className="text-secondary">{currentStepChoice.label}</strong> — você
             pode manter ou escolher outra opção.
           </div>
         )}
@@ -301,11 +195,9 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
         {/* ── Choice step ── */}
         {currentStep?.type === "choice" && (
           <div>
-            <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>
-              {currentStep.prompt}
-            </h3>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {currentStep.choices.map((ch) => {
+            <h3 className="text-lg font-bold mb-4 font-heading">{currentStep.prompt}</h3>
+            <div className="flex flex-col gap-2.5">
+              {shuffledChoices.map((ch) => {
                 const wasSelected = currentStepAnswer?.choiceId === ch.id;
                 return (
                   <button
@@ -313,46 +205,14 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
                     onClick={() =>
                       currentStep.type === "choice" && handleChoice(ch, currentStep)
                     }
-                    style={{
-                      padding: "16px 20px",
-                      borderRadius: 12,
-                      background: wasSelected ? COLORS.accentDim : COLORS.card,
-                      border: `1px solid ${wasSelected ? COLORS.accent : COLORS.border}`,
-                      color: COLORS.text,
-                      fontSize: 15,
-                      fontWeight: 500,
-                      textAlign: "left",
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                      lineHeight: 1.5,
-                      position: "relative",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!wasSelected) {
-                        e.currentTarget.style.background = COLORS.cardHover;
-                        e.currentTarget.style.borderColor = COLORS.accent + "60";
-                        e.currentTarget.style.transform = "translateX(4px)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!wasSelected) {
-                        e.currentTarget.style.background = COLORS.card;
-                        e.currentTarget.style.borderColor = COLORS.border;
-                        e.currentTarget.style.transform = "translateX(0)";
-                      }
-                    }}
+                    className={`rounded-xl border p-4 text-left text-on-surface text-[15px] font-medium leading-normal cursor-pointer transition-all relative ${
+                      wasSelected
+                        ? "bg-secondary/10 border-secondary"
+                        : "bg-surface-container-lowest border-outline-variant hover:bg-surface-container-low hover:border-secondary/40 hover:translate-x-1"
+                    }`}
                   >
                     {wasSelected && (
-                      <span
-                        style={{
-                          position: "absolute",
-                          top: 8,
-                          right: 12,
-                          fontSize: 11,
-                          color: COLORS.accent,
-                          fontWeight: 600,
-                        }}
-                      >
+                      <span className="absolute top-2 right-3 text-[11px] text-secondary font-semibold">
                         resposta atual
                       </span>
                     )}
@@ -367,43 +227,19 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
         {/* ── Resolution step ── */}
         {currentStep?.type === "resolution" && !showResult && (
           <div>
-            <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
-              {currentStep.prompt}
-            </h3>
-            <p style={{ fontSize: 14, color: COLORS.textMuted, marginBottom: 16 }}>
+            <h3 className="text-lg font-bold mb-2 font-heading">{currentStep.prompt}</h3>
+            <p className="text-sm text-on-surface-variant mb-4">
               Selecione um cenário de mercado:
             </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div className="flex flex-col gap-2.5">
               {currentStep.scenarios.map((sc) => (
                 <button
                   key={sc.id}
                   onClick={() => handleResolution(sc)}
-                  style={{
-                    padding: "16px 20px",
-                    borderRadius: 12,
-                    background: COLORS.card,
-                    border: `1px solid ${COLORS.border}`,
-                    color: COLORS.text,
-                    fontSize: 15,
-                    fontWeight: 500,
-                    textAlign: "left",
-                    cursor: "pointer",
-                    transition: "all 0.2s",
-                    lineHeight: 1.5,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = COLORS.cardHover;
-                    e.currentTarget.style.borderColor = COLORS.gold + "60";
-                    e.currentTarget.style.transform = "translateX(4px)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = COLORS.card;
-                    e.currentTarget.style.borderColor = COLORS.border;
-                    e.currentTarget.style.transform = "translateX(0)";
-                  }}
+                  className="rounded-xl border border-outline-variant bg-surface-container-lowest p-4 text-left text-on-surface text-[15px] font-medium leading-normal cursor-pointer transition-all hover:bg-surface-container-low hover:border-amber-500/40 hover:translate-x-1"
                 >
-                  <div style={{ fontWeight: 700, marginBottom: 4 }}>{sc.label}</div>
-                  <div style={{ fontSize: 13, color: COLORS.textMuted }}>{sc.description}</div>
+                  <div className="font-bold mb-1">{sc.label}</div>
+                  <div className="text-[13px] text-on-surface-variant">{sc.description}</div>
                 </button>
               ))}
             </div>
@@ -427,41 +263,16 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
               instrument={scenario.instrument}
               scenarioData={scenario}
             />
-            <div
-              style={{
-                display: "flex",
-                gap: 12,
-                marginTop: 24,
-                flexWrap: "wrap",
-              }}
-            >
+            <div className="flex gap-3 mt-6 flex-wrap">
               <button
                 onClick={goBack}
-                style={{
-                  padding: "12px 24px",
-                  borderRadius: 10,
-                  background: COLORS.card,
-                  border: `1px solid ${COLORS.border}`,
-                  color: COLORS.text,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
+                className="bg-surface-container-lowest border border-outline-variant rounded-xl px-6 py-3 text-on-surface text-sm font-semibold cursor-pointer transition-all hover:bg-surface-container-low"
               >
                 Testar outro cenário
               </button>
               <button
                 onClick={finishScenario}
-                style={{
-                  padding: "12px 24px",
-                  borderRadius: 10,
-                  background: `linear-gradient(135deg, ${COLORS.accent}, ${COLORS.green})`,
-                  border: "none",
-                  color: COLORS.bg,
-                  fontSize: 14,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                }}
+                className="bg-primary text-on-primary rounded-xl px-6 py-3 border-none text-sm font-bold cursor-pointer transition-all hover:opacity-90"
               >
                 Finalizar e voltar →
               </button>

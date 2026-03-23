@@ -1,4 +1,3 @@
-import { COLORS } from "@/lib/constants";
 import { fmt, fmtUSD } from "@/lib/formatters";
 import { calculateCreditResult } from "@/lib/calculations/credit";
 import type { Scenario, ResolutionScenario } from "@/types/scenario";
@@ -8,68 +7,23 @@ interface CreditResultPanelProps {
   scenarioData: Scenario;
 }
 
-function Panel({
-  title,
-  children,
-  bg,
-}: {
-  title: string;
-  children: React.ReactNode;
-  bg?: string;
-}) {
+function Panel({ title, children, className }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <div
-      style={{
-        padding: "20px 24px",
-        borderRadius: 12,
-        background: bg || COLORS.card,
-        border: `1px solid ${COLORS.border}`,
-      }}
-    >
-      <div
-        style={{
-          fontSize: 13,
-          color: COLORS.textMuted,
-          marginBottom: 12,
-          textTransform: "uppercase",
-          letterSpacing: 1,
-        }}
-      >
-        {title}
-      </div>
-      <div style={{ fontSize: 14, color: COLORS.text, lineHeight: 1.8 }}>{children}</div>
+    <div className={`rounded-xl border border-outline-variant p-6 ${className ?? 'bg-surface-container-lowest'}`}>
+      <div className="mb-3 text-xs font-bold uppercase tracking-wider text-on-surface-variant">{title}</div>
+      <div className="text-sm leading-relaxed text-on-surface">{children}</div>
     </div>
   );
 }
 
-function PnLBig({
-  value,
-  label,
-  prefix,
-  formatFn,
-}: {
-  value: number;
-  label: string;
-  prefix?: string;
-  formatFn?: (v: number) => string;
-}) {
-  const c = value >= 0 ? COLORS.green : COLORS.red;
+function PnLBig({ value, label, prefix, formatFn }: { value: number; label: string; prefix?: string; formatFn?: (v: number) => string }) {
   const p = prefix || "";
   const display = formatFn ? formatFn(value) : fmt(value);
   return (
-    <div style={{ marginTop: 8 }}>
-      <div style={{ fontSize: 12, color: COLORS.textMuted }}>{label}</div>
-      <div
-        style={{
-          fontSize: 28,
-          fontWeight: 800,
-          color: c,
-          fontFamily: "'JetBrains Mono', monospace",
-        }}
-      >
-        {value >= 0 ? "+" : ""}
-        {p}
-        {display}
+    <div className="mt-2">
+      <div className="text-xs text-on-surface-variant">{label}</div>
+      <div className={`text-[28px] font-extrabold font-mono ${value >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+        {value >= 0 ? "+" : ""}{p}{display}
       </div>
     </div>
   );
@@ -83,16 +37,9 @@ export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelP
     const spreadAnual =
       ((r.spreadInicial as number) / 10000) * (r.nocional as number);
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-        <div
-          style={{
-            padding: "16px 20px",
-            borderRadius: 12,
-            background: COLORS.cardHover,
-            border: `1px solid ${COLORS.border}`,
-          }}
-        >
-          <p style={{ color: COLORS.textMuted, fontSize: 14, margin: 0, lineHeight: 1.6 }}>
+      <div className="flex flex-col gap-5">
+        <div className="rounded-xl border border-outline-variant bg-surface-container-low p-5">
+          <p className="text-sm leading-relaxed text-on-surface-variant">
             {scenario.description}
           </p>
         </div>
@@ -108,16 +55,16 @@ export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelP
           <div>
             (3) Custo total da proteção (2 anos) = {fmt(r.custoTotal as number)}
           </div>
-          <div style={{ marginTop: 8, fontSize: 13, color: COLORS.textMuted }}>
+          <div className="mt-2 text-xs text-on-surface-variant">
             Na contratação, o banco registra um{" "}
-            <strong style={{ color: COLORS.accent }}>ativo</strong> de{" "}
+            <strong className="text-secondary">ativo</strong> de{" "}
             {fmt(r.custoTotal as number)} (direito à proteção de crédito). A saída de caixa
             tem contrapartida no ativo — sem impacto imediato no resultado.
           </div>
         </Panel>
         {r.isDefault ? (
           <>
-            <Panel title="② Evento de crédito — CDS acionado" bg={COLORS.greenDim}>
+            <Panel title="② Evento de crédito — CDS acionado" className="bg-emerald-50 border-emerald-200">
               <div>(1) Default ocorreu após ~12 meses</div>
               <div>
                 (2) Spread pago até o default = {fmt(r.spreadPagoAteDefault as number)} (12
@@ -131,23 +78,16 @@ export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelP
               <div>
                 (6) Indenização recebida = {fmt(r.nocional as number)} ×{" "}
                 {((r.lgd as number) * 100).toFixed(0)}% ={" "}
-                <strong style={{ color: COLORS.green }}>+{fmt(r.indenizacao as number)}</strong>
+                <strong className="text-emerald-600">+{fmt(r.indenizacao as number)}</strong>
               </div>
             </Panel>
-            <Panel title="③ Resultado líquido" bg={COLORS.greenDim}>
+            <Panel title="③ Resultado líquido" className="bg-emerald-50 border-emerald-200">
               <div>(1) Indenização recebida = +{fmt(r.indenizacao as number)}</div>
               <div>
                 (2) Spread pago até o default = −{fmt(r.spreadPagoAteDefault as number)}
               </div>
               <PnLBig value={r.resultadoLiquido as number} label="Resultado líquido da proteção" />
-              <div
-                style={{
-                  marginTop: 12,
-                  padding: "10px 14px",
-                  borderRadius: 8,
-                  background: COLORS.card,
-                }}
-              >
+              <div className="mt-3 rounded-lg bg-surface-container-low p-3.5">
                 O evento de crédito ocorreu. A indenização de {fmt(r.indenizacao as number)}{" "}
                 cobriu {((r.lgd as number) * 100).toFixed(0)}% da exposição. Sem o CDS, a
                 perda teria sido {fmt((r.nocional as number) * (r.lgd as number))}. Com o CDS,
@@ -173,15 +113,13 @@ export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelP
                 (5) Ajuste no valor do ativo = {fmt(r.dv01Total as number)} × (
                 {(r.spreadFinal as number) - (r.spreadInicial as number)}) ={" "}
                 <strong
-                  style={{
-                    color: (r.mtm as number) >= 0 ? COLORS.green : COLORS.red,
-                  }}
+                  className={(r.mtm as number) >= 0 ? 'text-emerald-600' : 'text-red-600'}
                 >
                   {(r.mtm as number) >= 0 ? "+" : ""}
                   {fmt(r.mtm as number)}
                 </strong>
               </div>
-              <div style={{ marginTop: 8, fontSize: 13, color: COLORS.textMuted }}>
+              <div className="mt-2 text-xs text-on-surface-variant">
                 {(r.spreadFinal as number) < (r.spreadInicial as number)
                   ? `O spread comprimiu — a proteção comprada perdeu valor. O ativo que custou ${fmt(r.custoTotal as number)} agora poderia ser revendido por aproximadamente ${fmt((r.custoTotal as number) + (r.mtm as number))}. A diferença de ${fmt(Math.abs(r.mtm as number))} é a perda de marcação a mercado.`
                   : `O spread alargou — a proteção comprada ganhou valor. O ativo que custou ${fmt(r.custoTotal as number)} agora vale mais no mercado — poderia ser revendido com ganho de ${fmt(r.mtm as number)}.`}
@@ -189,7 +127,7 @@ export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelP
             </Panel>
             <Panel
               title="③ Resultado econômico"
-              bg={(r.resultadoLiquido as number) >= 0 ? COLORS.greenDim : COLORS.redDim}
+              className={`${(r.resultadoLiquido as number) >= 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'}`}
             >
               <div>
                 (1) Valor original do ativo (CDS contratado) = {fmt(r.custoTotal as number)}
@@ -197,9 +135,7 @@ export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelP
               <div>
                 (2) Ajuste de marcação a mercado ={" "}
                 <strong
-                  style={{
-                    color: (r.mtm as number) >= 0 ? COLORS.green : COLORS.red,
-                  }}
+                  className={(r.mtm as number) >= 0 ? 'text-emerald-600' : 'text-red-600'}
                 >
                   {(r.mtm as number) >= 0 ? "+" : ""}
                   {fmt(r.mtm as number)}
@@ -213,14 +149,7 @@ export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelP
                 value={r.mtm as number}
                 label="Resultado (variação do valor do ativo)"
               />
-              <div
-                style={{
-                  marginTop: 12,
-                  padding: "10px 14px",
-                  borderRadius: 8,
-                  background: COLORS.card,
-                }}
-              >
+              <div className="mt-3 rounded-lg bg-surface-container-low p-3.5">
                 {(r.spreadFinal as number) < (r.spreadInicial as number)
                   ? `O risco diminuiu e o spread comprimiu de ${r.spreadInicial} para ${r.spreadFinal} bps. O ativo de proteção perdeu ${fmt(Math.abs(r.mtm as number))} de valor. Se o banco encerrar a posição (vender o CDS no mercado), realizaria essa perda. Se mantiver até o vencimento sem evento de crédito, o ativo será totalmente amortizado. O "seguro" cumpriu seu papel durante o período de incerteza — a perda de valor é o custo da proteção que não precisou ser acionada.`
                   : `O spread se manteve estável em ${r.spreadFinal} bps. O ativo de proteção teve variação marginal de valor. O CDS continua cumprindo seu papel de seguro.`}
@@ -234,16 +163,9 @@ export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelP
 
   if (strat === "trs") {
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-        <div
-          style={{
-            padding: "16px 20px",
-            borderRadius: 12,
-            background: COLORS.cardHover,
-            border: `1px solid ${COLORS.border}`,
-          }}
-        >
-          <p style={{ color: COLORS.textMuted, fontSize: 14, margin: 0, lineHeight: 1.6 }}>
+      <div className="flex flex-col gap-5">
+        <div className="rounded-xl border border-outline-variant bg-surface-container-low p-5">
+          <p className="text-sm leading-relaxed text-on-surface-variant">
             {scenario.description}
           </p>
         </div>
@@ -262,16 +184,14 @@ export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelP
           <div>
             (4) Carry anual = {((r.spreadLiq as number) * 100).toFixed(2)}% ×{" "}
             {fmt(r.nocional as number)} ={" "}
-            <strong style={{ color: COLORS.green }}>+{fmt(r.carry as number)}</strong>
+            <strong className="text-emerald-600">+{fmt(r.carry as number)}</strong>
           </div>
         </Panel>
         <Panel title="② Variação de preço da debênture">
           <div>
             (1) Variação ={" "}
             <strong
-              style={{
-                color: (r.varPct as number) >= 0 ? COLORS.green : COLORS.red,
-              }}
+              className={(r.varPct as number) >= 0 ? 'text-emerald-600' : 'text-red-600'}
             >
               {(r.varPct as number) >= 0 ? "+" : ""}
               {(r.varPct as number).toFixed(1)}%
@@ -280,9 +200,7 @@ export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelP
           <div>
             (2) Impacto = {(r.varPct as number).toFixed(1)}% × {fmt(r.nocional as number)} ={" "}
             <strong
-              style={{
-                color: (r.deltaPreco as number) >= 0 ? COLORS.green : COLORS.red,
-              }}
+              className={(r.deltaPreco as number) >= 0 ? 'text-emerald-600' : 'text-red-600'}
             >
               {(r.deltaPreco as number) >= 0 ? "+" : ""}
               {fmt(r.deltaPreco as number)}
@@ -291,19 +209,12 @@ export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelP
         </Panel>
         <Panel
           title="③ Resultado total do TRS"
-          bg={(r.total as number) >= 0 ? COLORS.greenDim : COLORS.redDim}
+          className={`${(r.total as number) >= 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'}`}
         >
           <div>(1) Carry = +{fmt(r.carry as number)}</div>
           <div>(2) Variação de preço = {fmt(r.deltaPreco as number)}</div>
           <PnLBig value={r.total as number} label="Resultado total" />
-          <div
-            style={{
-              marginTop: 12,
-              padding: "10px 14px",
-              borderRadius: 8,
-              background: COLORS.card,
-            }}
-          >
+          <div className="mt-3 rounded-lg bg-surface-container-low p-3.5">
             {(r.total as number) > 0
               ? `A estratégia funcionou: o carry de ${fmt(r.carry as number)} somado à valorização de ${fmt(r.deltaPreco as number)} gerou resultado positivo. O TRS permitiu capturar o retorno sem desembolsar os ${fmt(r.nocional as number)} da compra direta.`
               : (r.deltaPreco as number) < 0
@@ -319,16 +230,9 @@ export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelP
     const isUSD = r.moeda === "USD";
     const f = isUSD ? fmtUSD : fmt;
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-        <div
-          style={{
-            padding: "16px 20px",
-            borderRadius: 12,
-            background: COLORS.cardHover,
-            border: `1px solid ${COLORS.border}`,
-          }}
-        >
-          <p style={{ color: COLORS.textMuted, fontSize: 14, margin: 0, lineHeight: 1.6 }}>
+      <div className="flex flex-col gap-5">
+        <div className="rounded-xl border border-outline-variant bg-surface-container-low p-5">
+          <p className="text-sm leading-relaxed text-on-surface-variant">
             {scenario.description}
           </p>
         </div>
@@ -346,7 +250,7 @@ export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelP
             (5) Ganho/perda MTM = {f(r.dv01Total as number)} × {Math.abs(r.spreadVar as number)}{" "}
             bps ={" "}
             <strong
-              style={{ color: (r.mtm as number) >= 0 ? COLORS.green : COLORS.red }}
+              className={(r.mtm as number) >= 0 ? 'text-emerald-600' : 'text-red-600'}
             >
               {(r.mtm as number) >= 0 ? "+" : ""}
               {f(r.mtm as number)}
@@ -358,24 +262,17 @@ export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelP
           <div>
             (2) Carry anual = {((r.spreadInicial as number) / 100).toFixed(2)}% ×{" "}
             {f(r.nocional as number)} ={" "}
-            <strong style={{ color: COLORS.red }}>−{f(r.carryAnual as number)}</strong>
+            <strong className="text-red-600">−{f(r.carryAnual as number)}</strong>
           </div>
         </Panel>
         <Panel
           title="③ Resultado líquido"
-          bg={(r.resultadoLiquido as number) >= 0 ? COLORS.greenDim : COLORS.redDim}
+          className={`${(r.resultadoLiquido as number) >= 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'}`}
         >
           <div>(1) MTM = {f(r.mtm as number)}</div>
           <div>(2) Carry = −{f(r.carryAnual as number)}</div>
           <PnLBig value={r.resultadoLiquido as number} label="Resultado líquido (~12 meses)" formatFn={f} />
-          <div
-            style={{
-              marginTop: 12,
-              padding: "10px 14px",
-              borderRadius: 8,
-              background: COLORS.card,
-            }}
-          >
+          <div className="mt-3 rounded-lg bg-surface-container-low p-3.5">
             {(r.spreadVar as number) > 0
               ? `O spread alargou ${r.spreadVar} bps como projetado. O ganho de MTM (${f(r.mtm as number)}) superou o custo do carry (${f(r.carryAnual as number)}). A aposta na deterioração do crédito acertou.`
               : (r.spreadVar as number) < 0
@@ -389,16 +286,9 @@ export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelP
 
   if (strat === "basis_trade") {
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-        <div
-          style={{
-            padding: "16px 20px",
-            borderRadius: 12,
-            background: COLORS.cardHover,
-            border: `1px solid ${COLORS.border}`,
-          }}
-        >
-          <p style={{ color: COLORS.textMuted, fontSize: 14, margin: 0, lineHeight: 1.6 }}>
+      <div className="flex flex-col gap-5">
+        <div className="rounded-xl border border-outline-variant bg-surface-container-low p-5">
+          <p className="text-sm leading-relaxed text-on-surface-variant">
             {scenario.description}
           </p>
         </div>
@@ -408,11 +298,11 @@ export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelP
           <div>
             (3) Carry líquido = {r.bondSpread} − {r.cdsInicial} ={" "}
             {(r.bondSpread as number) - (r.cdsInicial as number)} bps a.a. ={" "}
-            <strong style={{ color: COLORS.red }}>{fmt(r.carryAnual as number)}/ano</strong>
+            <strong className="text-red-600">{fmt(r.carryAnual as number)}/ano</strong>
           </div>
           <div>
             (4) Carry pago em {r.meses} meses ={" "}
-            <strong style={{ color: COLORS.red }}>{fmt(r.carryPago as number)}</strong>
+            <strong className="text-red-600">{fmt(r.carryPago as number)}</strong>
           </div>
         </Panel>
         <Panel title="② Mark-to-market do CDS">
@@ -431,9 +321,7 @@ export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelP
             (5) Ganho MTM = {fmt(r.dv01Total as number)} × {Math.abs(r.cdsVar as number)} bps
             ={" "}
             <strong
-              style={{
-                color: (r.mtmCDS as number) >= 0 ? COLORS.green : COLORS.red,
-              }}
+              className={(r.mtmCDS as number) >= 0 ? 'text-emerald-600' : 'text-red-600'}
             >
               {(r.mtmCDS as number) >= 0 ? "+" : ""}
               {fmt(r.mtmCDS as number)}
@@ -457,21 +345,14 @@ export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelP
         </Panel>
         <Panel
           title="④ Resultado líquido do basis trade"
-          bg={(r.resultadoLiquido as number) >= 0 ? COLORS.greenDim : COLORS.redDim}
+          className={`${(r.resultadoLiquido as number) >= 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'}`}
         >
           <div>(1) Ganho MTM do CDS = {fmt(r.mtmCDS as number)}</div>
           <div>
             (2) Carry pago ({r.meses} meses) = {fmt(r.carryPago as number)}
           </div>
           <PnLBig value={r.resultadoLiquido as number} label="Resultado líquido" />
-          <div
-            style={{
-              marginTop: 12,
-              padding: "10px 14px",
-              borderRadius: 8,
-              background: COLORS.card,
-            }}
-          >
+          <div className="mt-3 rounded-lg bg-surface-container-low p-3.5">
             {(r.baseFinal as number) < (r.baseInicial as number) * 0.5
               ? `A base convergiu de ${r.baseInicial} para ${r.baseFinal} bps. O ganho de MTM no CDS (${fmt(r.mtmCDS as number)}) superou o carry negativo (${fmt(Math.abs(r.carryPago as number))}). A arbitragem de base funcionou.`
               : (r.baseFinal as number) > (r.baseInicial as number)

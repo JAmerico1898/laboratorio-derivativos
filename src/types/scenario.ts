@@ -6,6 +6,7 @@ export interface Theme {
   id: string;
   label: string;
   icon: string;
+  materialIcon: string;
   route: string;
   description: string;
 }

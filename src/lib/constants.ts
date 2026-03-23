@@ -1,23 +1,23 @@
 /**
- * Paleta de cores do laboratório de derivativos.
- * Usada em estilos inline dos componentes React.
+ * Paleta de cores para componentes SVG / Recharts.
+ * Tailwind classes são usadas em todo o resto.
  */
 export const COLORS = {
-  bg: "#0a0f1a",
-  card: "#111827",
-  cardHover: "#1a2235",
-  border: "#1e2a3a",
-  accent: "#22d3ee",
-  accentDim: "rgba(34,211,238,0.15)",
-  green: "#34d399",
-  greenDim: "rgba(52,211,153,0.15)",
-  red: "#f87171",
-  redDim: "rgba(248,113,113,0.15)",
-  gold: "#fbbf24",
-  goldDim: "rgba(251,191,36,0.15)",
-  text: "#e2e8f0",
-  textMuted: "#94a3b8",
-  textDim: "#475569",
+  bg: "#f8f9fa",
+  card: "#ffffff",
+  cardHover: "#f3f4f5",
+  border: "#bfc9c4",
+  accent: "#006b5f",
+  accentDim: "rgba(0,107,95,0.10)",
+  green: "#059669",
+  greenDim: "rgba(5,150,105,0.10)",
+  red: "#dc2626",
+  redDim: "rgba(220,38,38,0.10)",
+  gold: "#d97706",
+  goldDim: "rgba(217,119,6,0.10)",
+  text: "#191c1d",
+  textMuted: "#3f4945",
+  textDim: "#707975",
 } as const;
 
 export type ColorKey = keyof typeof COLORS;

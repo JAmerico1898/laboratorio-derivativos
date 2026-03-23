@@ -1,5 +1,3 @@
-import { COLORS } from "@/lib/constants";
-
 interface MarkdownTextProps {
   text: string;
 }
@@ -10,7 +8,7 @@ export function MarkdownText({ text }: MarkdownTextProps) {
     <span>
       {parts.map((p, i) =>
         p.startsWith("**") && p.endsWith("**") ? (
-          <strong key={i} style={{ color: COLORS.accent, fontWeight: 700 }}>
+          <strong key={i} className="font-bold text-secondary">
             {p.slice(2, -2)}
           </strong>
         ) : (

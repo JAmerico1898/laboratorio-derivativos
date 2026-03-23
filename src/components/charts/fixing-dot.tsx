@@ -7,9 +7,10 @@ interface FixingDotProps {
   payload?: { fixing: number };
   fixingRate?: number;
   fixingPnL?: number;
-  tolerance?: number;
   overridePnL?: number;
   index?: number;
+  /** The single data-point index that should render the dot. */
+  targetIndex?: number;
 }
 
 export function FixingDot({
@@ -18,15 +19,18 @@ export function FixingDot({
   payload,
   fixingRate,
   fixingPnL,
-  tolerance,
   overridePnL,
+  index,
+  targetIndex,
 }: FixingDotProps) {
+  // Only render for the ONE closest point
   if (
+    targetIndex === undefined ||
+    index !== targetIndex ||
     !fixingRate ||
     !payload ||
     cx === undefined ||
-    cy === undefined ||
-    Math.abs(payload.fixing - fixingRate) > (tolerance || 0.02)
+    cy === undefined
   )
     return null;
 

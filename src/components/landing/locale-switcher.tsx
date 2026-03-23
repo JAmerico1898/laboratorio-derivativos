@@ -3,9 +3,12 @@
 import { useTranslations } from 'next-intl';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { useParams } from 'next/navigation';
-import { COLORS } from '@/lib/constants';
 
-export function LocaleSwitcher() {
+interface LocaleSwitcherProps {
+  className?: string;
+}
+
+export function LocaleSwitcher({ className }: LocaleSwitcherProps) {
   const t = useTranslations('locale');
   const router = useRouter();
   const pathname = usePathname();
@@ -21,30 +24,7 @@ export function LocaleSwitcher() {
     <button
       onClick={handleSwitch}
       title={t('label')}
-      style={{
-        position: 'fixed',
-        top: 16,
-        right: 16,
-        zIndex: 100,
-        background: 'none',
-        border: `1px solid ${COLORS.accent}60`,
-        color: COLORS.accent,
-        padding: '5px 12px',
-        borderRadius: 8,
-        cursor: 'pointer',
-        fontSize: 12,
-        fontWeight: 700,
-        letterSpacing: 1,
-        transition: 'all 0.2s',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.background = COLORS.accentDim;
-        e.currentTarget.style.borderColor = COLORS.accent;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background = 'none';
-        e.currentTarget.style.borderColor = `${COLORS.accent}60`;
-      }}
+      className={`px-3 py-1.5 rounded-lg border border-gray-300 text-sm font-semibold hover:bg-gray-100 transition-colors cursor-pointer ${className ?? ''}`}
     >
       {t('switch')}
     </button>

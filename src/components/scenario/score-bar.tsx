@@ -1,5 +1,3 @@
-import { COLORS } from "@/lib/constants";
-
 interface ScoreBarProps {
   score: number;
   maxScore: number;
@@ -8,36 +6,14 @@ interface ScoreBarProps {
 export function ScoreBar({ score, maxScore }: ScoreBarProps) {
   const pct = maxScore > 0 ? Math.min((score / maxScore) * 100, 100) : 0;
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-      <div
-        style={{
-          flex: 1,
-          height: 8,
-          borderRadius: 4,
-          background: COLORS.border,
-          overflow: "hidden",
-        }}
-      >
+    <div className="flex items-center gap-3">
+      <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-container-high">
         <div
-          style={{
-            width: `${pct}%`,
-            height: "100%",
-            borderRadius: 4,
-            background: `linear-gradient(90deg, ${COLORS.accent}, ${COLORS.green})`,
-            transition: "width 0.6s cubic-bezier(.4,0,.2,1)",
-          }}
+          className="h-full rounded-full bg-gradient-to-r from-secondary to-emerald-500 transition-all duration-500"
+          style={{ width: `${pct}%` }}
         />
       </div>
-      <span
-        style={{
-          color: COLORS.gold,
-          fontWeight: 700,
-          fontSize: 14,
-          fontFamily: "'JetBrains Mono', monospace",
-          minWidth: 60,
-          textAlign: "right",
-        }}
-      >
+      <span className="min-w-[60px] text-right font-mono text-sm font-bold text-amber-600">
         {score} / {maxScore}
       </span>
     </div>

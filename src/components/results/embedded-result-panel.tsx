@@ -1,4 +1,3 @@
-import { COLORS } from "@/lib/constants";
 import { fmt } from "@/lib/formatters";
 import { calculateEmbeddedResult } from "@/lib/calculations/embedded";
 import type { Scenario, ResolutionScenario } from "@/types/scenario";
@@ -8,55 +7,21 @@ interface EmbeddedResultPanelProps {
   scenarioData: Scenario;
 }
 
-function Panel({
-  title,
-  children,
-  bg,
-}: {
-  title: string;
-  children: React.ReactNode;
-  bg?: string;
-}) {
+function Panel({ title, children, className }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <div
-      style={{
-        padding: "20px 24px",
-        borderRadius: 12,
-        background: bg || COLORS.card,
-        border: `1px solid ${COLORS.border}`,
-      }}
-    >
-      <div
-        style={{
-          fontSize: 13,
-          color: COLORS.textMuted,
-          marginBottom: 12,
-          textTransform: "uppercase",
-          letterSpacing: 1,
-        }}
-      >
-        {title}
-      </div>
-      <div style={{ fontSize: 14, color: COLORS.text, lineHeight: 1.8 }}>{children}</div>
+    <div className={`rounded-xl border border-outline-variant p-6 ${className ?? 'bg-surface-container-lowest'}`}>
+      <div className="mb-3 text-xs font-bold uppercase tracking-wider text-on-surface-variant">{title}</div>
+      <div className="text-sm leading-relaxed text-on-surface">{children}</div>
     </div>
   );
 }
 
 function PnLBig({ value, label }: { value: number; label: string }) {
-  const c = value >= 0 ? COLORS.green : COLORS.red;
   return (
-    <div style={{ marginTop: 8 }}>
-      <div style={{ fontSize: 12, color: COLORS.textMuted }}>{label}</div>
-      <div
-        style={{
-          fontSize: 28,
-          fontWeight: 800,
-          color: c,
-          fontFamily: "'JetBrains Mono', monospace",
-        }}
-      >
-        {value >= 0 ? "+" : ""}
-        {fmt(value)}
+    <div className="mt-2">
+      <div className="text-xs text-on-surface-variant">{label}</div>
+      <div className={`text-[28px] font-extrabold font-mono ${value >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+        {value >= 0 ? "+" : ""}{fmt(value)}
       </div>
     </div>
   );
@@ -67,16 +32,9 @@ export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPa
   const strat = scenarioData.embeddedStrategy;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      <div
-        style={{
-          padding: "16px 20px",
-          borderRadius: 12,
-          background: COLORS.cardHover,
-          border: `1px solid ${COLORS.border}`,
-        }}
-      >
-        <p style={{ color: COLORS.textMuted, fontSize: 14, margin: 0, lineHeight: 1.6 }}>
+    <div className="flex flex-col gap-5">
+      <div className="rounded-xl border border-outline-variant bg-surface-container-low p-5">
+        <p className="text-sm leading-relaxed text-on-surface-variant">
           {scenario.description}
         </p>
       </div>
@@ -92,9 +50,7 @@ export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPa
               (2) Participação = 70% × {((r.retornoSP as number) * 100).toFixed(0)}% ×{" "}
               {fmt(r.inv as number)} ={" "}
               <strong
-                style={{
-                  color: (r.participacao as number) > 0 ? COLORS.green : COLORS.textMuted,
-                }}
+                className={(r.participacao as number) > 0 ? 'text-emerald-600' : 'text-on-surface-variant'}
               >
                 {fmt(r.participacao as number)}
               </strong>
@@ -112,7 +68,7 @@ export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPa
           </Panel>
           <Panel
             title="③ Comparação"
-            bg={(r.diff as number) >= 0 ? COLORS.greenDim : COLORS.redDim}
+            className={(r.diff as number) >= 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'}
           >
             <div>
               COE: {fmt(r.coeResult as number)} vs CDI: {fmt(r.cdiResult as number)}
@@ -141,13 +97,7 @@ export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPa
             <PnLBig value={r.ganhoLiquido as number} label="Ganho líquido do exercício" />
           </Panel>
           <Panel title="② Lição">
-            <div
-              style={{
-                padding: "10px 14px",
-                borderRadius: 8,
-                background: COLORS.cardHover,
-              }}
-            >
+            <div className="rounded-lg bg-surface-container-low p-3.5">
               {scenario.id === "exerceu"
                 ? "A empresa exerceu a opção e economizou. A call sobre a dívida estava 'in the money'."
                 : scenario.id === "juros_subiram"
@@ -179,15 +129,9 @@ export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPa
           </Panel>
           <Panel
             title="② Análise do prêmio de 50 bps"
-            bg={(r.cdiFinal as number) < 10 ? COLORS.redDim : COLORS.greenDim}
+            className={(r.cdiFinal as number) < 10 ? 'bg-red-50 border-red-200' : 'bg-emerald-50 border-emerald-200'}
           >
-            <div
-              style={{
-                padding: "10px 14px",
-                borderRadius: 8,
-                background: COLORS.cardHover,
-              }}
-            >
+            <div className="rounded-lg bg-surface-container-low p-3.5">
               {(r.cdiFinal as number) < 10
                 ? `Juros caíram e a call foi exercida. O prêmio de 50 bps acumulado por ${r.callAno} anos (${(r.callAno as number) * 50} bps) não compensou o custo de reinvestimento a taxas ${((r.cdiFinal as number) + 2.5 - ((r.cdiFinal as number) + 2.0)).toFixed(1)}% menores por ${(r.prazo as number) - (r.callAno as number)} anos. O risco de reinvestimento se materializou.`
                 : (r.cdiFinal as number) > 13
@@ -202,7 +146,7 @@ export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPa
         <>
           <Panel
             title={`① Resultado: trigger ${r.triggered ? "ACIONADO" : "NÃO acionado"}`}
-            bg={r.triggered ? COLORS.redDim : COLORS.greenDim}
+            className={r.triggered ? 'bg-red-50 border-red-200' : 'bg-emerald-50 border-emerald-200'}
           >
             <div>(1) Dólar final = R$ {(r.fixDolar as number).toFixed(2)}</div>
             <div>(2) Barreira = R$ {(r.barreira as number).toFixed(2)}</div>
@@ -215,13 +159,7 @@ export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPa
             {r.triggered && <div>(4) Impacto anual = {fmt(r.impacto as number)}</div>}
           </Panel>
           <Panel title="② Tratamento contábil">
-            <div
-              style={{
-                padding: "10px 14px",
-                borderRadius: 8,
-                background: COLORS.cardHover,
-              }}
-            >
+            <div className="rounded-lg bg-surface-container-low p-3.5">
               Bifurcação obrigatória: a call digital de dólar (variável: câmbio) não está
               intimamente relacionada ao hospedeiro (empréstimo em BRL). O derivativo deve ser
               separado e marcado a valor justo, independentemente de o trigger ter sido acionado.
@@ -233,7 +171,7 @@ export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPa
       {strat === "trs_sintetico" && (
         <>
           {r.bancoQuebrou ? (
-            <Panel title="① Risco do emissor materializado" bg={COLORS.redDim}>
+            <Panel title="① Risco do emissor materializado" className="bg-red-50 border-red-200">
               <div>O banco emissor do COE entrou em liquidação.</div>
               <div>O portfólio de referência performou bem, mas o investimento foi perdido.</div>
               <div>O FGC NÃO cobre COE.</div>
@@ -259,7 +197,7 @@ export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPa
         <>
           <Panel
             title={`① Resultado: step-up ${r.triggered ? "ATIVADO" : "NÃO ativado"}`}
-            bg={r.triggered ? COLORS.redDim : COLORS.greenDim}
+            className={r.triggered ? 'bg-red-50 border-red-200' : 'bg-emerald-50 border-emerald-200'}
           >
             <div>
               (1){" "}
@@ -290,25 +228,25 @@ export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPa
             </div>
             <div>
               (4) Custo efetivo ={" "}
-              <strong style={{ color: COLORS.accent }}>
+              <strong className="text-secondary">
                 {((r.custoEfetivo as number) * 100).toFixed(2)}%
               </strong>
             </div>
           </Panel>
           <Panel
             title="② Impacto dos derivativos"
-            bg={
+            className={
               (r.impactoCap as number) > 0
-                ? COLORS.greenDim
+                ? 'bg-emerald-50 border-emerald-200'
                 : (r.impactoFloor as number) > 0
-                ? COLORS.redDim
-                : COLORS.card
+                ? 'bg-red-50 border-red-200'
+                : 'bg-surface-container-lowest'
             }
           >
             {(r.impactoCap as number) > 0 && (
               <div>
                 Cap acionado! Economia ={" "}
-                <strong style={{ color: COLORS.green }}>
+                <strong className="text-emerald-600">
                   +{fmt(r.impactoCap as number)}/ano
                 </strong>{" "}
                 (banco absorve o excedente)
@@ -317,7 +255,7 @@ export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPa
             {(r.impactoFloor as number) > 0 && (
               <div>
                 Floor acionado! Custo extra ={" "}
-                <strong style={{ color: COLORS.red }}>
+                <strong className="text-red-600">
                   +{fmt(r.impactoFloor as number)}/ano
                 </strong>{" "}
                 (empresa paga acima do CDI+spread)
@@ -353,31 +291,30 @@ export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPa
             </div>
           </Panel>
           {r.valeConverter ? (
-            <Panel title="② Resultado da conversão" bg={COLORS.greenDim}>
+            <Panel title="② Resultado da conversão" className="bg-emerald-50 border-emerald-200">
               <PnLBig
                 value={r.ganhoTotal as number}
                 label="Ganho de conversão (vs valor de face)"
               />
-              <div style={{ marginTop: 8 }}>
+              <div className="mt-2">
                 (1) Cupom sacrificado ao longo de 5 anos = {fmt(r.cupomSacrificado as number)}
               </div>
               <div>
                 (2) Ganho líquido = {fmt(r.ganhoTotal as number)} −{" "}
                 {fmt(r.cupomSacrificado as number)} ={" "}
                 <strong
-                  style={{
-                    color:
-                      (r.ganhoTotal as number) - (r.cupomSacrificado as number) >= 0
-                        ? COLORS.green
-                        : COLORS.red,
-                  }}
+                  className={
+                    (r.ganhoTotal as number) - (r.cupomSacrificado as number) >= 0
+                      ? 'text-emerald-600'
+                      : 'text-red-600'
+                  }
                 >
                   {fmt((r.ganhoTotal as number) - (r.cupomSacrificado as number))}
                 </strong>
               </div>
             </Panel>
           ) : (
-            <Panel title="② Debênture mantida" bg={COLORS.redDim}>
+            <Panel title="② Debênture mantida" className="bg-red-50 border-red-200">
               <div>
                 Conversão não exercida. O investidor mantém a debênture e recebe CDI+1,00% até
                 o vencimento.

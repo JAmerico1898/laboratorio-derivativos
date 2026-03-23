@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Laboratório de Derivativos - Derivativos de Crédito</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-error-container": "#93000a",
+              "surface-bright": "#f8f9fa",
+              "surface-container-high": "#e7e8e9",
+              "on-secondary-container": "#007165",
+              "surface-dim": "#d9dadb",
+              "surface": "#f8f9fa",
+              "surface-container": "#edeeef",
+              "surface-variant": "#e1e3e4",
+              "error": "#ba1a1a",
+              "on-secondary": "#ffffff",
+              "surface-tint": "#346383",
+              "surface-container-highest": "#e1e3e4",
+              "on-surface-variant": "#3f4945",
+              "secondary": "#006b5f",
+              "inverse-primary": "#9eccf0",
+              "error-container": "#ffdad6",
+              "primary-fixed": "#cae6ff",
+              "surface-container-lowest": "#ffffff",
+              "tertiary": "#003608",
+              "on-background": "#191c1d",
+              "tertiary-container": "#004f11",
+              "on-primary-fixed": "#001e2f",
+              "secondary-fixed-dim": "#70d8c8",
+              "secondary-fixed": "#8df5e4",
+              "primary-fixed-dim": "#9eccf0",
+              "on-tertiary-container": "#72c26e",
+              "tertiary-fixed": "#a3f69c",
+              "on-tertiary-fixed-variant": "#005312",
+              "on-tertiary-fixed": "#002204",
+              "tertiary-fixed-dim": "#88d982",
+              "inverse-on-surface": "#f0f1f2",
+              "inverse-surface": "#2e3132",
+              "on-primary-container": "#89b6d9",
+              "on-secondary-fixed-variant": "#005048",
+              "on-primary-fixed-variant": "#184b6a",
+              "primary": "#00314a",
+              "outline": "#707975",
+              "surface-container-low": "#f3f4f5",
+              "on-error": "#ffffff",
+              "on-tertiary": "#ffffff",
+              "on-primary": "#ffffff",
+              "on-secondary-fixed": "#00201c",
+              "secondary-container": "#8df5e4",
+              "outline-variant": "#bfc9c4",
+              "primary-container": "#134866",
+              "on-surface": "#191c1d",
+              "background": "#f8f9fa"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "0.5rem", "xl": "0.75rem", "3xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .bg-level-intermediate { background-color: #fffbeb; border: 1px solid #fef3c7; } /* Amber-50 */
+      .bg-level-advanced { background-color: #fef2f2; border: 1px solid #fee2e2; } /* Red-50 */
+      .bg-level-challenge { background-color: #f5f3ff; border: 1px solid #ede9fe; } /* Purple-50 */
+    </style>
+</head>
+<body class="bg-background text-on-background font-body min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="bg-slate-50/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200/50">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<button class="hover:bg-slate-100 transition-colors p-2 rounded-full scale-95 active:scale-90">
+<span class="material-symbols-outlined text-[#00314a]">arrow_back</span>
+</button>
+<h1 class="font-headline font-bold text-2xl text-[#00314a]">Derivativos de Crédito</h1>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-xl font-bold tracking-tight text-[#00314a] hidden md:block">Laboratório de Derivativos</span>
+<button class="hover:bg-slate-100 transition-colors p-2 rounded-full scale-95 active:scale-90">
+<span class="material-symbols-outlined text-[#00314a]">help_outline</span>
+</button>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-6 py-12">
+<!-- Hero Title Section -->
+<div class="mb-12">
+<span class="font-label text-xs font-semibold uppercase tracking-[0.2em] text-secondary mb-3 block">Módulo Acadêmico</span>
+<h2 class="font-headline text-4xl font-extrabold text-primary mb-4 leading-tight">Cenários de Mercado e <br/><span class="text-secondary">Risco de Crédito</span></h2>
+<div class="h-1.5 w-24 bg-secondary rounded-full"></div>
+</div>
+<!-- Scenarios Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Scenario 1: CDS Corporativo -->
+<div class="bg-level-intermediate rounded-3xl p-8 flex flex-col transition-all hover:shadow-[0_12px_32px_rgba(25,28,29,0.06)] group border">
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-6">
+<span class="bg-white px-3 py-1 rounded-lg text-[#b45309] text-[10px] font-bold uppercase tracking-widest border border-amber-100">Intermediário</span>
+<span class="material-symbols-outlined text-amber-700/40 group-hover:text-amber-700 transition-colors">security</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-primary mb-4 group-hover:text-secondary transition-colors">CDS Corporativo — Hedge de Carteira de Crédito</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-8">
+                        Você é gestor(a) de crédito do Banco Horizonte e tem R$ 500 milhões em debêntures da Construtora Atlântico S.A. (rating A-). O setor está sob pressão e você precisa mitigar o risco de default imediato...
+                    </p>
+</div>
+<button class="w-full py-3.5 bg-primary text-on-primary rounded-xl font-semibold text-sm flex items-center justify-center gap-2 group-hover:bg-primary-container transition-colors active:scale-[0.98]">
+                    Iniciar Simulação
+                    <span class="material-symbols-outlined text-sm">play_circle</span>
+</button>
+</div>
+<!-- Scenario 2: TRS -->
+<div class="bg-level-intermediate rounded-3xl p-8 flex flex-col transition-all hover:shadow-[0_12px_32px_rgba(25,28,29,0.06)] group border">
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-6">
+<span class="bg-white px-3 py-1 rounded-lg text-[#b45309] text-[10px] font-bold uppercase tracking-widest border border-amber-100">Intermediário</span>
+<span class="material-symbols-outlined text-amber-700/40 group-hover:text-amber-700 transition-colors">swap_horiz</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-primary mb-4 group-hover:text-secondary transition-colors">TRS — Exposição Sintética a Crédito</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-8">
+                        Você é gestor(a) do fundo Crédito Plus FIM e identificou oportunidade em debêntures da Energia Renovável S.A. No entanto, o fundo não tem caixa disponível e precisa de uma estrutura sintética para capturar o spread...
+                    </p>
+</div>
+<button class="w-full py-3.5 bg-primary text-on-primary rounded-xl font-semibold text-sm flex items-center justify-center gap-2 group-hover:bg-primary-container transition-colors active:scale-[0.98]">
+                    Iniciar Simulação
+                    <span class="material-symbols-outlined text-sm">play_circle</span>
+</button>
+</div>
+<!-- Scenario 3: Naked CDS -->
+<div class="bg-level-advanced rounded-3xl p-8 flex flex-col transition-all hover:shadow-[0_12px_32px_rgba(25,28,29,0.06)] group border">
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-6">
+<span class="bg-white px-3 py-1 rounded-lg text-error text-[10px] font-bold uppercase tracking-widest border border-red-100">Avançado</span>
+<span class="material-symbols-outlined text-red-700/40 group-hover:text-red-700 transition-colors">public</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-primary mb-4 group-hover:text-secondary transition-colors">Naked CDS — Aposta contra o Soberano</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-8">
+                        Como gestor de um hedge fund global, você analisa o risco soberano do Brasil. Sua análise sugere deterioração fiscal e você decide comprar proteção via CDS de 5 anos para lucrar com o aumento do spread de crédito soberano...
+                    </p>
+</div>
+<button class="w-full py-3.5 bg-primary text-on-primary rounded-xl font-semibold text-sm flex items-center justify-center gap-2 group-hover:bg-primary-container transition-colors active:scale-[0.98]">
+                    Iniciar Simulação
+                    <span class="material-symbols-outlined text-sm">play_circle</span>
+</button>
+</div>
+<!-- Scenario 4: Basis Trade -->
+<div class="bg-level-challenge rounded-3xl p-8 flex flex-col transition-all hover:shadow-[0_12px_32px_rgba(25,28,29,0.06)] group border">
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-6">
+<span class="bg-white px-3 py-1 rounded-lg text-tertiary-container text-[10px] font-bold uppercase tracking-widest border border-purple-100">Super Desafio</span>
+<span class="material-symbols-outlined text-purple-700/40 group-hover:text-purple-700 transition-colors">hub</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-primary mb-4 group-hover:text-secondary transition-colors">Super Desafio — CDS Basis Trade</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-8">
+                        Você identifica uma distorção entre o mercado de títulos e de derivativos: a debênture VALE 2028 rende menos que o custo de proteção via CDS. Execute uma estratégia de arbitragem de spread para capturar o "negative basis"...
+                    </p>
+</div>
+<button class="w-full py-3.5 bg-primary text-on-primary rounded-xl font-semibold text-sm flex items-center justify-center gap-2 group-hover:bg-primary-container transition-colors active:scale-[0.98]">
+                    Iniciar Simulação
+                    <span class="material-symbols-outlined text-sm">play_circle</span>
+</button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-white shadow-[0px_-12px_32px_rgba(25,28,29,0.06)] border-t border-slate-100 rounded-t-3xl">
+<a class="flex flex-col items-center justify-center text-[#006b5f] bg-[#006b5f]/10 rounded-xl px-5 py-1 transition-transform duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">science</span>
+<span class="font-inter text-[10px] font-bold tracking-widest uppercase mt-1">Laboratório</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 hover:text-[#00314a] transition-all px-4 py-1 active:translate-y-0.5" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-inter text-[10px] font-semibold tracking-widest uppercase mt-1">Mercado</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 hover:text-[#00314a] transition-all px-4 py-1 active:translate-y-0.5" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-inter text-[10px] font-semibold tracking-widest uppercase mt-1">Progresso</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 hover:text-[#00314a] transition-all px-4 py-1 active:translate-y-0.5" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-inter text-[10px] font-semibold tracking-widest uppercase mt-1">Perfil</span>
+</a>
+</nav>
+</body></html>

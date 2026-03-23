@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Derivativos Lab | COPPEAD UFRJ</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-container": "#134866",
+              "error": "#ba1a1a",
+              "on-error-container": "#93000a",
+              "outline-variant": "#bfc9c4",
+              "primary-fixed-dim": "#9eccf0",
+              "surface-container-lowest": "#ffffff",
+              "surface": "#f8f9fa",
+              "background": "#f8f9fa",
+              "tertiary-fixed-dim": "#88d982",
+              "on-surface": "#191c1d",
+              "on-tertiary": "#ffffff",
+              "secondary-fixed": "#8df5e4",
+              "on-background": "#191c1d",
+              "inverse-surface": "#2e3132",
+              "error-container": "#ffdad6",
+              "secondary": "#006b5f",
+              "primary": "#00314a",
+              "secondary-fixed-dim": "#70d8c8",
+              "primary-fixed": "#cae6ff",
+              "on-tertiary-fixed-variant": "#005312",
+              "tertiary-fixed": "#a3f69c",
+              "on-secondary-fixed": "#00201c",
+              "on-primary-fixed": "#001e2f",
+              "surface-container-low": "#f3f4f5",
+              "tertiary-container": "#004f11",
+              "on-tertiary-fixed": "#002204",
+              "surface-dim": "#d9dadb",
+              "on-tertiary-container": "#72c26e",
+              "on-primary-fixed-variant": "#184b6a",
+              "surface-container-high": "#e7e8e9",
+              "tertiary": "#003608",
+              "surface-variant": "#e1e3e4",
+              "outline": "#707975",
+              "on-surface-variant": "#3f4945",
+              "on-secondary": "#ffffff",
+              "surface-bright": "#f8f9fa",
+              "on-primary-container": "#89b6d9",
+              "inverse-on-surface": "#f0f1f2",
+              "on-error": "#ffffff",
+              "on-secondary-container": "#007165",
+              "surface-tint": "#346383",
+              "surface-container": "#edeeef",
+              "inverse-primary": "#9eccf0",
+              "on-primary": "#ffffff",
+              "on-secondary-fixed-variant": "#005048",
+              "surface-container-highest": "#e1e3e4",
+              "secondary-container": "#8df5e4"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #00314a 0%, #134866 100%);
+        }
+        .tonal-shift-dark {
+            background-color: #001a26;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body antialiased">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-[0_12px_32px_rgba(25,28,29,0.06)] h-20">
+<div class="flex justify-between items-center max-w-7xl mx-auto px-8 h-full">
+<div class="text-2xl font-extrabold text-[#00314a] tracking-tighter font-headline">
+                Derivativos Lab
+            </div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="font-manrope font-bold tracking-tight text-lg text-[#006b5f] border-b-2 border-[#006b5f] pb-1" href="#">Módulos</a>
+<a class="font-manrope font-bold tracking-tight text-lg text-slate-600 hover:text-[#00314a] transition-colors" href="#">Metodologia</a>
+<a class="font-manrope font-bold tracking-tight text-lg text-slate-600 hover:text-[#00314a] transition-colors" href="#">Sobre</a>
+<a class="font-manrope font-bold tracking-tight text-lg text-slate-600 hover:text-[#00314a] transition-colors" href="#">Contato</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="text-slate-600 font-medium px-3 py-2 hover:bg-slate-50 rounded-lg transition-all">PT/EN</button>
+<button class="bg-primary text-on-primary px-6 py-3 rounded-xl font-semibold active:scale-95 duration-200 ease-in-out">Acessar Lab</button>
+</div>
+</div>
+<div class="bg-gradient-to-r from-transparent via-[#006b5f]/10 to-transparent h-[1px]"></div>
+</header>
+<!-- Hero Section -->
+<section class="relative pt-40 pb-24 overflow-hidden">
+<div class="absolute inset-0 z-0">
+<div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary-container/10 to-transparent opacity-50"></div>
+</div>
+<div class="max-w-7xl mx-auto px-8 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
+<div class="space-y-8">
+<h1 class="text-6xl md:text-7xl font-headline font-extrabold text-primary leading-[1.1] tracking-tight">
+                    Laboratório de Simulação em <span class="text-secondary">Derivativos</span>
+</h1>
+<p class="text-xl text-on-surface-variant max-w-xl leading-relaxed">
+                    Aprofunde seu conhecimento técnico através de modelos de simulação avançados e árvores de decisão interativas. Uma plataforma pedagógica de excelência acadêmica para o mercado financeiro.
+                </p>
+</div>
+<div class="relative">
+<div class="absolute -inset-4 bg-secondary/10 rounded-3xl blur-3xl"></div>
+<img alt="Modern stock exchange trading floor with multiple screens" class="relative z-10 w-full aspect-[4/3] object-cover rounded-2xl shadow-2xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRF1MfP_vtTOKFHljOKlrN9UI7JYm9H-Xb-EhedXc6SkejDco8Nitbc0nBm4tpenIUDpHGeHrpOqnaQwvHYz7CqyV4FohocYg0ClZZMchxF5O-Gc4TA3Znj2kfABj_7uhHpdYIIEXRIrMScVZc4Ozt16f5XZpgmU50TXiU2FOw4RZ8A6OFxKA5tR34uQF-eI2mpHiKnBq68DQvwyXSge24xmxG_-D0rAELxGDYmKCCAHVzgTSd_xwkQYINPYQD4CC2mZ0zF-BYVSI"/>
+</div>
+</div>
+</section>
+<!-- How It Works Section -->
+<section class="bg-surface-container-low py-24">
+<div class="max-w-7xl mx-auto px-8">
+<div class="text-center mb-16 space-y-4">
+<h2 class="text-4xl font-headline font-bold text-primary">Metodologia de Aprendizado</h2>
+<div class="w-24 h-1 bg-secondary mx-auto rounded-full"></div>
+</div>
+<div class="grid md:grid-cols-3 gap-8">
+<!-- Step 1 -->
+<div class="flex flex-col items-center text-center p-8 space-y-6">
+<div class="w-16 h-16 bg-primary-container text-on-primary-container rounded-2xl flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-3xl">topic</span>
+</div>
+<div class="space-y-2">
+<h3 class="text-xl font-bold text-primary">1. Seleção Temática</h3>
+<p class="text-on-surface-variant">Escolha entre os 6 módulos fundamentais do currículo de derivativos.</p>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="flex flex-col items-center text-center p-8 space-y-6">
+<div class="w-16 h-16 bg-secondary text-on-secondary rounded-2xl flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-3xl">account_tree</span>
+</div>
+<div class="space-y-2">
+<h3 class="text-xl font-bold text-primary">2. Análise de Cenários</h3>
+<p class="text-on-surface-variant">Explore as árvores de decisão e visualize os payoffs dinâmicos em tempo real.</p>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="flex flex-col items-center text-center p-8 space-y-6">
+<div class="w-16 h-16 bg-tertiary-container text-on-tertiary-container rounded-2xl flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-3xl">school</span>
+</div>
+<div class="space-y-2">
+<h3 class="text-xl font-bold text-primary">3. Validação Técnica</h3>
+<p class="text-on-surface-variant">Avalie os impactos financeiros e consolide o rigor técnico acadêmico.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Modules Grid Section -->
+<section class="py-24 bg-surface">
+<div class="max-w-7xl mx-auto px-8">
+<div class="mb-16">
+<div class="space-y-2">
+<h2 class="text-4xl font-headline font-bold text-primary tracking-tight">Acesse os módulos clicando abaixo</h2>
+</div>
+</div>
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Module 1 -->
+<div class="group cursor-pointer bg-surface-container-lowest rounded-xl p-8 hover:shadow-[0_12px_32px_rgba(25,28,29,0.06)] transition-all duration-300 flex flex-col justify-between min-h-[320px] relative overflow-hidden">
+<div class="space-y-4 relative z-10">
+<div class="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors">
+<span class="material-symbols-outlined">contract</span>
+</div>
+<h3 class="text-xl font-bold text-primary">Termos (NDF)</h3>
+<p class="text-on-surface-variant leading-relaxed text-sm">Contratos a termo e NDFs: Estruturação, precificação e estratégias de hedge cambial.</p>
+</div>
+<div class="mt-8 relative z-10">
+<div class="flex justify-between items-center mb-2">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Progresso Acadêmico</span>
+<span class="text-xs font-bold text-secondary">0/4 concluídos</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-secondary-fixed-dim w-0 h-full"></div>
+</div>
+</div>
+</div>
+<!-- Module 2 -->
+<div class="group cursor-pointer bg-surface-container-lowest rounded-xl p-8 hover:shadow-[0_12px_32px_rgba(25,28,29,0.06)] transition-all duration-300 flex flex-col justify-between min-h-[320px] relative overflow-hidden">
+<div class="space-y-4 relative z-10">
+<div class="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors">
+<span class="material-symbols-outlined">history_toggle_off</span>
+</div>
+<h3 class="text-xl font-bold text-primary">Futuros</h3>
+<p class="text-on-surface-variant leading-relaxed text-sm">Contratos futuros e ajuste diário: Margens, liquidação e mecânica operacional da B3.</p>
+</div>
+<div class="mt-8 relative z-10">
+<div class="flex justify-between items-center mb-2">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Progresso Acadêmico</span>
+<span class="text-xs font-bold text-secondary">0/4 concluídos</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-secondary-fixed-dim w-0 h-full"></div>
+</div>
+</div>
+</div>
+<!-- Module 3 -->
+<div class="group cursor-pointer bg-surface-container-lowest rounded-xl p-8 hover:shadow-[0_12px_32px_rgba(25,28,29,0.06)] transition-all duration-300 flex flex-col justify-between min-h-[320px] relative overflow-hidden">
+<div class="space-y-4 relative z-10">
+<div class="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors">
+<span class="material-symbols-outlined">currency_exchange</span>
+</div>
+<h3 class="text-xl font-bold text-primary">Swaps</h3>
+<p class="text-on-surface-variant leading-relaxed text-sm">Swaps de taxa de juros e câmbio: Troca de fluxos, DI vs dólar e swaps pré-fixados.</p>
+</div>
+<div class="mt-8 relative z-10">
+<div class="flex justify-between items-center mb-2">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Progresso Acadêmico</span>
+<span class="text-xs font-bold text-secondary">0/4 concluídos</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-secondary-fixed-dim w-0 h-full"></div>
+</div>
+</div>
+</div>
+<!-- Module 4 -->
+<div class="group cursor-pointer bg-surface-container-lowest rounded-xl p-8 hover:shadow-[0_12px_32px_rgba(25,28,29,0.06)] transition-all duration-300 flex flex-col justify-between min-h-[320px] relative overflow-hidden">
+<div class="space-y-4 relative z-10">
+<div class="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors">
+<span class="material-symbols-outlined">hdr_strong</span>
+</div>
+<h3 class="text-xl font-bold text-primary">Opções</h3>
+<p class="text-on-surface-variant leading-relaxed text-sm">Opções vanilla e estratégias: Calls, Puts, Black &amp; Scholes e as Gregas aplicadas.</p>
+</div>
+<div class="mt-8 relative z-10">
+<div class="flex justify-between items-center mb-2">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Progresso Acadêmico</span>
+<span class="text-xs font-bold text-secondary">0/4 concluídos</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-secondary-fixed-dim w-0 h-full"></div>
+</div>
+</div>
+</div>
+<!-- Module 5 -->
+<div class="group cursor-pointer bg-surface-container-lowest rounded-xl p-8 hover:shadow-[0_12px_32px_rgba(25,28,29,0.06)] transition-all duration-300 flex flex-col justify-between min-h-[320px] relative overflow-hidden">
+<div class="space-y-4 relative z-10">
+<div class="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors">
+<span class="material-symbols-outlined">security</span>
+</div>
+<h3 class="text-xl font-bold text-primary">Deriv. Crédito</h3>
+<p class="text-on-surface-variant leading-relaxed text-sm">CDS e derivativos de crédito: Gerenciamento de risco de contraparte e spreads de crédito.</p>
+</div>
+<div class="mt-8 relative z-10">
+<div class="flex justify-between items-center mb-2">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Progresso Acadêmico</span>
+<span class="text-xs font-bold text-secondary">0/4 concluídos</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-secondary-fixed-dim w-0 h-full"></div>
+</div>
+</div>
+</div>
+<!-- Module 6 -->
+<div class="group cursor-pointer bg-surface-container-lowest rounded-xl p-8 hover:shadow-[0_12px_32px_rgba(25,28,29,0.06)] transition-all duration-300 flex flex-col justify-between min-h-[320px] relative overflow-hidden">
+<div class="space-y-4 relative z-10">
+<div class="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors">
+<span class="material-symbols-outlined">extension</span>
+</div>
+<h3 class="text-xl font-bold text-primary">Embutidos</h3>
+<p class="text-on-surface-variant leading-relaxed text-sm">Derivativos embutidos em contratos: Identificação em notas estruturadas e COEs.</p>
+</div>
+<div class="mt-8 relative z-10">
+<div class="flex justify-between items-center mb-2">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Progresso Acadêmico</span>
+<span class="text-xs font-bold text-secondary">0/4 concluídos</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-secondary-fixed-dim w-0 h-full"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="w-full py-12 border-t border-white/10 bg-[#00314a]">
+<div class="flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto px-8 gap-6">
+<div class="flex flex-col items-center md:items-start gap-4">
+<div class="text-xl font-manrope font-bold text-white">Derivativos Lab</div>
+<div class="font-inter text-sm text-slate-300">© 2024 Laboratório de Derivativos. Todos os direitos reservados.</div>
+</div>
+<div class="flex gap-8">
+<a class="text-slate-400 hover:text-emerald-400 transition-opacity hover:opacity-80 underline decoration-emerald-500/50 underline-offset-4" href="#">Termos de Uso</a>
+<a class="text-slate-400 hover:text-emerald-400 transition-opacity hover:opacity-80 underline decoration-emerald-500/50 underline-offset-4" href="#">Privacidade</a>
+<a class="text-slate-400 hover:text-emerald-400 transition-opacity hover:opacity-80 underline decoration-emerald-500/50 underline-offset-4" href="#">UFRJ</a>
+<a class="text-slate-400 hover:text-emerald-400 transition-opacity hover:opacity-80 underline decoration-emerald-500/50 underline-offset-4" href="#">COPPEAD</a>
+</div>
+</div>
+</footer>
+</body></html>

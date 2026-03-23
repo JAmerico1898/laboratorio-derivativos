@@ -1,4 +1,3 @@
-import { COLORS } from "@/lib/constants";
 import { fmt, fmtRate } from "@/lib/formatters";
 import { PayoffChart } from "@/components/charts/payoff-chart";
 import { EmbeddedResultPanel } from "./embedded-result-panel";
@@ -36,8 +35,12 @@ export function ResultPanel({
   }
 
   const isProfit = result.ndfPnL > 0;
-  const color = isProfit ? COLORS.green : result.ndfPnL === 0 ? COLORS.gold : COLORS.red;
-  const bgColor = isProfit ? COLORS.greenDim : result.ndfPnL === 0 ? COLORS.goldDim : COLORS.redDim;
+  const colorClass = isProfit ? "text-emerald-600" : result.ndfPnL === 0 ? "text-amber-600" : "text-red-600";
+  const bgClass = isProfit
+    ? "bg-emerald-50 border-emerald-200"
+    : result.ndfPnL === 0
+    ? "bg-amber-50 border-amber-200"
+    : "bg-red-50 border-red-200";
   const isFut =
     instrument?.includes("Futuro") ||
     instrument?.includes("DI") ||
@@ -111,17 +114,10 @@ export function ResultPanel({
   const custoSemSwap = fixDolar * notionalUSD;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+    <div className="flex flex-col gap-5">
       {/* Scenario description */}
-      <div
-        style={{
-          padding: "16px 20px",
-          borderRadius: 12,
-          background: COLORS.cardHover,
-          border: `1px solid ${COLORS.border}`,
-        }}
-      >
-        <p style={{ color: COLORS.textMuted, fontSize: 14, margin: 0, lineHeight: 1.6 }}>
+      <div className="rounded-xl border border-outline-variant bg-surface-container-low px-5 py-4">
+        <p className="text-sm leading-relaxed text-on-surface-variant">
           {scenario.description}
         </p>
       </div>
@@ -130,42 +126,25 @@ export function ResultPanel({
       {isSwapCambial ? (
         <>
           {/* Panel 1: Dívida SEM swap */}
-          <div
-            style={{
-              padding: "20px 24px",
-              borderRadius: 12,
-              background: COLORS.card,
-              border: `1px solid ${COLORS.border}`,
-            }}
-          >
-            <div
-              style={{
-                fontSize: 13,
-                color: COLORS.textMuted,
-                marginBottom: 12,
-                textTransform: "uppercase",
-                letterSpacing: 1,
-              }}
-            >
+          <div className="rounded-xl border border-outline-variant p-6 bg-surface-container-lowest">
+            <div className="mb-3 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
               ① Dívida sem swap (exposição cambial aberta)
             </div>
-            <div style={{ fontSize: 14, color: COLORS.text, lineHeight: 1.8 }}>
+            <div className="text-sm leading-relaxed text-on-surface">
               <div>(1) Dívida = USD {(notionalUSD / 1e6).toFixed(0)}M</div>
               <div>
                 (2) Dólar na contratação ={" "}
-                <strong style={{ color: COLORS.accent }}>R$ {spotInicial.toFixed(2)}</strong>
+                <strong className="text-secondary">R$ {spotInicial.toFixed(2)}</strong>
               </div>
               <div>
                 (3) Dólar no vencimento ={" "}
-                <strong style={{ color: COLORS.gold }}>R$ {fixDolar.toFixed(2)}</strong>
+                <strong className="text-amber-600">R$ {fixDolar.toFixed(2)}</strong>
               </div>
               <div>
                 (4) Variação cambial = ({fixDolar.toFixed(2)} − {spotInicial.toFixed(2)}) ÷{" "}
                 {spotInicial.toFixed(2)} ={" "}
                 <strong
-                  style={{
-                    color: varCambialPct >= 0 ? COLORS.red : COLORS.green,
-                  }}
+                  className={varCambialPct >= 0 ? "text-red-600" : "text-emerald-600"}
                 >
                   {varCambialPct >= 0 ? "+" : ""}
                   {varCambialPct.toFixed(1)}%
@@ -179,9 +158,7 @@ export function ResultPanel({
               <div>
                 (6) Impacto cambial vs contratação ={" "}
                 <strong
-                  style={{
-                    color: varCambialBRL >= 0 ? COLORS.red : COLORS.green,
-                  }}
+                  className={varCambialBRL >= 0 ? "text-red-600" : "text-emerald-600"}
                 >
                   {varCambialBRL >= 0 ? "+" : ""}
                   {fmt(varCambialBRL)}
@@ -197,28 +174,13 @@ export function ResultPanel({
 
           {/* Panel 2: Resultado do swap isolado — ambas as pernas */}
           <div
-            style={{
-              padding: "20px 24px",
-              borderRadius: 12,
-              background: resultadoSwap >= 0 ? COLORS.greenDim : COLORS.redDim,
-              border: `1px solid ${resultadoSwap >= 0 ? COLORS.green : COLORS.red}30`,
-            }}
+            className={`rounded-xl border p-6 ${resultadoSwap >= 0 ? "bg-emerald-50 border-emerald-200" : "bg-red-50 border-red-200"}`}
           >
-            <div
-              style={{
-                fontSize: 13,
-                color: COLORS.textMuted,
-                marginBottom: 12,
-                textTransform: "uppercase",
-                letterSpacing: 1,
-              }}
-            >
+            <div className="mb-3 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
               ② Resultado do swap cambial (isolado)
             </div>
-            <div style={{ fontSize: 14, color: COLORS.text, lineHeight: 1.8 }}>
-              <div
-                style={{ marginBottom: 8, fontWeight: 600, color: COLORS.green }}
-              >
+            <div className="text-sm leading-relaxed text-on-surface">
+              <div className="mb-2 font-semibold text-emerald-600">
                 Perna ativa — recebe: variação cambial + cupom cambial (
                 {(cupomCambial * 100).toFixed(1)}% a.a.)
               </div>
@@ -242,18 +204,14 @@ export function ResultPanel({
                 {fmt(notionalUSD * fixDolar * Math.pow(1 + cupomCambial, prazoAnos))} −{" "}
                 {fmt(nocionalBRL)} ={" "}
                 <strong
-                  style={{
-                    color: pernaCambial >= 0 ? COLORS.green : COLORS.red,
-                  }}
+                  className={pernaCambial >= 0 ? "text-emerald-600" : "text-red-600"}
                 >
                   {pernaCambial >= 0 ? "+" : ""}
                   {fmt(pernaCambial)}
                 </strong>
               </div>
 
-              <div
-                style={{ marginTop: 16, marginBottom: 8, fontWeight: 600, color: COLORS.red }}
-              >
+              <div className="mt-4 mb-2 font-semibold text-red-600">
                 Perna passiva — paga: CDI acumulado ({(cdiAA * 100).toFixed(2)}% a.a.)
               </div>
               <div>
@@ -263,17 +221,11 @@ export function ResultPanel({
               <div>
                 = {fmt(nocionalBRL)} ×{" "}
                 {(Math.pow(1 + cdiAA, prazoAnos) - 1).toFixed(4)} ={" "}
-                <strong style={{ color: COLORS.red }}>−{fmt(pernaCDI)}</strong>
+                <strong className="text-red-600">−{fmt(pernaCDI)}</strong>
               </div>
 
-              <div
-                style={{
-                  marginTop: 16,
-                  paddingTop: 12,
-                  borderTop: `1px solid ${COLORS.border}`,
-                }}
-              >
-                <div style={{ fontWeight: 600 }}>
+              <div className="mt-4 border-t border-outline-variant pt-3">
+                <div className="font-semibold">
                   Resultado líquido do swap = Perna ativa − Perna passiva
                 </div>
                 <div>
@@ -281,13 +233,7 @@ export function ResultPanel({
                 </div>
               </div>
               <div
-                style={{
-                  fontSize: 28,
-                  fontWeight: 800,
-                  color: resultadoSwap >= 0 ? COLORS.green : COLORS.red,
-                  fontFamily: "'JetBrains Mono', monospace",
-                  marginTop: 4,
-                }}
+                className={`mt-1 text-[28px] font-extrabold font-mono ${resultadoSwap >= 0 ? "text-emerald-600" : "text-red-600"}`}
               >
                 = {resultadoSwap >= 0 ? "+" : ""}
                 {fmt(resultadoSwap)}
@@ -296,26 +242,11 @@ export function ResultPanel({
           </div>
 
           {/* Panel 3: Resultado combinado (hedge) */}
-          <div
-            style={{
-              padding: "20px 24px",
-              borderRadius: 12,
-              background: COLORS.accentDim,
-              border: `1px solid ${COLORS.accent}30`,
-            }}
-          >
-            <div
-              style={{
-                fontSize: 13,
-                color: COLORS.accent,
-                marginBottom: 12,
-                textTransform: "uppercase",
-                letterSpacing: 1,
-              }}
-            >
+          <div className="rounded-xl border border-secondary/30 bg-secondary/10 p-6">
+            <div className="mb-3 text-xs font-bold uppercase tracking-wider text-secondary">
               ③ Resultado combinado (dívida + swap = hedge)
             </div>
-            <div style={{ fontSize: 14, color: COLORS.text, lineHeight: 1.8 }}>
+            <div className="text-sm leading-relaxed text-on-surface">
               <div>
                 (1) Custo da dívida sem swap = {fmt(custoSemSwap)} (USD{" "}
                 {(notionalUSD / 1e6).toFixed(0)}M × R$ {fixDolar.toFixed(2)})
@@ -323,9 +254,7 @@ export function ResultPanel({
               <div>
                 (2) Resultado líquido do swap ={" "}
                 <strong
-                  style={{
-                    color: resultadoSwap >= 0 ? COLORS.green : COLORS.red,
-                  }}
+                  className={resultadoSwap >= 0 ? "text-emerald-600" : "text-red-600"}
                 >
                   {resultadoSwap >= 0 ? "+" : ""}
                   {fmt(resultadoSwap)}
@@ -334,11 +263,11 @@ export function ResultPanel({
               <div>
                 (3) Custo efetivo da dívida com hedge = {fmt(custoSemSwap)} −{" "}
                 {fmt(resultadoSwap)} ={" "}
-                <strong style={{ color: COLORS.accent }}>
+                <strong className="text-secondary">
                   {fmt(custoSemSwap - resultadoSwap)}
                 </strong>
               </div>
-              <div style={{ marginTop: 8 }}>
+              <div className="mt-2">
                 (4) Custo original (na contratação) = {fmt(nocionalBRL)}
               </div>
               <div>
@@ -346,14 +275,7 @@ export function ResultPanel({
                 custo do CDI líquido do cupom cambial ao longo de {prazoAnos.toFixed(1)} anos.
               </div>
 
-              <div
-                style={{
-                  marginTop: 12,
-                  padding: "10px 14px",
-                  borderRadius: 8,
-                  background: COLORS.card,
-                }}
-              >
+              <div className="mt-3 rounded-lg bg-surface-container-lowest p-3.5">
                 {varCambialBRL > 0
                   ? `O dólar subiu ${varCambialPct.toFixed(1)}%. Sem swap, a dívida custaria ${fmt(custoSemSwap)} (${fmt(Math.abs(varCambialBRL))} a mais). Com swap, o custo efetivo foi ${fmt(custoSemSwap - resultadoSwap)} — a variação cambial foi substancialmente neutralizada. O custo residual reflete o CDI pago menos o cupom cambial recebido.`
                   : varCambialBRL < 0
@@ -364,24 +286,8 @@ export function ResultPanel({
           </div>
 
           {/* Payoff Chart */}
-          <div
-            style={{
-              padding: "16px 8px",
-              borderRadius: 12,
-              background: COLORS.cardHover,
-              border: `1px solid ${COLORS.border}`,
-            }}
-          >
-            <div
-              style={{
-                fontSize: 13,
-                color: COLORS.textMuted,
-                marginBottom: 8,
-                paddingLeft: 12,
-                textTransform: "uppercase",
-                letterSpacing: 1,
-              }}
-            >
+          <div className="rounded-xl border border-outline-variant bg-surface-container-low px-2 py-4">
+            <div className="mb-2 pl-3 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
               Diagrama de Payoff do Swap
             </div>
             <PayoffChart
@@ -398,52 +304,27 @@ export function ResultPanel({
         /* ──── DEFAULT: NDF, Futuros, Swap CDI×Pré ──── */
         <>
           <div
-            style={{
-              padding: "20px 24px",
-              borderRadius: 12,
-              background: bgColor,
-              border: `1px solid ${color}30`,
-            }}
+            className={`rounded-xl border p-6 ${bgClass}`}
           >
-            <div
-              style={{
-                fontSize: 13,
-                color: COLORS.textMuted,
-                marginBottom: 4,
-                textTransform: "uppercase",
-                letterSpacing: 1,
-              }}
-            >
+            <div className="mb-1 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
               Resultado do {instrument || "Derivativo"}
             </div>
             <div
-              style={{
-                fontSize: 32,
-                fontWeight: 800,
-                color,
-                fontFamily: "'JetBrains Mono', monospace",
-              }}
+              className={`text-3xl font-extrabold font-mono ${colorClass}`}
             >
               {result.ndfPnL > 0 ? "+" : ""}
               {fmt(result.ndfPnL)}
             </div>
-            <div
-              style={{
-                fontSize: 13,
-                color: COLORS.textMuted,
-                marginTop: 8,
-                lineHeight: 1.7,
-              }}
-            >
+            <div className="mt-2 text-xs leading-relaxed text-on-surface-variant">
               Você {posLabel} a{" "}
-              <strong style={{ color: COLORS.accent }}>{fmtRate(forwardChosen)}</strong>.
+              <strong className="text-secondary">{fmtRate(forwardChosen)}</strong>.
               {isSwapCDI ? " CDI médio: " : isFut ? " Liquidação: " : " Fixing: "}
-              <strong style={{ color }}>{fmtRate(scenario.fixingRate)}</strong>.
+              <strong className={colorClass}>{fmtRate(scenario.fixingRate)}</strong>.
               {isSwapCDI ? (
                 <>
                   <br />
                   Resultado líquido do swap:{" "}
-                  <strong style={{ color }}>
+                  <strong className={colorClass}>
                     {result.ndfPnL > 0 ? "+" : ""}
                     {fmt(result.ndfPnL)}
                   </strong>
@@ -452,7 +333,7 @@ export function ResultPanel({
                 <>
                   <br />
                   Ajustes diários acumulados:{" "}
-                  <strong style={{ color }}>
+                  <strong className={colorClass}>
                     {result.ndfPnL > 0 ? "+" : ""}
                     {fmt(result.ndfPnL)}
                   </strong>
@@ -461,29 +342,13 @@ export function ResultPanel({
                 <>
                   <br />
                   Taxa efetiva:{" "}
-                  <strong style={{ color: COLORS.text }}>{fmtRate(result.effectiveRate)}</strong>
+                  <strong className="text-on-surface">{fmtRate(result.effectiveRate)}</strong>
                 </>
               )}
             </div>
           </div>
-          <div
-            style={{
-              padding: "16px 8px",
-              borderRadius: 12,
-              background: COLORS.cardHover,
-              border: `1px solid ${COLORS.border}`,
-            }}
-          >
-            <div
-              style={{
-                fontSize: 13,
-                color: COLORS.textMuted,
-                marginBottom: 8,
-                paddingLeft: 12,
-                textTransform: "uppercase",
-                letterSpacing: 1,
-              }}
-            >
+          <div className="rounded-xl border border-outline-variant bg-surface-container-low px-2 py-4">
+            <div className="mb-2 pl-3 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
               Diagrama de Payoff
             </div>
             <PayoffChart
@@ -494,26 +359,11 @@ export function ResultPanel({
               xLabel={xLabel}
             />
           </div>
-          <div
-            style={{
-              padding: "16px 20px",
-              borderRadius: 12,
-              background: COLORS.card,
-              border: `1px solid ${COLORS.border}`,
-            }}
-          >
-            <div
-              style={{
-                fontSize: 13,
-                color: COLORS.accent,
-                marginBottom: 8,
-                textTransform: "uppercase",
-                letterSpacing: 1,
-              }}
-            >
+          <div className="rounded-xl border border-outline-variant p-5 bg-surface-container-lowest">
+            <div className="mb-2 text-xs font-bold uppercase tracking-wider text-secondary">
               Por que este resultado?
             </div>
-            <p style={{ color: COLORS.text, fontSize: 14, margin: 0, lineHeight: 1.7 }}>
+            <p className="text-sm leading-relaxed text-on-surface">
               {position === "sell_usd" ? (
                 <>
                   Ao{" "}
@@ -579,28 +429,13 @@ export function ResultPanel({
               )}
             </p>
           </div>
-          <div
-            style={{
-              padding: "16px 20px",
-              borderRadius: 12,
-              background: COLORS.goldDim,
-              border: `1px solid ${COLORS.gold}30`,
-            }}
-          >
-            <div
-              style={{
-                fontSize: 13,
-                color: COLORS.gold,
-                marginBottom: 8,
-                textTransform: "uppercase",
-                letterSpacing: 1,
-              }}
-            >
+          <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
+            <div className="mb-2 text-xs font-bold uppercase tracking-wider text-amber-600">
               E se você tivesse escolhido diferente?
             </div>
-            <p style={{ color: COLORS.text, fontSize: 14, margin: 0, lineHeight: 1.7 }}>
+            <p className="text-sm leading-relaxed text-on-surface">
               Se tivesse <strong>{altLabel}</strong> ao invés de {posLabel}, resultado seria{" "}
-              <strong style={{ color: altPnL > 0 ? COLORS.green : COLORS.red }}>
+              <strong className={altPnL > 0 ? "text-emerald-600" : "text-red-600"}>
                 {altPnL > 0 ? "+" : ""}
                 {fmt(altPnL)}
               </strong>

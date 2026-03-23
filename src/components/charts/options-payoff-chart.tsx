@@ -36,8 +36,15 @@ export function OptionsPayoffChart({
     (optResult?.combinedPnL as number | undefined) ??
     (optResult?.optionsPnL as number | undefined) ??
     0;
-  const range = spot * 1.3 - spot * 0.7;
-  const tol = range / 50;
+  // Find the single closest data point to fixingRate
+  let closestIdx = -1;
+  if (fixingRate) {
+    let minDist = Infinity;
+    for (let i = 0; i < data.length; i++) {
+      const dist = Math.abs(data[i].fixing - fixingRate);
+      if (dist < minDist) { minDist = dist; closestIdx = i; }
+    }
+  }
 
   return (
     <div style={{ width: "100%", height: 320 }}>
@@ -45,7 +52,7 @@ export function OptionsPayoffChart({
         <AreaChart data={data} margin={{ top: 40, right: 20, left: 20, bottom: 10 }}>
           <defs>
             <linearGradient id="optGreen" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={COLORS.green} stopOpacity={0.4} />
+              <stop offset="0%" stopColor={COLORS.green} stopOpacity={0.3} />
               <stop offset="100%" stopColor={COLORS.green} stopOpacity={0} />
             </linearGradient>
           </defs>
@@ -126,8 +133,9 @@ export function OptionsPayoffChart({
                 payload={props.payload as { fixing: number }}
                 fixingRate={fixingRate}
                 fixingPnL={0}
-                tolerance={tol}
                 overridePnL={totalPnL}
+                index={props.index as number}
+                targetIndex={closestIdx}
               />
             )}
             activeDot={{ r: 4, fill: COLORS.accent, stroke: COLORS.text }}
