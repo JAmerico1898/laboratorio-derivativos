@@ -34,6 +34,87 @@ export function ResultPanel({
     return <EmbeddedResultPanel scenario={scenario} scenarioData={scenarioData} />;
   }
 
+  // Calendar spread detection
+  const isSpread = instrument?.includes("Spread");
+  if (isSpread) {
+    const smd = scenarioData.context.marketData;
+    const spreadInitial = (smd.spreadBps as number) || 80;
+    const newSpread = scenario.fixingRate; // fixingRate stores new spread in bp
+    const dv01Short = (smd.dv01Short as number) || 14;
+    const dv01Long = (smd.dv01Long as number) || 20;
+    const cShort = (smd.contractsShort as number) || 5000;
+    const cLong = (smd.contractsLong as number) || 3500;
+    const dv01TotalShort = cShort * dv01Short;
+    const dv01TotalLong = cLong * dv01Long;
+    const spreadChange = spreadInitial - newSpread;
+    const spreadPnl = spreadChange * dv01TotalLong;
+    const isGain = spreadPnl > 0;
+    const rateShort = smd.spotRate as number;
+    const rateLong = smd.forwardRate90d as number;
+
+    return (
+      <div className="flex flex-col gap-5">
+        <div className="rounded-xl border border-outline-variant bg-surface-container-low p-5">
+          <p className="text-sm leading-relaxed text-on-surface-variant">{scenario.description}</p>
+        </div>
+
+        <div className={`rounded-xl border p-6 ${isGain ? "bg-emerald-50 border-emerald-200" : spreadPnl === 0 ? "bg-amber-50 border-amber-200" : "bg-red-50 border-red-200"}`}>
+          <div className="mb-1 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+            Resultado do Calendar Spread
+          </div>
+          <div className={`text-3xl font-extrabold font-mono ${isGain ? "text-emerald-600" : "text-red-600"}`}>
+            {spreadPnl >= 0 ? "+" : ""}{fmt(spreadPnl)}
+          </div>
+          <div className="mt-2 text-sm text-on-surface-variant">
+            Spread: {spreadInitial}bps → {newSpread}bps ({spreadChange > 0 ? "comprimiu" : spreadChange < 0 ? "alargou" : "estável"} {Math.abs(spreadChange)}bps)
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-outline-variant p-6 bg-surface-container-lowest">
+          <div className="mb-3 text-xs font-bold uppercase tracking-wider text-secondary">
+            ① Perna curta — Comprar taxa Jan/27 ({cShort.toLocaleString("pt-BR")} contratos)
+          </div>
+          <div className="text-sm leading-relaxed text-on-surface">
+            <div>(1) Posição: comprar taxa (vender PU) no Jan/27 a {rateShort.toFixed(2)}%</div>
+            <div>(2) DV01 total = {cShort.toLocaleString("pt-BR")} × R$ {dv01Short} = <strong className="text-secondary">R$ {dv01TotalShort.toLocaleString("pt-BR")}/bp</strong></div>
+            <div>(3) Em um choque paralelo de +1bp, esta perna <strong className="text-emerald-600">ganha</strong> R$ {dv01TotalShort.toLocaleString("pt-BR")}</div>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-outline-variant p-6 bg-surface-container-lowest">
+          <div className="mb-3 text-xs font-bold uppercase tracking-wider text-secondary">
+            ② Perna longa — Vender taxa Jan/28 ({cLong.toLocaleString("pt-BR")} contratos)
+          </div>
+          <div className="text-sm leading-relaxed text-on-surface">
+            <div>(1) Posição: vender taxa (comprar PU) no Jan/28 a {rateLong.toFixed(2)}%</div>
+            <div>(2) DV01 total = {cLong.toLocaleString("pt-BR")} × R$ {dv01Long} = <strong className="text-secondary">R$ {dv01TotalLong.toLocaleString("pt-BR")}/bp</strong></div>
+            <div>(3) Em um choque paralelo de +1bp, esta perna <strong className="text-red-600">perde</strong> R$ {dv01TotalLong.toLocaleString("pt-BR")}</div>
+            <div>(4) DV01 casado: {dv01TotalShort.toLocaleString("pt-BR")} ≈ {dv01TotalLong.toLocaleString("pt-BR")} → risco direcional neutralizado ✓</div>
+          </div>
+        </div>
+
+        <div className={`rounded-xl border p-6 ${isGain ? "bg-secondary/10 border-secondary/30" : "bg-red-50 border-red-200"}`}>
+          <div className="mb-3 text-xs font-bold uppercase tracking-wider text-secondary">
+            ③ Resultado líquido do spread
+          </div>
+          <div className="text-sm leading-relaxed text-on-surface">
+            <div>(1) Spread inicial = {spreadInitial} bps (Jan/28 {rateLong.toFixed(2)}% − Jan/27 {rateShort.toFixed(2)}%)</div>
+            <div>(2) Spread final = {newSpread} bps</div>
+            <div>(3) Compressão/alargamento = {spreadChange > 0 ? "+" : ""}{spreadChange} bps</div>
+            <div>(4) P&L = {Math.abs(spreadChange)} bps × R$ {dv01TotalLong.toLocaleString("pt-BR")}/bp = <strong className={isGain ? "text-emerald-600" : "text-red-600"}>{spreadPnl >= 0 ? "+" : ""}{fmt(spreadPnl)}</strong></div>
+            <div className="mt-3 rounded-lg bg-surface-container-lowest p-3.5">
+              {spreadChange > 0
+                ? `O spread comprimiu de ${spreadInitial} para ${newSpread} bps como projetado. A perna longa (vender taxa Jan/28) ganhou mais do que a perna curta (comprar taxa Jan/27) perdeu, pois o vértice longo caiu mais. O flattener capturou a compressão da curva — resultado de +${fmt(spreadPnl)}.`
+                : spreadChange < 0
+                ? `O spread alargou de ${spreadInitial} para ${newSpread} bps — oposto da tese. A perna longa perdeu mais do que a perna curta ganhou. Embora o DV01 seja casado para choques paralelos, o alargamento do spread gera perda líquida de ${fmt(Math.abs(spreadPnl))}. O flattener sofre quando a curva inclina.`
+                : `O spread ficou praticamente estável. Sem variação relevante entre as pernas. Resultado marginal.`}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const isProfit = result.ndfPnL > 0;
   const colorClass = isProfit ? "text-emerald-600" : result.ndfPnL === 0 ? "text-amber-600" : "text-red-600";
   const bgClass = isProfit
