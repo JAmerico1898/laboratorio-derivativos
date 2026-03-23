@@ -25,15 +25,16 @@ export async function POST(request: Request) {
     .filter(Boolean)
     .join("\n");
 
+  const body = new URLSearchParams({
+    token,
+    user,
+    title: "Derivativos Lab — Contato",
+    message: lines,
+  });
+
   const res = await fetch("https://api.pushover.net/1/messages.json", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      token,
-      user,
-      title: "Derivativos Lab — Contato",
-      message: lines,
-    }),
+    body,
   });
 
   if (!res.ok) {
