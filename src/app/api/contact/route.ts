@@ -11,8 +11,10 @@ export async function POST(request: Request) {
   const user = process.env.PUSHOVER_USER;
 
   if (!token || !user) {
-    console.error("Pushover credentials not configured");
-    return NextResponse.json({ error: "Serviço indisponível." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Serviço indisponível.", detail: "credentials missing" },
+      { status: 500 }
+    );
   }
 
   const lines = [
@@ -25,21 +27,25 @@ export async function POST(request: Request) {
     .filter(Boolean)
     .join("\n");
 
-  const body = new URLSearchParams({
-    token,
-    user,
-    title: "Derivativos Lab — Contato",
-    message: lines,
-  });
+  const body = new URLSearchParams();
+  body.append("token", token);
+  body.append("user", user);
+  body.append("title", "Derivativos Lab — Contato");
+  body.append("message", lines);
 
   const res = await fetch("https://api.pushover.net/1/messages.json", {
     method: "POST",
-    body,
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
   });
 
+  const resBody = await res.text();
+
   if (!res.ok) {
-    console.error("Pushover error:", await res.text());
-    return NextResponse.json({ error: "Falha ao enviar mensagem." }, { status: 502 });
+    return NextResponse.json(
+      { error: "Falha ao enviar mensagem.", pushover: resBody },
+      { status: 502 }
+    );
   }
 
   return NextResponse.json({ ok: true });
