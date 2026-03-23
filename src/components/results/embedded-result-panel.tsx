@@ -87,24 +87,41 @@ export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPa
 
       {strat === "prepayment" && (
         <>
-          <Panel title="① Análise do exercício">
-            <div>(1) Economia anual = {fmt(r.economia as number)}</div>
-            <div>
-              (2) Economia total ({scenarioData.context.marketData.prazoRestante} anos) ={" "}
-              {fmt(r.economiaTotal as number)}
-            </div>
-            <div>(3) Multa de pré-pagamento = {fmt(r.multa as number)}</div>
-            <PnLBig value={r.ganhoLiquido as number} label="Ganho líquido do exercício" />
-          </Panel>
-          <Panel title="② Lição">
-            <div className="rounded-lg bg-surface-container-low p-3.5">
-              {scenario.id === "exerceu"
-                ? "A empresa exerceu a opção e economizou. A call sobre a dívida estava 'in the money'."
-                : scenario.id === "juros_subiram"
-                ? "A janela fechou. A opção voltou a ficar 'out of the money'. O timing do exercício é crítico."
-                : "Exerceu cedo demais — se esperasse, teria conseguido taxa ainda melhor. Risco de exercício prematuro."}
-            </div>
-          </Panel>
+          {scenario.id === "juros_subiram" ? (
+            <>
+              <Panel title="① Resultado: opção NÃO exercida" className="bg-red-50 border-red-200">
+                <div>(1) A oferta de CDI+2,00% desapareceu — juros voltaram a subir.</div>
+                <div>(2) A empresa continua pagando CDI+3,00% sobre {fmt(r.saldo as number)}.</div>
+                <div>(3) A opção de pré-pagamento voltou a ficar &apos;fora do dinheiro&apos; (out of the money).</div>
+              </Panel>
+              <Panel title="② Lição">
+                <div className="rounded-lg bg-surface-container-low p-3.5">
+                  A janela de oportunidade fechou. O timing do exercício é crítico em opções reais: a oferta de refinanciamento
+                  não é permanente. A opção de pré-pagamento só tem valor quando as condições de mercado permitem refinanciar
+                  a taxa menor — e essas condições podem ser transitórias.
+                </div>
+              </Panel>
+            </>
+          ) : (
+            <>
+              <Panel title="① Análise do exercício">
+                <div>(1) Economia anual = {fmt(r.economia as number)}</div>
+                <div>
+                  (2) Economia total ({scenarioData.context.marketData.prazoRestante} anos) ={" "}
+                  {fmt(r.economiaTotal as number)}
+                </div>
+                <div>(3) Multa de pré-pagamento = {fmt(r.multa as number)}</div>
+                <PnLBig value={r.ganhoLiquido as number} label="Ganho líquido do exercício" />
+              </Panel>
+              <Panel title="② Lição">
+                <div className="rounded-lg bg-surface-container-low p-3.5">
+                  {scenario.id === "exerceu"
+                    ? "A empresa exerceu a opção e economizou. A call sobre a dívida estava 'in the money'."
+                    : "Exerceu cedo demais — se esperasse, teria conseguido taxa ainda melhor. Risco de exercício prematuro."}
+                </div>
+              </Panel>
+            </>
+          )}
         </>
       )}
 
@@ -133,7 +150,7 @@ export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPa
           >
             <div className="rounded-lg bg-surface-container-low p-3.5">
               {(r.cdiFinal as number) < 10
-                ? `Juros caíram e a call foi exercida. O prêmio de 50 bps acumulado por ${r.callAno} anos (${(r.callAno as number) * 50} bps) não compensou o custo de reinvestimento a taxas ${((r.cdiFinal as number) + 2.5 - ((r.cdiFinal as number) + 2.0)).toFixed(1)}% menores por ${(r.prazo as number) - (r.callAno as number)} anos. O risco de reinvestimento se materializou.`
+                ? `Juros caíram e a call foi exercida. O prêmio de 50 bps acumulado por ${r.callAno} anos (${(r.callAno as number) * 50} bps) compensou a perda de spread de 50 bps por ${(r.prazo as number) - (r.callAno as number)} anos (${((r.prazo as number) - (r.callAno as number)) * 50} bps): saldo líquido de +${(r.callAno as number) * 50 - ((r.prazo as number) - (r.callAno as number)) * 50} bps em spread. Porém, o verdadeiro custo é o reinvestimento em um ambiente de CDI muito mais baixo: antes, o investidor recebia ${((r.cdiFinal as number) + 2.5).toFixed(1)}% total; agora reinveste a ${((r.cdiFinal as number) + 2.0).toFixed(1)}% — uma queda de yield que vai além do spread. O risco de reinvestimento se materializou pelo nível dos juros, não pelo spread.`
                 : (r.cdiFinal as number) > 13
                 ? `Juros subiram e o call não foi exercido. O investidor recebeu o prêmio de 50 bps por todos os ${r.prazo} anos (${(r.prazo as number) * 50} bps acumulados). Excelente negócio — a call vendida expirou 'out of the money'.`
                 : `Juros estáveis, call não exercido. O investidor recebeu o prêmio integral de 50 bps/ano.`}
