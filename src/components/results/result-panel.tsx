@@ -209,9 +209,9 @@ export function ResultPanel({
   const varCambialPct = ((fixDolar - spotInicial) / spotInicial) * 100;
   const varCambialBRL = (fixDolar - spotInicial) * notionalUSD;
 
-  // Perna ativa (recebe): variação cambial + cupom cambial
+  // Perna ativa (recebe): variação cambial + cupom cambial (juros simples)
   const pernaCambial =
-    notionalUSD * fixDolar * Math.pow(1 + cupomCambial, prazoAnos) - nocionalBRL;
+    notionalUSD * fixDolar * (1 + cupomCambial * prazoAnos) - nocionalBRL;
   // Perna passiva (paga): CDI acumulado
   const pernaCDI = nocionalBRL * (Math.pow(1 + cdiAA, prazoAnos) - 1);
   // Resultado líquido do swap = recebe - paga
@@ -296,18 +296,18 @@ export function ResultPanel({
               </div>
               <div>
                 (2) Valor final da perna cambial = USD {(notionalUSD / 1e6).toFixed(0)}M × R${" "}
-                {fixDolar.toFixed(2)} × (1 + {(cupomCambial * 100).toFixed(1)}%)^
-                {prazoAnos.toFixed(1)}
+                {fixDolar.toFixed(2)} × (1 + {(cupomCambial * 100).toFixed(1)}% ×{" "}
+                {prazoAnos.toFixed(1)})
               </div>
               <div>
                 ={" "}
                 {fmt(
-                  notionalUSD * fixDolar * Math.pow(1 + cupomCambial, prazoAnos)
+                  notionalUSD * fixDolar * (1 + cupomCambial * prazoAnos)
                 )}
               </div>
               <div>
                 (3) Resultado da perna ativa ={" "}
-                {fmt(notionalUSD * fixDolar * Math.pow(1 + cupomCambial, prazoAnos))} −{" "}
+                {fmt(notionalUSD * fixDolar * (1 + cupomCambial * prazoAnos))} −{" "}
                 {fmt(nocionalBRL)} ={" "}
                 <strong
                   className={pernaCambial >= 0 ? "text-emerald-600" : "text-red-600"}
