@@ -39,13 +39,8 @@ export async function POST(request: Request) {
     body: body.toString(),
   });
 
-  const resBody = await res.text();
-
   if (!res.ok) {
-    return NextResponse.json(
-      { error: "Falha ao enviar mensagem.", pushover: resBody },
-      { status: 502 }
-    );
+    return NextResponse.json({ error: "Falha ao enviar mensagem." }, { status: 502 });
   }
 
   return NextResponse.json({ ok: true });
