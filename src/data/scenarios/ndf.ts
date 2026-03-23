@@ -122,7 +122,7 @@ export const NDF_SCENARIOS: Scenario[] = [
         { id: "buy_usd", label: "Comprar USD a termo a R$ 5,42", correct: false, score: 0, feedback: "Comprar no forward caro é o contrário do que a arbitragem exige.", next: "contract_arb" },
         { id: "sell_usd_teorico", label: "Vender USD a termo ao preço teórico de R$ 5,32", correct: false, score: 5, feedback: "R$ 5,32 não é um preço disponível no mercado — é o teórico. A arbitragem vende no preço de mercado.", next: "contract_arb" },
       ]},
-      { id: "contract_arb", type: "choice", prompt: "Além do NDF vendido a R$ 5,42, o que mais?", choices: [
+      { id: "contract_arb", type: "choice", prompt: "Além do NDF vendido a R$ 5,42, como você montaria o sintético comprado a R$ 5,32?", choices: [
         { id: "sintetico_completo", label: "Tomar CDI emprestado, comprar USD spot, aplicar no cupom cambial", correct: true, score: 30, feedback: "Excelente! A perna sintética completa a arbitragem sem risco direcional.", next: "resolution_arb" },
         { id: "apenas_ndf", label: "Nada mais — o NDF vendido basta", correct: false, score: 0, feedback: "Apenas o NDF cria posição direcional vendida. Precisa da perna sintética.", next: "resolution_arb" },
         { id: "outro_ndf", label: "Comprar outro NDF de prazo diferente", correct: false, score: 5, feedback: "Prazo diferente cria risco de basis. A perna correta é o sintético.", next: "resolution_arb" },

@@ -52,7 +52,8 @@ export function ResultPanel({
   const isSwap = instrument?.includes("Swap");
   const isSwapCambial = instrument?.includes("USD");
   const isSwapCDI = isSwap && !isSwapCambial;
-  const posLabel = isDI
+  // Conjugated past tense for "Você ___ a R$..."
+  const posVerb = isDI
     ? position === "buy_usd"
       ? "comprou taxa"
       : "vendeu taxa"
@@ -65,6 +66,20 @@ export function ResultPanel({
     : position === "sell_usd"
     ? "vendeu"
     : "comprou";
+  // Participle for "Se tivesse ___ ao invés de ___"
+  const posLabel = isDI
+    ? position === "buy_usd"
+      ? "comprado taxa"
+      : "vendido taxa"
+    : isSwapCDI
+    ? position === "sell_usd"
+      ? "recebido taxa fixa"
+      : "pago taxa fixa"
+    : isSwapCambial
+    ? "contratado swap cambial"
+    : position === "sell_usd"
+    ? "vendido"
+    : "comprado";
   const altPos = position === "sell_usd" ? "buy_usd" : "sell_usd";
   const altLabel = isDI
     ? altPos === "buy_usd"
@@ -91,8 +106,18 @@ export function ResultPanel({
     ? "Taxa / Preço de Liquidação"
     : "Taxa de Fixing (R$/USD)";
 
-  // Swap cambial specific calculations
+  // Arbitrage detection and calculations
   const md = scenarioData?.context?.marketData;
+  const isArbitrage = !!(md?.forwardMercado);
+  const arbFwdMercado = (md?.forwardMercado as number) || 0;
+  const arbFwdTeorico = (md?.forwardRate90d as number) || 0;
+  const arbNotional = (md?.notional_usd as number) || 0;
+  const arbSpread = arbFwdMercado - arbFwdTeorico;
+  const arbGain = arbSpread * arbNotional;
+  const arbNdfPnl = (arbFwdMercado - scenario.fixingRate) * arbNotional;
+  const arbSyntheticPnl = (scenario.fixingRate - arbFwdTeorico) * arbNotional;
+
+  // Swap cambial specific calculations
   const spotInicial = (md?.spotRate as number) || 5.2;
   const notionalUSD = (md?.notional_usd as number) || 100000000;
   const nocionalBRL = spotInicial * notionalUSD;
@@ -300,6 +325,60 @@ export function ResultPanel({
             />
           </div>
         </>
+      ) : isArbitrage ? (
+        /* ──── ARBITRAGE: two-leg locked spread ──── */
+        <>
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6">
+            <div className="mb-1 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+              Resultado da Arbitragem
+            </div>
+            <div className="text-3xl font-extrabold font-mono text-emerald-600">
+              +{fmt(arbGain)}
+            </div>
+            <div className="mt-2 text-sm leading-relaxed text-on-surface-variant">
+              Lucro travado na montagem: ({fmtRate(arbFwdMercado)} − {fmtRate(arbFwdTeorico)}) × USD {(arbNotional / 1e6).toFixed(0)}M = <strong className="text-emerald-600">+{fmt(arbGain)}</strong>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-outline-variant p-6 bg-surface-container-lowest">
+            <div className="mb-3 text-xs font-bold uppercase tracking-wider text-secondary">
+              ① NDF vendido (perna de mercado)
+            </div>
+            <div className="text-sm leading-relaxed text-on-surface">
+              <div>(1) Vendeu USD a termo a <strong className="text-secondary">{fmtRate(arbFwdMercado)}</strong></div>
+              <div>(2) Fixing = {fmtRate(scenario.fixingRate)}</div>
+              <div>(3) Resultado da perna NDF = ({fmtRate(arbFwdMercado)} − {fmtRate(scenario.fixingRate)}) × USD {(arbNotional / 1e6).toFixed(0)}M = <strong className={arbNdfPnl >= 0 ? "text-emerald-600" : "text-red-600"}>{arbNdfPnl >= 0 ? "+" : ""}{fmt(arbNdfPnl)}</strong></div>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-outline-variant p-6 bg-surface-container-lowest">
+            <div className="mb-3 text-xs font-bold uppercase tracking-wider text-secondary">
+              ② Sintético comprado (perna de paridade coberta)
+            </div>
+            <div className="text-sm leading-relaxed text-on-surface">
+              <div>(1) Tomou CDI emprestado, comprou USD spot a {fmtRate(md?.spotRate as number)}, aplicou no cupom cambial</div>
+              <div>(2) Taxa forward implícita do sintético = <strong className="text-secondary">{fmtRate(arbFwdTeorico)}</strong></div>
+              <div>(3) Fixing = {fmtRate(scenario.fixingRate)}</div>
+              <div>(4) Resultado da perna sintética = ({fmtRate(scenario.fixingRate)} − {fmtRate(arbFwdTeorico)}) × USD {(arbNotional / 1e6).toFixed(0)}M = <strong className={arbSyntheticPnl >= 0 ? "text-emerald-600" : "text-red-600"}>{arbSyntheticPnl >= 0 ? "+" : ""}{fmt(arbSyntheticPnl)}</strong></div>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-secondary/30 bg-secondary/10 p-6">
+            <div className="mb-3 text-xs font-bold uppercase tracking-wider text-secondary">
+              ③ Resultado líquido (perna 1 + perna 2)
+            </div>
+            <div className="text-sm leading-relaxed text-on-surface">
+              <div>(1) NDF vendido = {arbNdfPnl >= 0 ? "+" : ""}{fmt(arbNdfPnl)}</div>
+              <div>(2) Sintético comprado = {arbSyntheticPnl >= 0 ? "+" : ""}{fmt(arbSyntheticPnl)}</div>
+              <div>(3) Total = {fmt(arbNdfPnl)} + {fmt(arbSyntheticPnl)} = <strong className="text-emerald-600">+{fmt(arbGain)}</strong></div>
+              <div className="mt-3 rounded-lg bg-surface-container-lowest p-3.5">
+                Independente do fixing ({fmtRate(scenario.fixingRate)}), o lucro é sempre R$ {(arbSpread).toFixed(2)}/USD × USD {(arbNotional / 1e6).toFixed(0)}M = {fmt(arbGain)}.
+                As duas pernas se cancelam em relação ao mercado: o que a perna NDF perde/ganha com o fixing, a perna sintética ganha/perde exatamente o oposto.
+                O lucro foi travado na montagem da operação — por isso se chama arbitragem.
+              </div>
+            </div>
+          </div>
+        </>
       ) : (
         /* ──── DEFAULT: NDF, Futuros, Swap CDI×Pré ──── */
         <>
@@ -316,7 +395,7 @@ export function ResultPanel({
               {fmt(result.ndfPnL)}
             </div>
             <div className="mt-2 text-xs leading-relaxed text-on-surface-variant">
-              Você {posLabel} a{" "}
+              Você {posVerb} a{" "}
               <strong className="text-secondary">{fmtRate(forwardChosen)}</strong>.
               {isSwapCDI ? " CDI médio: " : isFut ? " Liquidação: " : " Fixing: "}
               <strong className={colorClass}>{fmtRate(scenario.fixingRate)}</strong>.
