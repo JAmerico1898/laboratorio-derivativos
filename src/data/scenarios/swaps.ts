@@ -40,7 +40,7 @@ export const SWAPS_SCENARIOS: Scenario[] = [
     theme: "Swaps", themeId: "swaps", instrument: "Swap Cambial (USD × CDI)",
     difficulty: "Intermediário",
     context: {
-      narrative: "Você é tesoureiro(a) da **Siderúrgica Nacional S.A.**, que tem dívida de **USD 100 milhões** com vencimento em **3 anos**. A receita da empresa é 100% em reais. O dólar spot está em **R$ 5,20**, o cupom cambial é **4,50% a.a.** (juros simples) e o CDI é **11,75% a.a.**.",
+      narrative: "Você é tesoureiro(a) da **Siderúrgica Nacional S.A.**, que tem dívida de **USD 100 milhões** com vencimento em **3 anos**. A receita da empresa é 100% em reais. A Diretoria deseja contratar um **swap cambial** para gerenciar a exposição cambial passiva que a dívida representa. O dólar spot está em **R$ 5,20**, o cupom cambial é **4,50% a.a.** (juros simples) e o CDI é **11,75% a.a.**.",
       marketData: { spotRate: 5.20, forwardRate90d: 5.20, cdiRate: 0.1175, notional_usd: 100000000, tenor: 756 },
       displayFields: [["Dívida", "USD 100M"], ["Spot", "R$ 5,20"], ["CDI", "11,75% a.a."], ["Cupom cambial", "4,50% a.a."], ["Prazo", "3 anos"]],
       question: "A receita é em reais mas a dívida é em dólar. Como eliminar o descasamento cambial?",
