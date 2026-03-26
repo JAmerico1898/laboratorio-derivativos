@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { fmt } from "@/lib/formatters";
 import { calculateEmbeddedResult } from "@/lib/calculations/embedded";
 import type { Scenario, ResolutionScenario } from "@/types/scenario";
@@ -28,6 +29,7 @@ function PnLBig({ value, label }: { value: number; label: string }) {
 }
 
 export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPanelProps) {
+  useTranslations("app"); // available for future UI chrome translations
   const r = calculateEmbeddedResult(scenarioData, scenario);
   const strat = scenarioData.embeddedStrategy;
 

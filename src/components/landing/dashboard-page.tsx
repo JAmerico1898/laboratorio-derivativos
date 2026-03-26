@@ -149,7 +149,7 @@ export function DashboardPage() {
       <footer className="w-full py-12 border-t border-white/10 bg-primary">
         <div className="flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto px-8 gap-6">
           <div className="flex flex-col items-center md:items-start gap-4">
-            <div className="text-xl font-heading font-bold text-white">Laboratório de Derivativos</div>
+            <div className="text-xl font-heading font-bold text-white">{t("siteTitle")}</div>
             <div className="text-sm text-slate-300">{t("footerCopyright1")}</div>
             <div className="text-sm text-slate-300">{t("footerCopyright2")}</div>
           </div>

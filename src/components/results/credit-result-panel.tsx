@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { fmt, fmtUSD } from "@/lib/formatters";
 import { calculateCreditResult } from "@/lib/calculations/credit";
 import type { Scenario, ResolutionScenario } from "@/types/scenario";
@@ -30,6 +31,7 @@ function PnLBig({ value, label, prefix, formatFn }: { value: number; label: stri
 }
 
 export function CreditResultPanel({ scenario, scenarioData }: CreditResultPanelProps) {
+  useTranslations("app"); // available for future UI chrome translations
   const r = calculateCreditResult(scenarioData, scenario);
   const strat = scenarioData.creditStrategy;
 
