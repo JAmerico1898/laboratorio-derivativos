@@ -5,7 +5,6 @@ import { Link } from "@/i18n/navigation";
 import { THEMES } from "@/data/themes";
 import { getScenariosByTheme } from "@/data/scenarios";
 import { useCompletedScenarios } from "@/hooks/use-completed-scenarios";
-import { LocaleSwitcher } from "./locale-switcher";
 
 export function DashboardPage() {
   const t = useTranslations("app");
@@ -20,29 +19,8 @@ export function DashboardPage() {
 
   return (
     <div className="bg-background text-on-background font-sans antialiased">
-      {/* ── Top Navigation Bar ── */}
-      <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-[0_12px_32px_rgba(25,28,29,0.06)] h-20">
-        <div className="flex justify-between items-center max-w-7xl mx-auto px-8 h-full">
-          <div className="text-2xl font-extrabold text-primary tracking-tighter font-heading">
-            Laboratório de Derivativos
-          </div>
-          <nav className="hidden md:flex items-center gap-8">
-            <a className="font-heading font-bold tracking-tight text-lg text-secondary border-b-2 border-secondary pb-1" href="#modules">
-              {t("navModules")}
-            </a>
-            <a className="font-heading font-bold tracking-tight text-lg text-slate-600 hover:text-primary transition-colors" href="#methodology">
-              {t("navMethodology")}
-            </a>
-          </nav>
-          <div className="flex items-center gap-4">
-            <LocaleSwitcher />
-          </div>
-        </div>
-        <div className="bg-gradient-to-r from-transparent via-secondary/10 to-transparent h-[1px]" />
-      </header>
-
       {/* ── Hero Section ── */}
-      <section className="relative pt-40 pb-24 overflow-hidden">
+      <section className="relative pt-28 pb-24 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary-container/10 to-transparent opacity-50" />
         </div>

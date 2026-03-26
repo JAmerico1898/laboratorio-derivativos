@@ -44,7 +44,7 @@ export function ContactForm() {
         <div className="absolute bottom-0 left-0 h-1/3 w-1/3 rounded-full bg-secondary/5 blur-[100px]" />
       </div>
 
-      <main className="mx-auto max-w-xl px-6 pb-20 pt-12">
+      <main className="mx-auto max-w-xl px-6 pb-20 pt-24">
         {/* Back */}
         <div className="mb-10">
           <button

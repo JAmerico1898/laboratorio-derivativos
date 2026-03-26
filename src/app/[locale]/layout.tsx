@@ -1,6 +1,7 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
+import { Navbar } from '@/components/landing/navbar';
 import type { ReactNode } from 'react';
 
 export function generateStaticParams() {
@@ -19,6 +20,7 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
+      <Navbar />
       {children}
     </NextIntlClientProvider>
   );

@@ -79,7 +79,7 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
       <div className="fixed bottom-[-150px] right-[-80px] w-[400px] h-[400px] rounded-full bg-secondary/5 blur-[100px] pointer-events-none" />
 
       <div
-        className={`max-w-[720px] mx-auto pt-6 pb-12 transition-opacity duration-300 ${fadeIn ? "opacity-100" : "opacity-0"}`}
+        className={`max-w-[720px] mx-auto pt-24 pb-12 transition-opacity duration-300 ${fadeIn ? "opacity-100" : "opacity-0"}`}
       >
         {/* ── Top bar ── */}
         <div className="flex justify-between items-center mb-5">
@@ -229,7 +229,7 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
           <div>
             <h3 className="text-lg font-bold mb-2 font-heading">{currentStep.prompt}</h3>
             <p className="text-sm text-on-surface-variant mb-4">
-              Selecione um cenário de mercado:
+              Selecione um cenário de mercado e descreva o que aconteceu:
             </p>
             <div className="flex flex-col gap-2.5">
               {currentStep.scenarios.map((sc) => (

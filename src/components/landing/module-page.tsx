@@ -83,7 +83,7 @@ export function ModulePage({ themeId }: ModulePageProps) {
         <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-secondary/5 blur-[100px] rounded-full" />
       </div>
 
-      <main className="pt-12 pb-20 px-6 max-w-7xl mx-auto">
+      <main className="pt-24 pb-20 px-6 max-w-7xl mx-auto">
         {/* Header Section */}
         <header className="mb-12 relative">
           <div className="flex items-center gap-4 mb-8">
