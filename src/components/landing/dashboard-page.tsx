@@ -1,13 +1,12 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
+import { strings, moduleProgress } from "@/lib/strings";
 import { THEMES } from "@/data/themes";
 import { getScenariosByTheme } from "@/data/scenarios";
 import { useCompletedScenarios } from "@/hooks/use-completed-scenarios";
 
 export function DashboardPage() {
-  const t = useTranslations("app");
   const { completedScenarios } = useCompletedScenarios();
 
   function getModuleProgress(themeId: string) {
@@ -27,11 +26,11 @@ export function DashboardPage() {
         <div className="max-w-7xl mx-auto px-8 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
             <h1 className="text-6xl md:text-7xl font-heading font-extrabold text-primary leading-[1.1] tracking-tight">
-              {t("heroTitle")}{" "}
-              <span className="text-secondary">{t("heroTitleAccent")}</span>
+              {strings.heroTitle}{" "}
+              <span className="text-secondary">{strings.heroTitleAccent}</span>
             </h1>
             <p className="text-xl text-on-surface-variant max-w-xl leading-relaxed">
-              {t("heroSubtitle")}
+              {strings.heroSubtitle}
             </p>
           </div>
           <div className="relative hidden lg:block">
@@ -50,7 +49,7 @@ export function DashboardPage() {
         <div className="max-w-7xl mx-auto px-8">
           <div className="text-center mb-16 space-y-4">
             <h2 className="text-4xl font-heading font-bold text-primary">
-              {t("methodologyTitle")}
+              {strings.methodologyTitle}
             </h2>
             <div className="w-24 h-1 bg-secondary mx-auto rounded-full" />
           </div>
@@ -61,8 +60,8 @@ export function DashboardPage() {
                 <span className="material-symbols-outlined text-3xl">topic</span>
               </div>
               <div className="space-y-2">
-                <h3 className="text-xl font-bold text-primary">{t("methodStep1Title")}</h3>
-                <p className="text-on-surface-variant">{t("methodStep1Text")}</p>
+                <h3 className="text-xl font-bold text-primary">{strings.methodStep1Title}</h3>
+                <p className="text-on-surface-variant">{strings.methodStep1Text}</p>
               </div>
             </div>
             {/* Step 2 */}
@@ -71,8 +70,8 @@ export function DashboardPage() {
                 <span className="material-symbols-outlined text-3xl">account_tree</span>
               </div>
               <div className="space-y-2">
-                <h3 className="text-xl font-bold text-primary">{t("methodStep2Title")}</h3>
-                <p className="text-on-surface-variant">{t("methodStep2Text")}</p>
+                <h3 className="text-xl font-bold text-primary">{strings.methodStep2Title}</h3>
+                <p className="text-on-surface-variant">{strings.methodStep2Text}</p>
               </div>
             </div>
             {/* Step 3 */}
@@ -81,8 +80,8 @@ export function DashboardPage() {
                 <span className="material-symbols-outlined text-3xl">school</span>
               </div>
               <div className="space-y-2">
-                <h3 className="text-xl font-bold text-primary">{t("methodStep3Title")}</h3>
-                <p className="text-on-surface-variant">{t("methodStep3Text")}</p>
+                <h3 className="text-xl font-bold text-primary">{strings.methodStep3Title}</h3>
+                <p className="text-on-surface-variant">{strings.methodStep3Text}</p>
               </div>
             </div>
           </div>
@@ -95,7 +94,7 @@ export function DashboardPage() {
           <div className="mb-16">
             <div className="space-y-2">
               <h2 className="text-4xl font-heading font-bold text-primary tracking-tight">
-                {t("modulesTitle")}
+                {strings.modulesTitle}
               </h2>
             </div>
           </div>
@@ -121,13 +120,10 @@ export function DashboardPage() {
                     <div className="mt-8 relative z-10">
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-                          {t("progressLabel")}
+                          {strings.progressLabel}
                         </span>
                         <span className="text-xs font-bold text-secondary">
-                          {t("moduleProgress", {
-                            completed: progress.completed,
-                            total: progress.total,
-                          })}
+                          {moduleProgress(progress.completed, progress.total)}
                         </span>
                       </div>
                       <div className="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
@@ -149,12 +145,12 @@ export function DashboardPage() {
       <footer className="w-full py-12 border-t border-white/10 bg-primary">
         <div className="flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto px-8 gap-6">
           <div className="flex flex-col items-center md:items-start gap-4">
-            <div className="text-xl font-heading font-bold text-white">{t("siteTitle")}</div>
-            <div className="text-sm text-slate-300">{t("footerCopyright1")}</div>
-            <div className="text-sm text-slate-300">{t("footerCopyright2")}</div>
+            <div className="text-xl font-heading font-bold text-white">{strings.siteTitle}</div>
+            <div className="text-sm text-slate-300">{strings.footerCopyright1}</div>
+            <div className="text-sm text-slate-300">{strings.footerCopyright2}</div>
           </div>
           <Link href="/contato" className="text-lg font-semibold text-slate-200 hover:text-emerald-400 transition-colors underline decoration-emerald-500/50 underline-offset-4">
-            {t("footerContact")}
+            {strings.footerContact}
           </Link>
         </div>
       </footer>

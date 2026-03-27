@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Manrope, Inter } from "next/font/google";
+import { Navbar } from "@/components/landing/navbar";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -18,7 +19,7 @@ const inter = Inter({
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html suppressHydrationWarning className={`${manrope.variable} ${inter.variable}`}>
+    <html lang="pt" suppressHydrationWarning className={`${manrope.variable} ${inter.variable}`}>
       <head>
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body className="font-sans antialiased">
+        <Navbar />
         {children}
       </body>
     </html>

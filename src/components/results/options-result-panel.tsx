@@ -1,5 +1,5 @@
-import { useTranslations } from "next-intl";
 import { fmt } from "@/lib/formatters";
+import { strings } from "@/lib/strings";
 import { calculateOptionsResult } from "@/lib/calculations/options";
 import { OptionsPayoffChart } from "@/components/charts/options-payoff-chart";
 import type { Scenario, ResolutionScenario } from "@/types/scenario";
@@ -30,7 +30,6 @@ function PnLBig({ value, label }: { value: number; label: string }) {
 }
 
 export function OptionsResultPanel({ scenario, scenarioData }: OptionsResultPanelProps) {
-  const t = useTranslations("app");
   const r = calculateOptionsResult(scenarioData, scenario.fixingRate);
   const strat = scenarioData.optionStrategy;
 
@@ -117,7 +116,7 @@ export function OptionsResultPanel({ scenario, scenarioData }: OptionsResultPane
         </Panel>
         <div className="rounded-xl border border-outline-variant bg-surface-container-low px-2 py-4">
           <div className="mb-2 pl-3 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-            {t("payoffDiagram")} (Carteira + Put)
+            {strings.payoffDiagram} (Carteira + Put)
           </div>
           <OptionsPayoffChart
             scenarioData={scenarioData}
@@ -197,7 +196,7 @@ export function OptionsResultPanel({ scenario, scenarioData }: OptionsResultPane
         </Panel>
         <div className="rounded-xl border border-outline-variant bg-surface-container-low px-2 py-4">
           <div className="mb-2 pl-3 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-            {t("payoffDiagram")} (Collar)
+            {strings.payoffDiagram} (Collar)
           </div>
           <OptionsPayoffChart
             scenarioData={scenarioData}
@@ -269,7 +268,7 @@ export function OptionsResultPanel({ scenario, scenarioData }: OptionsResultPane
         </Panel>
         <div className="rounded-xl border border-outline-variant bg-surface-container-low px-2 py-4">
           <div className="mb-2 pl-3 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-            {t("payoffDiagram")} (Straddle)
+            {strings.payoffDiagram} (Straddle)
           </div>
           <OptionsPayoffChart
             scenarioData={scenarioData}
@@ -366,7 +365,7 @@ export function OptionsResultPanel({ scenario, scenarioData }: OptionsResultPane
         </Panel>
         <div className="rounded-xl border border-outline-variant bg-surface-container-low px-2 py-4">
           <div className="mb-2 pl-3 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-            {t("payoffDiagram")} (Risk Reversal)
+            {strings.payoffDiagram} (Risk Reversal)
           </div>
           <OptionsPayoffChart
             scenarioData={scenarioData}

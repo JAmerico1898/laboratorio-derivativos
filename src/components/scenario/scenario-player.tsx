@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { useTranslations } from "next-intl";
 import { calculateResult } from "@/lib/calculations/generic";
+import { strings } from "@/lib/strings";
 import { useScenarioPlayer } from "@/hooks/use-scenario-player";
 import { ResultPanel } from "@/components/results/result-panel";
 import { ScoreBar } from "./score-bar";
@@ -35,7 +35,6 @@ interface ScenarioPlayerProps {
 }
 
 export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerProps) {
-  const t = useTranslations("app");
   const {
     stepIndex,
     score,
@@ -90,20 +89,20 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
               onClick={onBack}
               className="bg-transparent border border-outline-variant text-on-surface-variant px-3.5 py-1.5 rounded-lg cursor-pointer text-[13px]"
             >
-              {t("backHome")}
+              {strings.backHome}
             </button>
             {(stepIndex > 0 || showResult) && (
               <button
                 onClick={goBack}
                 className="bg-transparent border border-secondary/40 text-secondary px-3.5 py-1.5 rounded-lg cursor-pointer text-[13px] transition-all hover:bg-secondary/10"
               >
-                {t("prevStep")}
+                {strings.prevStep}
               </button>
             )}
           </div>
           <div className="text-right">
             <div className="text-[11px] text-outline uppercase tracking-wider">
-              {t("score")}
+              {strings.score}
             </div>
             <div className="w-[150px]">
               <ScoreBar score={score} maxScore={maxPS} />
@@ -145,7 +144,7 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
         {/* ── Context panel ── */}
         <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-6 mb-5">
           <div className="text-xs font-bold uppercase tracking-wider text-secondary mb-2">
-            {t("context")}
+            {strings.context}
           </div>
           <p className="text-[15px] leading-relaxed m-0">
             <MarkdownText text={scenario.context.narrative} />
@@ -179,7 +178,7 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
             <span
               className={`font-bold ${prevChoice.correct ? "text-emerald-600" : "text-red-600"}`}
             >
-              {prevChoice.correct ? t("correct") : t("canImprove")} —{" "}
+              {prevChoice.correct ? strings.correct : strings.canImprove} —{" "}
             </span>
             {prevChoice.feedback}
           </div>
@@ -188,8 +187,8 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
         {/* ── Revisit banner ── */}
         {currentStepChoice && (
           <div className="bg-surface-container-low border border-dashed border-secondary/30 rounded-xl px-5 py-3 mb-4 text-[13px] leading-relaxed text-on-surface-variant">
-            {t("prevAnswer")}:{" "}
-            <strong className="text-secondary">{currentStepChoice.label}</strong> {t("keepOrChange")}
+            {strings.prevAnswer}:{" "}
+            <strong className="text-secondary">{currentStepChoice.label}</strong> {strings.keepOrChange}
           </div>
         )}
 
@@ -214,7 +213,7 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
                   >
                     {wasSelected && (
                       <span className="absolute top-2 right-3 text-[11px] text-secondary font-semibold">
-                        {t("currentAnswer")}
+                        {strings.currentAnswer}
                       </span>
                     )}
                     {ch.label}
@@ -230,7 +229,7 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
           <div>
             <h3 className="text-lg font-bold mb-2 font-heading">{currentStep.prompt}</h3>
             <p className="text-sm text-on-surface-variant mb-4">
-              {t("selectScenario")}
+              {strings.selectScenario}
             </p>
             <div className="flex flex-col gap-2.5">
               {currentStep.scenarios.map((sc) => (
@@ -269,13 +268,13 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
                 onClick={goBack}
                 className="bg-surface-container-lowest border border-outline-variant rounded-xl px-6 py-3 text-on-surface text-sm font-semibold cursor-pointer transition-all hover:bg-surface-container-low"
               >
-                {t("tryAnother")}
+                {strings.tryAnother}
               </button>
               <button
                 onClick={finishScenario}
                 className="bg-primary text-on-primary rounded-xl px-6 py-3 border-none text-sm font-bold cursor-pointer transition-all hover:opacity-90"
               >
-                {t("finishReturn")}
+                {strings.finishReturn}
               </button>
             </div>
           </div>

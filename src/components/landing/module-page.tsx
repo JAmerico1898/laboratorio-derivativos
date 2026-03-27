@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
 import { THEMES } from '@/data/themes';
 import { getScenariosByTheme } from '@/data/scenarios';
 import { useCompletedScenarios } from '@/hooks/use-completed-scenarios';
 import { ScenarioPlayer } from '@/components/scenario/scenario-player';
-import { useRouter } from '@/i18n/navigation';
+import { useRouter } from 'next/navigation';
+import { strings } from '@/lib/strings';
 import type { Scenario } from '@/types/scenario';
 import type { CompletedScenario } from '@/types/results';
 
@@ -44,7 +44,6 @@ function getDifficultyStyles(difficulty: string) {
 }
 
 export function ModulePage({ themeId }: ModulePageProps) {
-  const t = useTranslations('app');
   const router = useRouter();
   const [activeScenario, setActiveScenario] = useState<Scenario | null>(null);
   const { completedScenarios, addCompletedScenario } = useCompletedScenarios();
@@ -92,7 +91,7 @@ export function ModulePage({ themeId }: ModulePageProps) {
               className="flex items-center gap-2 text-primary font-semibold hover:opacity-70 transition-opacity cursor-pointer"
             >
               <span className="material-symbols-outlined">arrow_back</span>
-              <span className="uppercase tracking-widest text-xs">{t('backToModules')}</span>
+              <span className="uppercase tracking-widest text-xs">{strings.backToModules}</span>
             </button>
           </div>
           <div className="max-w-3xl">
@@ -149,12 +148,12 @@ export function ModulePage({ themeId }: ModulePageProps) {
 
                 {isIntermediario ? (
                   <button className={`mt-8 w-fit px-8 py-3 rounded-xl font-bold text-sm flex items-center gap-2 transition-colors active:scale-95 cursor-pointer ${styles.cta}`}>
-                    {t('startScenario')}
+                    {strings.startScenario}
                     <span className="material-symbols-outlined text-sm">trending_flat</span>
                   </button>
                 ) : (
                   <div className={`mt-8 flex items-center justify-between font-bold text-sm group-hover:translate-x-1 transition-transform cursor-pointer ${styles.cta}`}>
-                    <span>{t('startScenario')}</span>
+                    <span>{strings.startScenario}</span>
                     <span className="material-symbols-outlined">chevron_right</span>
                   </div>
                 )}

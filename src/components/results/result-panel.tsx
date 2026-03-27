@@ -1,5 +1,5 @@
-import { useTranslations } from "next-intl";
 import { fmt, fmtRate } from "@/lib/formatters";
+import { strings, resultOf } from "@/lib/strings";
 import { PayoffChart } from "@/components/charts/payoff-chart";
 import { EmbeddedResultPanel } from "./embedded-result-panel";
 import { CreditResultPanel } from "./credit-result-panel";
@@ -24,7 +24,6 @@ export function ResultPanel({
   instrument,
   scenarioData,
 }: ResultPanelProps) {
-  const t = useTranslations("app");
   // Delegate to specialized panels
   if (scenarioData?.optionStrategy) {
     return <OptionsResultPanel scenario={scenario} scenarioData={scenarioData} />;
@@ -62,7 +61,7 @@ export function ResultPanel({
 
         <div className={`rounded-xl border p-6 ${isGain ? "bg-emerald-50 border-emerald-200" : spreadPnl === 0 ? "bg-amber-50 border-amber-200" : "bg-red-50 border-red-200"}`}>
           <div className="mb-1 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-            {t("resultCalendarSpread")}
+            {strings.resultCalendarSpread}
           </div>
           <div className={`text-3xl font-extrabold font-mono ${isGain ? "text-emerald-600" : "text-red-600"}`}>
             {spreadPnl >= 0 ? "+" : ""}{fmt(spreadPnl)}
@@ -97,7 +96,7 @@ export function ResultPanel({
 
         <div className={`rounded-xl border p-6 ${isGain ? "bg-secondary/10 border-secondary/30" : "bg-red-50 border-red-200"}`}>
           <div className="mb-3 text-xs font-bold uppercase tracking-wider text-secondary">
-            ③ {t("netSpreadResult")}
+            ③ {strings.netSpreadResult}
           </div>
           <div className="text-sm leading-relaxed text-on-surface">
             <div>(1) Spread inicial = {spreadInitial} bps (Jan/28 {rateLong.toFixed(2)}% − Jan/27 {rateShort.toFixed(2)}%)</div>
@@ -434,7 +433,7 @@ export function ResultPanel({
           {/* Payoff Chart */}
           <div className="rounded-xl border border-outline-variant bg-surface-container-low px-2 py-4">
             <div className="mb-2 pl-3 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-              {t("payoffDiagram")} (Swap)
+              {strings.payoffDiagram} (Swap)
             </div>
             <PayoffChart
               forwardRate={forwardChosen}
@@ -507,7 +506,7 @@ export function ResultPanel({
             className={`rounded-xl border p-6 ${bgClass}`}
           >
             <div className="mb-1 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-              {t("resultOf", { instrument: instrument || "Derivativo" })}
+              {resultOf(instrument || "Derivativo")}
             </div>
             <div
               className={`text-3xl font-extrabold font-mono ${colorClass}`}
@@ -549,7 +548,7 @@ export function ResultPanel({
           </div>
           <div className="rounded-xl border border-outline-variant bg-surface-container-low px-2 py-4">
             <div className="mb-2 pl-3 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-              {t("payoffDiagram")}
+              {strings.payoffDiagram}
             </div>
             <PayoffChart
               forwardRate={forwardChosen}
@@ -561,7 +560,7 @@ export function ResultPanel({
           </div>
           <div className="rounded-xl border border-outline-variant p-5 bg-surface-container-lowest">
             <div className="mb-2 text-xs font-bold uppercase tracking-wider text-secondary">
-              {t("whyResult")}
+              {strings.whyResult}
             </div>
             <p className="text-sm leading-relaxed text-on-surface">
               {position === "sell_usd" ? (
@@ -631,7 +630,7 @@ export function ResultPanel({
             {isHedge && (
               <div className="mt-4 rounded-lg bg-secondary/10 p-4 text-sm leading-relaxed text-on-surface">
                 <div className="mb-2 font-semibold text-secondary">
-                  {isSpecDI ? t("specView") : t("hedgeView")}
+                  {isSpecDI ? strings.specView : strings.hedgeView}
                 </div>
                 {isHedgeDI ? (
                   <div className="space-y-2">
@@ -857,7 +856,7 @@ export function ResultPanel({
           </div>
           <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
             <div className="mb-2 text-xs font-bold uppercase tracking-wider text-amber-600">
-              {t("whatIfDifferent")}
+              {strings.whatIfDifferent}
             </div>
             <p className="text-sm leading-relaxed text-on-surface">
               Se tivesse <strong>{altLabel}</strong> ao invés de {posLabel}, resultado seria{" "}
