@@ -79,11 +79,11 @@ const ContractHalf: React.FC<{
       />
       <text
         x={cx}
-        y={cy - 8}
+        y={cy - 16}
         textAnchor="middle"
         dominantBaseline="middle"
         fill={color}
-        fontSize={13}
+        fontSize={11}
         fontFamily="monospace"
         opacity={0.9}
       >
@@ -91,7 +91,7 @@ const ContractHalf: React.FC<{
       </text>
       <text
         x={cx}
-        y={cy + 12}
+        y={cy + 8}
         textAnchor="middle"
         dominantBaseline="middle"
         fill={color}

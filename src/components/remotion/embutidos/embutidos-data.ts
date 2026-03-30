@@ -65,10 +65,10 @@ export const BARS = [
 // ── Floating Labels ────────────────────────────────────────────────
 export const FLOATING_LABELS: EmbutidosFloatingLabel[] = [
   { value: "COE Principal Garantido", x: 0.72, y: 0.10, fontSize: 16, cycleOffset: 0, driftX: 0, driftY: -0.25, color: COLOR_TEAL },
-  { value: "Callable Bond", x: 0.82, y: 0.65, fontSize: 14, cycleOffset: 50, driftX: 0.1, driftY: -0.15, color: COLOR_GOLD },
+  { value: "Callable Bond", x: 0.42, y: 0.82, fontSize: 14, cycleOffset: 50, driftX: 0.1, driftY: -0.15, color: COLOR_GOLD },
   { value: "Conversível", x: 0.58, y: 0.08, fontSize: 15, cycleOffset: 100, driftX: -0.15, driftY: 0, color: COLOR_TEAL },
   { value: "Cap/Floor CDI", x: 0.85, y: 0.40, fontSize: 13, cycleOffset: 150, driftX: -0.1, driftY: -0.2, color: COLOR_RED },
-  { value: "Pré-pagamento", x: 0.65, y: 0.55, fontSize: 14, cycleOffset: 200, driftX: 0.08, driftY: -0.1, color: COLOR_GOLD },
+  { value: "Pré-pagamento", x: 0.78, y: 0.82, fontSize: 14, cycleOffset: 200, driftX: 0.08, driftY: -0.1, color: COLOR_GOLD },
   { value: "Nota Estruturada", x: 0.90, y: 0.18, fontSize: 16, cycleOffset: 250, driftX: -0.08, driftY: 0.1, color: COLOR_TEAL },
 ];
 

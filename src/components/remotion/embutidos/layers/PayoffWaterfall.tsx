@@ -153,7 +153,7 @@ export const PayoffWaterfall: React.FC = () => {
   });
 
   const scale = 1.1;
-  const svgOffsetX = 1920 * 0.55;
+  const svgOffsetX = 1920 * 0.68;
   const svgOffsetY = (800 - WATERFALL_VIEWBOX_H * scale) / 2 + 60;
 
   return (
