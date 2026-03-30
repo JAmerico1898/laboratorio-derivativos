@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { THEMES } from '@/data/themes';
 import { getScenariosByTheme } from '@/data/scenarios';
 import { useCompletedScenarios } from '@/hooks/use-completed-scenarios';
@@ -9,6 +9,12 @@ import { useRouter } from 'next/navigation';
 import { strings } from '@/lib/strings';
 import type { Scenario } from '@/types/scenario';
 import type { CompletedScenario } from '@/types/results';
+import dynamic from 'next/dynamic';
+
+const FuturosPlayer = dynamic(
+  () => import("@/components/remotion/futuros/FuturosPlayer").then((m) => ({ default: m.FuturosPlayer })),
+  { ssr: false }
+);
 
 interface ModulePageProps {
   themeId: string;
@@ -51,6 +57,21 @@ export function ModulePage({ themeId }: ModulePageProps) {
   const theme = THEMES.find((th) => th.id === themeId);
   const scenarios = getScenariosByTheme(themeId);
 
+  const hasFuturosHero = themeId === "futuros";
+
+  const [showText, setShowText] = useState(!hasFuturosHero);
+
+  useEffect(() => {
+    if (!hasFuturosHero) return;
+    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+    if (!isDesktop) {
+      setShowText(true);
+      return;
+    }
+    const timer = setTimeout(() => setShowText(true), 5000);
+    return () => clearTimeout(timer);
+  }, [hasFuturosHero]);
+
   const getCompletionForScenario = (scenarioId: string): CompletedScenario | undefined => {
     return [...completedScenarios].reverse().find((cs) => cs.id === scenarioId);
   };
@@ -84,25 +105,77 @@ export function ModulePage({ themeId }: ModulePageProps) {
 
       <main className="pt-24 pb-20 px-6 max-w-7xl mx-auto">
         {/* Header Section */}
-        <header className="mb-12 relative">
-          <div className="flex items-center gap-4 mb-8">
-            <button
-              onClick={() => router.push('/')}
-              className="flex items-center gap-2 text-primary font-semibold hover:opacity-70 transition-opacity cursor-pointer"
-            >
-              <span className="material-symbols-outlined">arrow_back</span>
-              <span className="uppercase tracking-widest text-xs">{strings.backToModules}</span>
-            </button>
-          </div>
-          <div className="max-w-3xl">
-            <h1 className="font-heading text-5xl font-extrabold tracking-tight text-primary mb-4 leading-none">
-              {theme?.label}
-            </h1>
-            <p className="text-on-surface-variant text-lg leading-relaxed">
-              {theme?.description}
-            </p>
-          </div>
-        </header>
+        {hasFuturosHero ? (
+          <section className="relative w-screen -ml-[calc((100vw-100%)/2)] min-h-[500px] lg:min-h-[600px] overflow-hidden bg-[#0a1628] mb-12">
+            {/* Animation layer — desktop only */}
+            <div className="absolute inset-0 hidden lg:block">
+              <FuturosPlayer />
+            </div>
+
+            {/* Gradient mask — dims animation under text */}
+            <div
+              className="absolute inset-0 z-[5] hidden lg:block pointer-events-none"
+              style={{
+                background:
+                  "linear-gradient(to right, #0a1628 0%, #0a1628 18%, rgba(10,22,40,0.85) 28%, transparent 48%)",
+              }}
+            />
+
+            {/* Mobile gradient background */}
+            <div
+              className="absolute inset-0 lg:hidden"
+              style={{
+                background:
+                  "linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a1628 100%)",
+              }}
+            />
+
+            {/* Text content */}
+            <div className="relative z-10 flex items-center min-h-[500px] lg:min-h-[600px] px-8 lg:px-16">
+              <div
+                className="max-w-xl space-y-8 lg:w-[40%]"
+                style={{
+                  opacity: showText ? 1 : 0,
+                  transition: "opacity 1s ease-in-out",
+                }}
+              >
+                <button
+                  onClick={() => router.push('/')}
+                  className="flex items-center gap-2 text-[#8df5e4] font-semibold hover:opacity-70 transition-opacity cursor-pointer"
+                >
+                  <span className="material-symbols-outlined">arrow_back</span>
+                  <span className="uppercase tracking-widest text-xs">{strings.backToModules}</span>
+                </button>
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-extrabold text-[#e8eaed] leading-[1.1] tracking-tight">
+                  <span className="text-[#8df5e4]">{strings.futurosHeroTitle}</span>
+                </h1>
+                <p className="text-lg lg:text-xl text-[rgba(232,234,237,0.55)] max-w-xl leading-relaxed">
+                  {strings.futurosHeroSubtitle}
+                </p>
+              </div>
+            </div>
+          </section>
+        ) : (
+          <header className="mb-12 relative">
+            <div className="flex items-center gap-4 mb-8">
+              <button
+                onClick={() => router.push('/')}
+                className="flex items-center gap-2 text-primary font-semibold hover:opacity-70 transition-opacity cursor-pointer"
+              >
+                <span className="material-symbols-outlined">arrow_back</span>
+                <span className="uppercase tracking-widest text-xs">{strings.backToModules}</span>
+              </button>
+            </div>
+            <div className="max-w-3xl">
+              <h1 className="font-heading text-5xl font-extrabold tracking-tight text-primary mb-4 leading-none">
+                {theme?.label}
+              </h1>
+              <p className="text-on-surface-variant text-lg leading-relaxed">
+                {theme?.description}
+              </p>
+            </div>
+          </header>
+        )}
 
         {/* Scenario Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
