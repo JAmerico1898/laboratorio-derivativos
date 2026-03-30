@@ -1,11 +1,11 @@
 import { AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
 
-export const BackgroundGrid: React.FC = () => {
+export const BackgroundGrid: React.FC<{ patternId?: string }> = ({ patternId = "hero-grid" }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 
   // Fade in over 1 second
-  const opacity = interpolate(frame, [0, 1 * fps], [0, 0.08], {
+  const opacity = interpolate(frame, [0, 1 * fps], [0, 0.15], {
     extrapolateRight: "clamp",
   });
 
@@ -32,7 +32,7 @@ export const BackgroundGrid: React.FC = () => {
       <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <pattern
-            id="hero-grid"
+            id={patternId}
             width={gridSize}
             height={gridSize}
             patternUnits="userSpaceOnUse"
@@ -41,7 +41,7 @@ export const BackgroundGrid: React.FC = () => {
             <line x1="0" y1={gridSize} x2={gridSize} y2={gridSize} stroke={gridColor} strokeWidth="0.5" />
           </pattern>
         </defs>
-        <rect width="100%" height="200%" fill="url(#hero-grid)" />
+        <rect width="100%" height="200%" fill={`url(#${patternId})`} />
       </svg>
     </AbsoluteFill>
   );
