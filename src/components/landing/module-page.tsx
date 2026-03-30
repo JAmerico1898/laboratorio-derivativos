@@ -57,7 +57,7 @@ export function ModulePage({ themeId, heroPlayer }: ModulePageProps) {
       setShowHeroText(true);
       return;
     }
-    const timer = setTimeout(() => setShowHeroText(true), 5000);
+    const timer = setTimeout(() => setShowHeroText(true), 7000);
     return () => clearTimeout(timer);
   }, [heroPlayer]);
 
@@ -76,6 +76,8 @@ export function ModulePage({ themeId, heroPlayer }: ModulePageProps) {
   const handleBack = () => {
     setActiveScenario(null);
   };
+
+  const moduleNumber = THEMES.findIndex((th) => th.id === themeId) + 1;
 
   if (activeScenario) {
     return (
@@ -98,7 +100,7 @@ export function ModulePage({ themeId, heroPlayer }: ModulePageProps) {
       {heroPlayer ? (
         <>
           {/* ── Hero Section with Animation ── */}
-          <section className="relative w-screen -ml-[calc((100vw-100%)/2)] min-h-[500px] lg:min-h-[600px] overflow-hidden bg-[#0a1628]">
+          <section className="relative w-screen -ml-[calc((100vw-100%)/2)] min-h-[600px] lg:min-h-[700px] overflow-hidden bg-[#0a1628]">
             {/* Animation layer — desktop only */}
             <div className="absolute inset-0 hidden lg:block">
               {heroPlayer}
@@ -109,7 +111,7 @@ export function ModulePage({ themeId, heroPlayer }: ModulePageProps) {
               className="absolute inset-0 z-[5] hidden lg:block pointer-events-none"
               style={{
                 background:
-                  "linear-gradient(to right, #0a1628 0%, #0a1628 20%, rgba(10,22,40,0.85) 30%, transparent 50%)",
+                  "linear-gradient(to right, #0a1628 0%, #0a1628 18%, rgba(10,22,40,0.85) 28%, transparent 42%)",
               }}
             />
 
@@ -123,7 +125,7 @@ export function ModulePage({ themeId, heroPlayer }: ModulePageProps) {
             />
 
             {/* Text content */}
-            <div className="relative z-10 flex items-center min-h-[500px] lg:min-h-[600px] px-8 lg:px-16">
+            <div className="relative z-10 flex items-center min-h-[600px] lg:min-h-[700px] px-8 lg:px-16">
               <div
                 className="max-w-xl space-y-6 lg:w-[35%]"
                 style={{
@@ -140,7 +142,7 @@ export function ModulePage({ themeId, heroPlayer }: ModulePageProps) {
                 </button>
                 <div className="space-y-4">
                   <span className="text-[rgba(141,245,228,0.6)] text-xs font-bold uppercase tracking-[3px]">
-                    Módulo 1
+                    {`Módulo ${moduleNumber}`}
                   </span>
                   <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-extrabold text-[#e8eaed] leading-[1.1] tracking-tight">
                     {theme?.label}
