@@ -184,6 +184,39 @@ const gaugeComponents: Record<string, React.FC<{ cx: number; cy: number; delay: 
   ν: VegaGauge,
 };
 
+// ── Single Gauge with Label (shared entrance animation) ─────────────
+
+const GaugeWithLabel: React.FC<{
+  symbol: string;
+  cx: number;
+  cy: number;
+  delay: number;
+}> = ({ symbol, cx, cy, delay }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  const entrance = spring({ frame, fps, delay, config: { damping: 20, stiffness: 180 } });
+  const GaugeComponent = gaugeComponents[symbol];
+
+  return (
+    <g opacity={entrance}>
+      {/* Greek symbol label */}
+      <text
+        x={cx}
+        y={cy - GAUGE_R - 8}
+        fill={symbol === "θ" ? COLOR_GOLD : COLOR_TEAL}
+        fontSize={14}
+        fontFamily="monospace"
+        textAnchor="middle"
+        opacity={0.6}
+      >
+        {symbol}
+      </text>
+      <GaugeComponent cx={cx} cy={cy} delay={delay} />
+    </g>
+  );
+};
+
 // ── Main Component ──────────────────────────────────────────────────
 
 export const GreeksGauges: React.FC = () => {
@@ -201,29 +234,15 @@ export const GreeksGauges: React.FC = () => {
         preserveAspectRatio="xMidYMid slice"
       >
         <g transform={`translate(${svgOffsetX}, ${svgOffsetY}) scale(${scale})`}>
-          {GREEKS.map((greek, i) => {
-            const GaugeComponent = gaugeComponents[greek.symbol];
-            const cx = GAUGE_START_X + i * GAUGE_SPACING;
-            const cy = GAUGE_ROW_Y;
-
-            return (
-              <g key={greek.symbol}>
-                {/* Greek symbol label */}
-                <text
-                  x={cx}
-                  y={cy - GAUGE_R - 8}
-                  fill={greek.symbol === "θ" ? COLOR_GOLD : COLOR_TEAL}
-                  fontSize={14}
-                  fontFamily="monospace"
-                  textAnchor="middle"
-                  opacity={0.6}
-                >
-                  {greek.symbol}
-                </text>
-                <GaugeComponent cx={cx} cy={cy} delay={greek.delay} />
-              </g>
-            );
-          })}
+          {GREEKS.map((greek, i) => (
+            <GaugeWithLabel
+              key={greek.symbol}
+              symbol={greek.symbol}
+              cx={GAUGE_START_X + i * GAUGE_SPACING}
+              cy={GAUGE_ROW_Y}
+              delay={greek.delay}
+            />
+          ))}
         </g>
       </svg>
     </AbsoluteFill>
