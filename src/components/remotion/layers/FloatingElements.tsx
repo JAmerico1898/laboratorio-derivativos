@@ -5,7 +5,7 @@ const TICKER_CYCLE_DURATION = 60; // frames per fade cycle for floating numbers
 
 const TickerTape: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { fps, durationInFrames } = useVideoConfig();
 
   const fadeIn = interpolate(frame, [1 * fps, 2 * fps], [0, 1], {
     extrapolateLeft: "clamp",
@@ -21,7 +21,7 @@ const TickerTape: React.FC = () => {
   const fullText = `${tickerText}   ·   ${tickerText}`;
 
   // Scroll speed: complete one cycle over the full duration
-  const scrollX = interpolate(frame, [0, 300], [0, -1200]);
+  const scrollX = interpolate(frame, [0, durationInFrames], [0, -1200]);
 
   return (
     <div
