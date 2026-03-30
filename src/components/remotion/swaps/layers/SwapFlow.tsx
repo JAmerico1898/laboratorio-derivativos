@@ -45,10 +45,10 @@ const CounterpartyNode: React.FC<{
       />
       <text
         x={0}
-        y={-5}
+        y={-6}
         textAnchor="middle"
         fill={color}
-        fontSize={12}
+        fontSize={16}
         fontFamily="monospace"
         opacity={0.9}
       >
@@ -56,10 +56,10 @@ const CounterpartyNode: React.FC<{
       </text>
       <text
         x={0}
-        y={12}
+        y={14}
         textAnchor="middle"
         fill={color}
-        fontSize={9}
+        fontSize={12}
         fontFamily="monospace"
         opacity={0.5}
       >
@@ -166,7 +166,7 @@ const ArcLabel: React.FC<{
       y={y}
       textAnchor="middle"
       fill={color}
-      fontSize={10}
+      fontSize={14}
       fontFamily="monospace"
       opacity={progress * 0.6}
     >
@@ -176,9 +176,10 @@ const ArcLabel: React.FC<{
 };
 
 export const SwapFlow: React.FC = () => {
-  // SVG viewBox is 600x260, positioned in the right 60% of 1920x800
-  const svgOffsetX = 1920 * 0.38; // start at 38% from left → right 62%
-  const svgOffsetY = (800 - 260) / 2; // vertically centered
+  // SVG viewBox is 600x260, scaled 1.4x and positioned in the right portion of 1920x800
+  const scale = 1.4;
+  const svgOffsetX = 1920 * 0.42; // shifted right
+  const svgOffsetY = (800 - 260 * scale) / 2; // vertically centered at scaled size
 
   return (
     <AbsoluteFill>
@@ -188,7 +189,7 @@ export const SwapFlow: React.FC = () => {
         viewBox="0 0 1920 800"
         preserveAspectRatio="xMidYMid slice"
       >
-        <g transform={`translate(${svgOffsetX}, ${svgOffsetY})`}>
+        <g transform={`translate(${svgOffsetX}, ${svgOffsetY}) scale(${scale})`}>
           {/* Counterparty nodes */}
           <CounterpartyNode
             center={PARTY_A}

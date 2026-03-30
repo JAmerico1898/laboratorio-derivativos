@@ -1,10 +1,12 @@
 // src/components/remotion/swaps/layers/PaymentTimeline.tsx
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { PARTICLE_CYCLE_FRAMES, COLOR_TEAL } from "../swaps-data";
+import { PARTICLE_CYCLE_FRAMES, PARTY_A, PARTY_B, COLOR_TEAL } from "../swaps-data";
 
 const TICK_COUNT = 5;
-const TIMELINE_WIDTH = 400;
-const TIMELINE_X_START = 50;
+// Timeline spans from PARTY_A.x to PARTY_B.x
+const TIMELINE_START = PARTY_A.x; // 100
+const TIMELINE_END = PARTY_B.x;   // 500
+const TIMELINE_WIDTH = TIMELINE_END - TIMELINE_START;
 
 export const PaymentTimeline: React.FC = () => {
   const frame = useCurrentFrame();
@@ -18,10 +20,10 @@ export const PaymentTimeline: React.FC = () => {
     config: { damping: 200 },
   });
 
-  // Position: aligned with the swap flow SVG group
-  // SwapFlow uses svgOffsetX = 1920 * 0.38, svgOffsetY center. Timeline sits below.
-  const svgOffsetX = 1920 * 0.38;
-  const timelineY = (800 - 260) / 2 + 260 + 30; // below the 260px swap flow area + 30px gap
+  // Same coordinate system as SwapFlow (scale 1.4, offset 42%)
+  const diagramScale = 1.4;
+  const svgOffsetX = 1920 * 0.42;
+  const timelineY = (800 - 260 * diagramScale) / 2 + 260 * diagramScale + 20;
 
   return (
     <AbsoluteFill style={{ opacity: fadeIn }}>
@@ -31,12 +33,12 @@ export const PaymentTimeline: React.FC = () => {
         viewBox="0 0 1920 800"
         preserveAspectRatio="xMidYMid slice"
       >
-        <g transform={`translate(${svgOffsetX + TIMELINE_X_START}, ${timelineY})`}>
-          {/* Horizontal line */}
+        <g transform={`translate(${svgOffsetX}, ${timelineY}) scale(${diagramScale})`}>
+          {/* Horizontal line from Parte A center to Parte B center */}
           <line
-            x1={0}
+            x1={TIMELINE_START}
             y1={0}
-            x2={TIMELINE_WIDTH}
+            x2={TIMELINE_END}
             y2={0}
             stroke={COLOR_TEAL}
             strokeWidth={1}
@@ -45,15 +47,13 @@ export const PaymentTimeline: React.FC = () => {
 
           {/* Tick markers */}
           {Array.from({ length: TICK_COUNT }, (_, i) => {
-            const x = (i / (TICK_COUNT - 1)) * TIMELINE_WIDTH;
+            const x = TIMELINE_START + (i / (TICK_COUNT - 1)) * TIMELINE_WIDTH;
 
             // Each tick pulses in sequence within the particle cycle
             const tickPhase = i / TICK_COUNT;
             const cycleProgress = (frame / PARTICLE_CYCLE_FRAMES) % 1;
-            // Distance from this tick's phase to current cycle progress (wrapped)
             const dist = Math.abs(cycleProgress - tickPhase);
             const wrappedDist = Math.min(dist, 1 - dist);
-            // Pulse: peaks when cycleProgress ≈ tickPhase
             const pulse = interpolate(
               wrappedDist,
               [0, 0.1, 0.2],
@@ -63,14 +63,14 @@ export const PaymentTimeline: React.FC = () => {
 
             const baseOpacity = 0.2;
             const pulseOpacity = baseOpacity + pulse * 0.5;
-            const scale = 1 + pulse * 0.5;
+            const tickScale = 1 + pulse * 0.5;
 
             return (
               <g key={i}>
                 <circle
                   cx={x}
                   cy={0}
-                  r={3 * scale}
+                  r={3 * tickScale}
                   fill={COLOR_TEAL}
                   opacity={pulseOpacity}
                 />
@@ -79,7 +79,7 @@ export const PaymentTimeline: React.FC = () => {
                   y={18}
                   textAnchor="middle"
                   fill={COLOR_TEAL}
-                  fontSize={8}
+                  fontSize={10}
                   fontFamily="monospace"
                   opacity={0.3}
                 >
