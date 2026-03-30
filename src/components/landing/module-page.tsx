@@ -9,15 +9,10 @@ import { useRouter } from 'next/navigation';
 import { strings } from '@/lib/strings';
 import type { Scenario } from '@/types/scenario';
 import type { CompletedScenario } from '@/types/results';
-import dynamic from 'next/dynamic';
-
-const FuturosPlayer = dynamic(
-  () => import("@/components/remotion/futuros/FuturosPlayer").then((m) => ({ default: m.FuturosPlayer })),
-  { ssr: false }
-);
 
 interface ModulePageProps {
   themeId: string;
+  heroPlayer?: React.ReactNode;
 }
 
 function getDifficultyStyles(difficulty: string) {
@@ -49,28 +44,25 @@ function getDifficultyStyles(difficulty: string) {
   };
 }
 
-export function ModulePage({ themeId }: ModulePageProps) {
+export function ModulePage({ themeId, heroPlayer }: ModulePageProps) {
   const router = useRouter();
   const [activeScenario, setActiveScenario] = useState<Scenario | null>(null);
   const { completedScenarios, addCompletedScenario } = useCompletedScenarios();
+  const [showHeroText, setShowHeroText] = useState(false);
+
+  useEffect(() => {
+    if (!heroPlayer) return;
+    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+    if (!isDesktop) {
+      setShowHeroText(true);
+      return;
+    }
+    const timer = setTimeout(() => setShowHeroText(true), 5000);
+    return () => clearTimeout(timer);
+  }, [heroPlayer]);
 
   const theme = THEMES.find((th) => th.id === themeId);
   const scenarios = getScenariosByTheme(themeId);
-
-  const hasFuturosHero = themeId === "futuros";
-
-  const [showText, setShowText] = useState(!hasFuturosHero);
-
-  useEffect(() => {
-    if (!hasFuturosHero) return;
-    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
-    if (!isDesktop) {
-      setShowText(true);
-      return;
-    }
-    const timer = setTimeout(() => setShowText(true), 5000);
-    return () => clearTimeout(timer);
-  }, [hasFuturosHero]);
 
   const getCompletionForScenario = (scenarioId: string): CompletedScenario | undefined => {
     return [...completedScenarios].reverse().find((cs) => cs.id === scenarioId);
@@ -103,13 +95,13 @@ export function ModulePage({ themeId }: ModulePageProps) {
         <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-secondary/5 blur-[100px] rounded-full" />
       </div>
 
-      <main className="pt-24 pb-20 px-6 max-w-7xl mx-auto">
-        {/* Header Section */}
-        {hasFuturosHero ? (
-          <section className="relative w-screen -ml-[calc((100vw-100%)/2)] min-h-[500px] lg:min-h-[600px] overflow-hidden bg-[#0a1628] mb-12">
+      {heroPlayer ? (
+        <>
+          {/* ── Hero Section with Animation ── */}
+          <section className="relative w-screen -ml-[calc((100vw-100%)/2)] min-h-[500px] lg:min-h-[600px] overflow-hidden bg-[#0a1628]">
             {/* Animation layer — desktop only */}
             <div className="absolute inset-0 hidden lg:block">
-              <FuturosPlayer />
+              {heroPlayer}
             </div>
 
             {/* Gradient mask — dims animation under text */}
@@ -117,7 +109,7 @@ export function ModulePage({ themeId }: ModulePageProps) {
               className="absolute inset-0 z-[5] hidden lg:block pointer-events-none"
               style={{
                 background:
-                  "linear-gradient(to right, #0a1628 0%, #0a1628 18%, rgba(10,22,40,0.85) 28%, transparent 48%)",
+                  "linear-gradient(to right, #0a1628 0%, #0a1628 20%, rgba(10,22,40,0.85) 30%, transparent 50%)",
               }}
             />
 
@@ -133,29 +125,94 @@ export function ModulePage({ themeId }: ModulePageProps) {
             {/* Text content */}
             <div className="relative z-10 flex items-center min-h-[500px] lg:min-h-[600px] px-8 lg:px-16">
               <div
-                className="max-w-xl space-y-8 lg:w-[40%]"
+                className="max-w-xl space-y-6 lg:w-[35%]"
                 style={{
-                  opacity: showText ? 1 : 0,
+                  opacity: showHeroText ? 1 : 0,
                   transition: "opacity 1s ease-in-out",
                 }}
               >
                 <button
                   onClick={() => router.push('/')}
-                  className="flex items-center gap-2 text-[#8df5e4] font-semibold hover:opacity-70 transition-opacity cursor-pointer"
+                  className="flex items-center gap-2 text-[rgba(141,245,228,0.7)] font-semibold hover:opacity-70 transition-opacity cursor-pointer"
                 >
-                  <span className="material-symbols-outlined">arrow_back</span>
+                  <span className="material-symbols-outlined text-sm">arrow_back</span>
                   <span className="uppercase tracking-widest text-xs">{strings.backToModules}</span>
                 </button>
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-extrabold text-[#e8eaed] leading-[1.1] tracking-tight">
-                  <span className="text-[#8df5e4]">{strings.futurosHeroTitle}</span>
-                </h1>
-                <p className="text-lg lg:text-xl text-[rgba(232,234,237,0.55)] max-w-xl leading-relaxed">
-                  {strings.futurosHeroSubtitle}
-                </p>
+                <div className="space-y-4">
+                  <span className="text-[rgba(141,245,228,0.6)] text-xs font-bold uppercase tracking-[3px]">
+                    Módulo 1
+                  </span>
+                  <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-extrabold text-[#e8eaed] leading-[1.1] tracking-tight">
+                    {theme?.label}
+                  </h1>
+                  <p className="text-lg lg:text-xl text-[rgba(232,234,237,0.55)] max-w-xl leading-relaxed">
+                    {theme?.description}
+                  </p>
+                </div>
               </div>
             </div>
           </section>
-        ) : (
+
+          {/* Scenario Cards Grid — below hero */}
+          <main className="py-16 px-6 max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {scenarios.map((scenario) => {
+                const completion = getCompletionForScenario(scenario.id);
+                const isCompleted = !!completion;
+                const styles = getDifficultyStyles(scenario.difficulty);
+                const isSuperDesafio = scenario.difficulty === 'Super Desafio';
+                const isIntermediario = scenario.difficulty === 'Intermediário';
+
+                return (
+                  <div
+                    key={scenario.id}
+                    onClick={() => setActiveScenario(scenario)}
+                    className={`rounded-xl p-8 transition-all group relative overflow-hidden flex flex-col justify-between min-h-[320px] cursor-pointer ${styles.card}`}
+                  >
+                    {!isSuperDesafio && (
+                      <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform duration-500" />
+                    )}
+                    <div>
+                      <div className="flex justify-between items-start mb-6">
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${styles.badge}`}>
+                          {scenario.difficulty}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          {isCompleted && (
+                            <span className="flex items-center gap-1 bg-secondary-container text-on-secondary-container px-2.5 py-1 rounded-full text-[10px] font-bold">
+                              <span className="material-symbols-outlined text-sm">check_circle</span>
+                              {completion.score}/{completion.totalScore}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <h3 className={`font-heading text-2xl font-bold mb-4 ${styles.title}`}>
+                        {scenario.title}
+                      </h3>
+                      <p className={`leading-relaxed ${styles.narrative}`}>
+                        {scenario.context.narrative.replace(/\*\*/g, '')}
+                      </p>
+                    </div>
+                    {isIntermediario ? (
+                      <button className={`mt-8 w-fit px-8 py-3 rounded-xl font-bold text-sm flex items-center gap-2 transition-colors active:scale-95 cursor-pointer ${styles.cta}`}>
+                        {strings.startScenario}
+                        <span className="material-symbols-outlined text-sm">trending_flat</span>
+                      </button>
+                    ) : (
+                      <div className={`mt-8 flex items-center justify-between font-bold text-sm group-hover:translate-x-1 transition-transform cursor-pointer ${styles.cta}`}>
+                        <span>{strings.startScenario}</span>
+                        <span className="material-symbols-outlined">chevron_right</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </main>
+        </>
+      ) : (
+        <main className="pt-24 pb-20 px-6 max-w-7xl mx-auto">
+          {/* Header Section — original layout when no hero */}
           <header className="mb-12 relative">
             <div className="flex items-center gap-4 mb-8">
               <button
@@ -175,66 +232,63 @@ export function ModulePage({ themeId }: ModulePageProps) {
               </p>
             </div>
           </header>
-        )}
 
-        {/* Scenario Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {scenarios.map((scenario) => {
-            const completion = getCompletionForScenario(scenario.id);
-            const isCompleted = !!completion;
-            const styles = getDifficultyStyles(scenario.difficulty);
-            const isSuperDesafio = scenario.difficulty === 'Super Desafio';
-            const isIntermediario = scenario.difficulty === 'Intermediário';
+          {/* Scenario Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {scenarios.map((scenario) => {
+              const completion = getCompletionForScenario(scenario.id);
+              const isCompleted = !!completion;
+              const styles = getDifficultyStyles(scenario.difficulty);
+              const isSuperDesafio = scenario.difficulty === 'Super Desafio';
+              const isIntermediario = scenario.difficulty === 'Intermediário';
 
-            return (
-              <div
-                key={scenario.id}
-                onClick={() => setActiveScenario(scenario)}
-                className={`rounded-xl p-8 transition-all group relative overflow-hidden flex flex-col justify-between min-h-[320px] cursor-pointer ${styles.card}`}
-              >
-                {/* Decorative orb */}
-                {!isSuperDesafio && (
-                  <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform duration-500" />
-                )}
-
-                <div>
-                  <div className="flex justify-between items-start mb-6">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${styles.badge}`}>
-                      {scenario.difficulty}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      {isCompleted && (
-                        <span className="flex items-center gap-1 bg-secondary-container text-on-secondary-container px-2.5 py-1 rounded-full text-[10px] font-bold">
-                          <span className="material-symbols-outlined text-sm">check_circle</span>
-                          {completion.score}/{completion.totalScore}
-                        </span>
-                      )}
+              return (
+                <div
+                  key={scenario.id}
+                  onClick={() => setActiveScenario(scenario)}
+                  className={`rounded-xl p-8 transition-all group relative overflow-hidden flex flex-col justify-between min-h-[320px] cursor-pointer ${styles.card}`}
+                >
+                  {!isSuperDesafio && (
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform duration-500" />
+                  )}
+                  <div>
+                    <div className="flex justify-between items-start mb-6">
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${styles.badge}`}>
+                        {scenario.difficulty}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {isCompleted && (
+                          <span className="flex items-center gap-1 bg-secondary-container text-on-secondary-container px-2.5 py-1 rounded-full text-[10px] font-bold">
+                            <span className="material-symbols-outlined text-sm">check_circle</span>
+                            {completion.score}/{completion.totalScore}
+                          </span>
+                        )}
+                      </div>
                     </div>
+                    <h3 className={`font-heading text-2xl font-bold mb-4 ${styles.title}`}>
+                      {scenario.title}
+                    </h3>
+                    <p className={`leading-relaxed ${styles.narrative}`}>
+                      {scenario.context.narrative.replace(/\*\*/g, '')}
+                    </p>
                   </div>
-                  <h3 className={`font-heading text-2xl font-bold mb-4 ${styles.title}`}>
-                    {scenario.title}
-                  </h3>
-                  <p className={`leading-relaxed ${styles.narrative}`}>
-                    {scenario.context.narrative.replace(/\*\*/g, '')}
-                  </p>
+                  {isIntermediario ? (
+                    <button className={`mt-8 w-fit px-8 py-3 rounded-xl font-bold text-sm flex items-center gap-2 transition-colors active:scale-95 cursor-pointer ${styles.cta}`}>
+                      {strings.startScenario}
+                      <span className="material-symbols-outlined text-sm">trending_flat</span>
+                    </button>
+                  ) : (
+                    <div className={`mt-8 flex items-center justify-between font-bold text-sm group-hover:translate-x-1 transition-transform cursor-pointer ${styles.cta}`}>
+                      <span>{strings.startScenario}</span>
+                      <span className="material-symbols-outlined">chevron_right</span>
+                    </div>
+                  )}
                 </div>
-
-                {isIntermediario ? (
-                  <button className={`mt-8 w-fit px-8 py-3 rounded-xl font-bold text-sm flex items-center gap-2 transition-colors active:scale-95 cursor-pointer ${styles.cta}`}>
-                    {strings.startScenario}
-                    <span className="material-symbols-outlined text-sm">trending_flat</span>
-                  </button>
-                ) : (
-                  <div className={`mt-8 flex items-center justify-between font-bold text-sm group-hover:translate-x-1 transition-transform cursor-pointer ${styles.cta}`}>
-                    <span>{strings.startScenario}</span>
-                    <span className="material-symbols-outlined">chevron_right</span>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </main>
+              );
+            })}
+          </div>
+        </main>
+      )}
     </div>
   );
 }
