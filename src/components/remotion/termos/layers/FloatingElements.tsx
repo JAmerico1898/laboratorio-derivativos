@@ -98,7 +98,7 @@ const FloatingNumber: React.FC<{
         fontFamily: "monospace",
         fontSize,
         color: COLOR_TEAL,
-        opacity: fadeIn * cycleOpacity * 0.25,
+        opacity: fadeIn * cycleOpacity * 0.15,
         pointerEvents: "none",
       }}
     >
