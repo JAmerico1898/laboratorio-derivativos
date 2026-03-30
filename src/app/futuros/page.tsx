@@ -1,3 +1,5 @@
+"use client";
+
 import { ModulePage } from '@/components/landing/module-page';
 import dynamic from 'next/dynamic';
 
