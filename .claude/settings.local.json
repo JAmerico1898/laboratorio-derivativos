@@ -8,7 +8,20 @@
       "Bash(cp -r nextjs-temp/node_modules .)",
       "Bash(rm -rf nextjs-temp)",
       "Bash(npm install:*)",
-      "Bash(npm cache:*)"
+      "Bash(npm cache:*)",
+      "Bash(git stash:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(npm run:*)",
+      "Bash(taskkill //F //IM node.exe)",
+      "Bash(pkill -f \"next build\")",
+      "Bash(xargs wc:*)",
+      "Bash(find C:/jose_americo/laboratorio-derivativos/src/components/remotion/termos -type f -name *.tsx)",
+      "Bash(find C:/jose_americo/laboratorio-derivativos/src/components/remotion/futuros -type f -name *.tsx)",
+      "Bash(grep -r embutidos C:/jose_americo/laboratorio-derivativos/src --include=*.ts --include=*.tsx --include=*.json)",
+      "Bash(bash \"C:\\\\Users\\\\felip\\\\.claude\\\\plugins\\\\cache\\\\claude-plugins-official\\\\superpowers\\\\5.0.6\\\\skills\\\\brainstorming\\\\scripts\\\\start-server.sh\" --project-dir \"C:\\\\jose_americo\\\\laboratorio-derivativos\")",
+      "Bash(git push:*)",
+      "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")"
     ]
   }
 }

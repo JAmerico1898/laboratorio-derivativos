@@ -1,6 +1,6 @@
-// src/components/remotion/opcoes/layers/OpcoesFloatingLabels.tsx
+// src/components/remotion/credito/layers/CreditoFloatingLabels.tsx
 import { AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
-import { FLOATING_LABELS } from "../opcoes-data";
+import { FLOATING_LABELS } from "../credito-data";
 
 const CYCLE_DURATION = 60;
 
@@ -52,7 +52,7 @@ const FloatingLabel: React.FC<{
   );
 };
 
-export const OpcoesFloatingLabels: React.FC = () => {
+export const CreditoFloatingLabels: React.FC = () => {
   return (
     <AbsoluteFill>
       {FLOATING_LABELS.map((label, i) => (

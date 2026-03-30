@@ -155,6 +155,13 @@ export function ModulePage({ themeId, heroPlayer }: ModulePageProps) {
             </div>
           </section>
 
+          {/* Banner — separates hero from scenarios */}
+          <div className="w-screen -ml-[calc((100vw-100%)/2)] bg-[#060d1a] flex items-center justify-center" style={{ height: '8.5rem' }}>
+            <h2 className="font-heading text-4xl md:text-5xl font-bold text-primary uppercase tracking-[4px] text-center">
+              Cenários de Análise
+            </h2>
+          </div>
+
           {/* Scenario Cards Grid — below hero */}
           <main className="py-16 px-6 max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -234,6 +241,13 @@ export function ModulePage({ themeId, heroPlayer }: ModulePageProps) {
               </p>
             </div>
           </header>
+
+          {/* Banner — separates header from scenarios */}
+          <div className="bg-[#060d1a] flex items-center justify-center -mx-6" style={{ height: '8.5rem' }}>
+            <h2 className="font-heading text-4xl md:text-5xl font-bold text-primary uppercase tracking-[4px] text-center">
+              Cenários de Análise
+            </h2>
+          </div>
 
           {/* Scenario Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Manrope, Inter } from "next/font/google";
 import { Navbar } from "@/components/landing/navbar";
+import { Footer } from "@/components/landing/footer";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="font-sans antialiased">
         <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
   );
