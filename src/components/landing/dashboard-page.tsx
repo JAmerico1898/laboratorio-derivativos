@@ -1,13 +1,33 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { strings, moduleProgress } from "@/lib/strings";
 import { THEMES } from "@/data/themes";
 import { getScenariosByTheme } from "@/data/scenarios";
 import { useCompletedScenarios } from "@/hooks/use-completed-scenarios";
 
+const HeroPlayer = dynamic(
+  () => import("@/components/remotion/HeroPlayer").then((m) => ({ default: m.HeroPlayer })),
+  { ssr: false }
+);
+
 export function DashboardPage() {
   const { completedScenarios } = useCompletedScenarios();
+
+  const [showText, setShowText] = useState(false);
+
+  useEffect(() => {
+    // On mobile (no animation), show text immediately
+    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+    if (!isDesktop) {
+      setShowText(true);
+      return;
+    }
+    const timer = setTimeout(() => setShowText(true), 7000);
+    return () => clearTimeout(timer);
+  }, []);
 
   function getModuleProgress(themeId: string) {
     const scenarios = getScenariosByTheme(themeId);
@@ -19,27 +39,46 @@ export function DashboardPage() {
   return (
     <div className="bg-background text-on-background font-sans antialiased">
       {/* ── Hero Section ── */}
-      <section className="relative pt-28 pb-24 overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary-container/10 to-transparent opacity-50" />
+      <section className="relative w-screen -ml-[calc((100vw-100%)/2)] min-h-[600px] lg:min-h-[700px] overflow-hidden bg-[#0a1628]">
+        {/* Animation layer — desktop only */}
+        <div className="absolute inset-0 hidden lg:block">
+          <HeroPlayer />
         </div>
-        <div className="max-w-7xl mx-auto px-8 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8">
-            <h1 className="text-6xl md:text-7xl font-heading font-extrabold text-primary leading-[1.1] tracking-tight">
+
+        {/* Gradient mask — dims animation under text */}
+        <div
+          className="absolute inset-0 z-[5] hidden lg:block pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(to right, #0a1628 0%, #0a1628 20%, rgba(10,22,40,0.85) 30%, transparent 50%)",
+          }}
+        />
+
+        {/* Mobile gradient background */}
+        <div
+          className="absolute inset-0 lg:hidden"
+          style={{
+            background:
+              "linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a1628 100%)",
+          }}
+        />
+
+        {/* Text content */}
+        <div className="relative z-10 flex items-center min-h-[600px] lg:min-h-[700px] px-8 lg:px-16">
+          <div
+            className="max-w-xl space-y-8 lg:w-[35%]"
+            style={{
+              opacity: showText ? 1 : 0,
+              transition: "opacity 1s ease-in-out",
+            }}
+          >
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-extrabold text-[#e8eaed] leading-[1.1] tracking-tight">
               {strings.heroTitle}{" "}
-              <span className="text-secondary">{strings.heroTitleAccent}</span>
+              <span className="text-[#8df5e4]">{strings.heroTitleAccent}</span>
             </h1>
-            <p className="text-xl text-on-surface-variant max-w-xl leading-relaxed">
+            <p className="text-lg lg:text-xl text-[rgba(232,234,237,0.55)] max-w-xl leading-relaxed">
               {strings.heroSubtitle}
             </p>
-          </div>
-          <div className="relative hidden lg:block">
-            <div className="absolute -inset-4 bg-secondary/10 rounded-3xl blur-3xl" />
-            <img
-              alt="Modern stock exchange trading floor with multiple screens"
-              className="relative z-10 w-full aspect-[4/3] object-cover rounded-2xl shadow-2xl"
-              src="/hero-trading.jpg"
-            />
           </div>
         </div>
       </section>
@@ -141,19 +180,6 @@ export function DashboardPage() {
         </div>
       </section>
 
-      {/* ── Footer ── */}
-      <footer className="w-full py-12 border-t border-white/10 bg-primary">
-        <div className="flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto px-8 gap-6">
-          <div className="flex flex-col items-center md:items-start gap-4">
-            <div className="text-xl font-heading font-bold text-white">{strings.siteTitle}</div>
-            <div className="text-sm text-slate-300">{strings.footerCopyright1}</div>
-            <div className="text-sm text-slate-300">{strings.footerCopyright2}</div>
-          </div>
-          <Link href="/contato" className="text-lg font-semibold text-slate-200 hover:text-emerald-400 transition-colors underline decoration-emerald-500/50 underline-offset-4">
-            {strings.footerContact}
-          </Link>
-        </div>
-      </footer>
     </div>
   );
 }
