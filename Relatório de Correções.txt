@@ -1,0 +1,178 @@
+Relatório de Correções — Módulo 2 (Futuros)
+
+  Issue 1-2: Cálculo do PU (Cenário 1)
+
+  - Antes: PU ≈ 73.785 (divisor 1,3554)
+  - Depois: PU ≈ 74.493 (divisor 1,3424)
+  - Verificação: (1,125)^2,5 = 1,265625 × 1,06066 = 1,3424. Logo PU = 100.000 ÷ 1,3424 = 74.493 ✓
+
+  Issue 3-4: Número de contratos (Cenário 1)
+
+  - Antes: 8.133 contratos (base 6.777)
+  - Depois: 8.054 contratos (base 6.712)
+  - Verificação: 500.000.000 ÷ 74.493 = 6.712; × 1,2 (duration) = 8.054 ✓
+  - Todos os textos de feedback e alternativas atualizados
+
+  Issue 5: Cenários de mercado do DI hedge (Cenário 1)
+
+  - notional_usd calibrado para 13.100.000 (baseado no DV01 total = 8.054 × R$ 16,56 ≈ R$ 133.000/bp)
+  - Descrições dos cenários atualizadas com PUs corretos:
+    - 13,50% → PU ≈ 72.865, P&L ≈ +R$ 13,1M
+    - 11,50% → PU ≈ 76.175, P&L ≈ −R$ 13,5M
+    - 12,60% → PU ≈ 74.327, P&L ≈ +R$ 1,3M
+
+  Issue 6: Forward rate do Dólar Futuro (Cenário 2)
+
+  - Bug: IDs de escolha above_fwd/market_fwd/spot_rate colidiam com a lógica de getForwardRate(), fazendo a taxa retornar 5,37 ao invés de
+   5,30
+  - Fix: Renomeados para dol_40/dol_20/dol_100 — agora retorna corretamente 5,30
+  - Descrições dos cenários atualizadas com os cálculos corretos dos ajustes diários
+
+  Issue 7: Redesign Especulação em Juros (Cenário 3)
+
+  - Antes: PU=78.925, DV01=R$180/ctr, 185 contratos, sem DU informado — dados inconsistentes
+  - Depois: DU=504, PU=79.720 (= 100.000 ÷ 1,12²), DV01=R$14/ctr, 2.340 contratos
+  - Verificação: Stop loss R$ 5M ÷ (R$ 14 × 150bp stress) = R$ 5M ÷ R$ 2.100 ≈ 2.380 → 2.340 (com margem)
+  - PUs dos cenários: 9,80% → 82.950; 13,50% → 77.630; 11,80% → 80.005
+  - Risk/reward: R$ 8,2M ganho potencial vs R$ 5M stop = 1,6:1
+
+  Issue 8: Calendar Spread (Cenário 4)
+
+  - Bug de direção: A resposta correta estava invertida
+    - Antes: "Vender taxa Jan/27 + Comprar taxa Jan/28 = flattener" (ERRADO — é steepener)
+    - Depois: "Comprar taxa Jan/27 + Vender taxa Jan/28 = flattener" (CORRETO — lucra quando o longo cai mais)
+  - DV01 corrigidos: 180→R$14/ctr (Jan/27), 240→R$20/ctr (Jan/28), contratos 3.750→3.500
+  - Resultado customizado: Novo painel de resultado dedicado para spread (como o painel de arbitragem) mostrando as duas pernas e o P&L   
+  baseado na compressão/alargamento do spread:
+    - Cenário A (80→30bp, +50bp compressão): +R$ 3.500.000 ✓
+    - Cenário B (80→150bp, −70bp alargamento): −R$ 4.900.000 ✓
+    - Cenário C (80→75bp, +5bp compressão): +R$ 350.000 ✓
+
+
+
+
+
+
+Relatório de Correções — Módulo 3 (Swaps)
+
+  Issue 1: Swap CDI × Pré mostrando taxa 12,57% ao invés de 12,50%
+
+  Causa raiz: O ID da alternativa correta era "above_fwd", que colide com a função getForwardRate() no hook use-scenario-player.ts. Essa  
+  função retorna forwardRate90d + 0.07 = 12.50 + 0.07 = 12.57 para o ID "above_fwd".
+
+  Correção: Renomeados os IDs das alternativas:
+  - "above_fwd" → "swap_custo_total" (14,50% — correto)
+  - "market_fwd" → "swap_taxa_fixa" (12,50% — errado)
+  - "spot_rate" → "swap_custo_atual" (13,75% — errado)
+
+  Agora getForwardRate() retorna corretamente 12.50 (valor default de forwardRate90d).
+
+  Verificação: P&L Cenário A (CDI=14,25%): (12,50 − 14,25) × 200M = resultado correto do swap isolado. ✓
+
+  ---
+  Issue 2: Swap Cambial — Contexto muito extenso
+
+  Antes: 4 linhas de narrativa explicando em detalhe todas as pernas do swap, o que já dava a resposta.
+
+  Depois: Contexto reduzido a informação essencial:
+  ▎ "Você é tesoureiro(a) da Siderúrgica Nacional S.A., que tem dívida de USD 100 milhões com vencimento em 3 anos. A receita da empresa é
+   100% em reais. O dólar spot está em R$ 5,20, o cupom cambial é 4,50% a.a. (juros simples) e o CDI é 11,75% a.a."
+
+  Também renomeados IDs: "above_fwd" → "swap_520m", "market_fwd" → "swap_100m", "spot_rate" → "swap_530m".
+
+  ---
+  Issue 3: Cupom cambial calculado com juros compostos (errado)
+
+  Antes (result-panel.tsx linha 214):
+  notionalUSD * fixDolar * Math.pow(1 + cupomCambial, prazoAnos)
+  // = USD 100M × R$ 6,80 × (1 + 4,5%)^3,0 = R$ 775.992.965
+
+  Depois:
+  notionalUSD * fixDolar * (1 + cupomCambial * prazoAnos)
+  // = USD 100M × R$ 6,80 × (1 + 4,5% × 3,0) = R$ 771.800.000
+
+  Correções aplicadas em 3 locais:
+  1. Cálculo da variável pernaCambial (linha 214)
+  2. Display do valor final da perna cambial (linhas 305, 310)
+  3. Texto da fórmula: (1 + 4,5%)^3,0 → (1 + 4,5% × 3,0) (potência → multiplicação)
+
+  ---
+  Issue 4-5: Swap Direcional — P&L de R$ 600M ao invés de R$ 10M
+
+  Causa raiz: notional_usd = 200,000,000 (valor bruto do nocional). A fórmula genérica calcula (taxa_fixa − CDI) × notional_usd, que dá   
+  3.0 × 200M = R$ 600M. Mas o P&L correto de um swap é (taxa_fixa − CDI) × nocional × prazo, onde as taxas são em decimal.
+
+  Cálculo correto:
+  - Cenário A: (12,00% − 9,00%) × R$ 222M × 1,5 = 0,03 × 222.222.222 × 1,5 = R$ 10.000.000
+  - Cenário B: (12,00% − 14,50%) × R$ 222M × 1,5 = -0,025 × 222.222.222 × 1,5 = −R$ 8.333.333
+  - Cenário C: (12,00% − 11,80%) × R$ 222M × 1,5 = 0,002 × 222.222.222 × 1,5 = +R$ 666.667
+
+  Correção: notional_usd calibrado para 3,333,333 — que é nocional × prazo / 100 = 222M × 1,5 / 100.
+
+  Verificação:
+  - Cenário A: (12.00 − 9.00) × 3,333,333 = 3.0 × 3,333,333 = +R$ 10.000.000 ✓
+  - Cenário B: (12.00 − 14.50) × 3,333,333 = −2.5 × 3,333,333 = −R$ 8.333.333 ✓
+  - Cenário C: (12.00 − 11.80) × 3,333,333 = 0.2 × 3,333,333 = +R$ 666.667 ✓
+
+  Descrições dos cenários atualizadas com os valores corretos.
+
+  ---
+  Issue 6: Super Desafio CVA — P&L de R$ 579M ao invés de ~R$ 17M
+
+  Causas raiz (duas):
+  1. ID da alternativa "above_fwd" retornava 12.00 + 0.07 = 12.07% ao invés de 12.08%
+  2. notional_usd = 300,000,000 — aplicava taxa × nocional bruto sem considerar prazo
+
+  Correções:
+  1. Renomeados IDs: "above_fwd" → "cva_adjusted", "market_fwd" → "cva_generic", "spot_rate" → "cva_clean", "buy_usd" → "cva_correct",    
+  "sell_usd" → "cva_nocional", "sell_usd_teorico" → "cva_lgd_total"
+  2. forwardRate90d alterado para 12.08 (taxa com CVA, usada como default por getForwardRate())
+  3. notional_usd calibrado para 9,000,000 (= R$ 300M × 3 anos / 100)
+
+  Verificação:
+  - Cenário B (CDI=14,00%): (12.08 − 14.00) × 9,000,000 = −1.92 × 9M = −R$ 17.280.000 ✓
+  - Cenário C (CDI=9,00%): (12.08 − 9.00) × 9,000,000 = +3.08 × 9M = +R$ 27.720.000 ✓
+
+
+
+Relatório de Correções — Módulo 6 (Derivativos Embutidos)
+
+  Issue 1: Pré-pagamento — Cenário B mostrava "Economia anual" sem exercício
+
+  Problema: A função calculateEmbeddedResult para prepayment sempre calculava economia/multa/ganho líquido independentemente do cenário.  
+  No Cenário B ("Não exerceu. Juros voltaram a subir"), o painel mostrava:
+  ① Análise do exercício
+  (1) Economia anual = R$ 500.000
+  (2) Economia total (3 anos) = R$ 1.500.000
+  (3) Multa de pré-pagamento = R$ 1.000.000
+  Ganho líquido do exercício: +R$ 500.000
+  ...quando a empresa NÃO exerceu.
+
+  Correção: O painel agora detecta scenario.id === "juros_subiram" e renderiza conteúdo diferente:
+  ① Resultado: opção NÃO exercida
+  (1) A oferta de CDI+2,00% desapareceu — juros voltaram a subir.
+  (2) A empresa continua pagando CDI+3,00% sobre R$ 50.000.000.
+  (3) A opção de pré-pagamento voltou a ficar 'fora do dinheiro'.
+  Com painel vermelho (bg-red-50) indicando resultado adverso, e lição sobre o timing de exercício em opções reais.
+
+  Os cenários A ("exerceu") e C ("exerceu cedo") continuam mostrando a análise com economia/multa/ganho líquido.
+
+  ---
+  Issue 2: Callable Bond — Análise do prêmio incorreta
+
+  Problema: O texto dizia: "O prêmio de 50 bps acumulado por 3 anos (150 bps) não compensou o custo de reinvestimento a taxas 0.5% menores
+   por 2 anos."
+
+  Verificação matemática:
+  - Prêmio acumulado: 50 bps/ano × 3 anos = 150 bps
+  - Perda de spread: 50 bps/ano × 2 anos restantes = 100 bps
+  - Saldo líquido: 150 − 100 = +50 bps → o prêmio COMPENSOU o diferencial de spread ✓
+
+  Correção: O texto agora reconhece que o saldo de spread é positivo (+50 bps), mas explica que o verdadeiro risco de reinvestimento é o  
+  nível mais baixo do CDI, não apenas o spread:
+
+  ▎ "O prêmio de 50 bps acumulado por 3 anos (150 bps) compensou a perda de spread de 50 bps por 2 anos (100 bps): saldo líquido de +50   
+  bps em spread. Porém, o verdadeiro custo é o reinvestimento em um ambiente de CDI muito mais baixo: antes, o investidor recebia 10,5%   
+  total; agora reinveste a 10,0% — uma queda de yield que vai além do spread. O risco de reinvestimento se materializou pelo nível dos    
+  juros, não pelo spread."
+
