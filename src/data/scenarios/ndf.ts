@@ -106,7 +106,7 @@ export const NDF_SCENARIOS: Scenario[] = [
     theme: "Termos (NDF)", themeId: "ndf", instrument: "NDF",
     difficulty: "Super Desafio",
     context: {
-      narrative: "Você é trader de câmbio no **Banco Atlântico**. O NDF de 90 dias de USD/BRL está cotado a **R$ 5,42** no mercado interbancário, mas o forward teórico (paridade coberta de juros) é **R$ 5,32**. CDI em **11,75% a.a.**, cupom cambial **4,5% a.a.**, spot **R$ 5,20**. Nocional: **USD 20 milhões**.",
+      narrative: "Você é trader de câmbio no **Banco Atlântico**. O NDF de 90 dias de USD/BRL está cotado a **R$ 5,42** no mercado interbancário, mas o forward teórico (paridade coberta de juros) é **R$ 5,32**. As demais informações do mercado são: CDI em **11,75% a.a.**, cupom cambial **4,5% a.a.**, spot **R$ 5,20**. Nocional: **USD 20 milhões**.",
       marketData: { spotRate: 5.20, forwardRate90d: 5.32, forwardMercado: 5.42, cdiRate: 0.1175, cupomCambial: 0.045, notional_usd: 20000000, tenor: 90 },
       displayFields: [["Spot", "R$ 5,2000"], ["Fwd Teórico", "R$ 5,3200"], ["Fwd Mercado", "R$ 5,4200"], ["Nocional", "USD 20M"], ["Prazo", "90 dias"]],
       question: "O forward de mercado diverge do forward teórico. Como capturar esse spread?",
