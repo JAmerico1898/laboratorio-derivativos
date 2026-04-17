@@ -8,7 +8,7 @@ export const SWAPS_SCENARIOS: Scenario[] = [
     difficulty: "Intermediário",
     context: {
       narrative: "Você é CFO da **Infralog S.A.**, uma empresa de logística que captou um empréstimo de **R$ 200 milhões** a **CDI + 2,00% a.a.** com vencimento em **2 anos**. O CDI atual é **11,75% a.a.**, então o custo total hoje é 13,75% a.a. A empresa tem receitas previsíveis (contratos longos de frete) e a diretoria quer transformar a dívida flutuante em custo fixo para facilitar o planejamento financeiro. Um banco oferece um swap CDI × Pré a **12,50% a.a.** (taxa fixa) para 2 anos.",
-      marketData: { spotRate: 11.75, forwardRate90d: 12.50, cdiRate: 0.1175, notional_usd: 200000000, tenor: 504, debtSpread: 2.0 },
+      marketData: { spotRate: 11.75, forwardRate90d: 12.50, cdiRate: 0.1175, notional_usd: 4000000, tenor: 504, debtSpread: 2.0 },
       displayFields: [["CDI atual", "11,75% a.a."], ["Spread", "+ 2,00% a.a."], ["Custo atual", "13,75% a.a."], ["Taxa swap", "12,50% a.a."], ["Nocional", "R$ 200M"], ["Prazo", "2 anos"]],
       question: "A dívida é flutuante e a empresa quer custo fixo. Como usar o swap?",
     },

@@ -702,7 +702,7 @@ export function ResultPanel({
                   <div className="space-y-2">
                     <p>
                       <strong>Operação original:</strong> a Infralog tem dívida de{" "}
-                      R$ {(result.notional / 1e6).toFixed(0)}M a CDI + {swapSpread.toFixed(2)}% a.a.
+                      R$ 200M a CDI + {swapSpread.toFixed(2)}% a.a.
                       Se o CDI subir, o custo financeiro sobe junto.
                     </p>
                     <p>
