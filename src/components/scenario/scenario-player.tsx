@@ -180,7 +180,7 @@ export function ScenarioPlayer({ scenario, onFinish, onBack }: ScenarioPlayerPro
             >
               {prevChoice.correct ? strings.correct : strings.canImprove} —{" "}
             </span>
-            {prevChoice.feedback}
+            <MarkdownText text={prevChoice.feedback} />
           </div>
         )}
 

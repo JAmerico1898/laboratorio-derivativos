@@ -38,11 +38,18 @@ export function calculateEmbeddedResult(
 
   if (strat === "callable") {
     const premioAnual = (md.premio as number) * 100; // exibido em bps
+    const cupomCallablePct = (md.cupomCallable as number) * 100; // ex: 2.5
+    const cupomPlainPct = (md.cupomPlain as number) * 100; // ex: 2.0
+    const newSpreadPct = fix as number; // spread de mercado para o emissor (% a.a.)
+    const exercised = newSpreadPct < cupomPlainPct; // exerce se novo spread < spread plain vanilla original
     return {
       premioAnual,
       callAno: md.callAno as number,
       prazo: md.prazo as number,
-      cdiFinal: fix,
+      cupomCallablePct,
+      cupomPlainPct,
+      newSpreadPct,
+      exercised,
     };
   }
 

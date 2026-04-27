@@ -33,11 +33,13 @@ export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPa
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="rounded-xl border border-outline-variant bg-surface-container-low p-5">
-        <p className="text-sm leading-relaxed text-on-surface-variant">
-          {scenario.description}
-        </p>
-      </div>
+      {scenario.description && scenario.description.trim() !== "" && (
+        <div className="rounded-xl border border-outline-variant bg-surface-container-low p-5">
+          <p className="text-sm leading-relaxed text-on-surface-variant">
+            {scenario.description}
+          </p>
+        </div>
+      )}
 
       {strat === "coe" && (
         <>
@@ -87,18 +89,19 @@ export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPa
 
       {strat === "prepayment" && (
         <>
-          {scenario.id === "juros_subiram" ? (
+          {scenario.id === "spread_alargou" ? (
             <>
               <Panel title="① Resultado: opção NÃO exercida" className="bg-red-50 border-red-200">
-                <div>(1) A oferta de CDI+2,00% desapareceu — juros voltaram a subir.</div>
+                <div>(1) A oferta de CDI+2,00% foi retirada — o spread de crédito do setor voltou a se alargar.</div>
                 <div>(2) A empresa continua pagando CDI+3,00% sobre {fmt(r.saldo as number)}.</div>
-                <div>(3) A opção de pré-pagamento voltou a ficar &apos;fora do dinheiro&apos; (out of the money).</div>
+                <div>(3) A opção de pré-pagamento voltou a ficar &apos;fora do dinheiro&apos; (out of the money) — não há ganho de spread a capturar.</div>
               </Panel>
               <Panel title="② Lição">
                 <div className="rounded-lg bg-surface-container-low p-3.5">
-                  A janela de oportunidade fechou. O timing do exercício é crítico em opções reais: a oferta de refinanciamento
-                  não é permanente. A opção de pré-pagamento só tem valor quando as condições de mercado permitem refinanciar
-                  a taxa menor — e essas condições podem ser transitórias.
+                  A janela de oportunidade fechou. Em empréstimos pós-fixados em CDI, o gatilho de exercício é a
+                  <strong> compressão do spread de crédito</strong> — não o nível de juros. Esse spread depende
+                  do rating do tomador e do apetite dos bancos pelo setor, e pode reverter rapidamente. O timing
+                  do exercício da call sobre dívida própria é tão crítico quanto o de qualquer opção americana.
                 </div>
               </Panel>
             </>
@@ -116,8 +119,8 @@ export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPa
               <Panel title="② Lição">
                 <div className="rounded-lg bg-surface-container-low p-3.5">
                   {scenario.id === "exerceu"
-                    ? "A empresa exerceu a opção e economizou. A call sobre a dívida estava 'in the money'."
-                    : "Exerceu cedo demais — se esperasse, teria conseguido taxa ainda melhor. Risco de exercício prematuro."}
+                    ? "A empresa exerceu a opção e economizou. A call sobre a dívida estava 'in the money' — o spread de crédito caiu de 3,00% para 2,00%, criando ganho mesmo com o CDI inalterado."
+                    : "Exerceu no momento certo, mas o spread continuou comprimindo depois. Não foi um erro — não há como antecipar a trajetória do prêmio de crédito —, apenas um lembrete de que opções americanas embutem o trade-off entre exercer agora e esperar por condições melhores."}
                 </div>
               </Panel>
             </>
@@ -128,32 +131,30 @@ export function EmbeddedResultPanel({ scenario, scenarioData }: EmbeddedResultPa
       {strat === "callable" && (
         <>
           <Panel title="① Resultado do callable bond">
-            <div>(1) CDI final = {(r.cdiFinal as number).toFixed(2)}%</div>
+            <div>(1) Spread de mercado para o emissor = {(r.newSpreadPct as number).toFixed(2)}% a.a.</div>
             <div>
-              (2) Custo de refinanciamento para a emissora = {(r.cdiFinal as number).toFixed(2)}%
-              + 2,00% = {((r.cdiFinal as number) + 2).toFixed(2)}%
+              (2) Cupom atual do callable = CDI + {(r.cupomCallablePct as number).toFixed(2)}%
             </div>
             <div>
-              (3) Cupom atual do callable = CDI + 2,50% ={" "}
-              {((r.cdiFinal as number) + 2.5).toFixed(2)}%
+              (3) Refinanciamento possível = CDI + {(r.newSpreadPct as number).toFixed(2)}%
             </div>
             <div>
               (4){" "}
-              {(r.cdiFinal as number) < 10
-                ? `Emissora exerce a call — refinancia de ${((r.cdiFinal as number) + 2.5).toFixed(2)}% para ${((r.cdiFinal as number) + 2.0).toFixed(2)}%. Investidor recebe o par e precisa reinvestir a taxas menores.`
-                : `Call NÃO exercido — emissora mantém a dívida. Investidor continua recebendo CDI+2,50%.`}
+              {r.exercised
+                ? `Emissora exerce a call — refinancia de CDI+${(r.cupomCallablePct as number).toFixed(2)}% para CDI+${(r.newSpreadPct as number).toFixed(2)}% (spread comprimiu ${((r.cupomCallablePct as number) - (r.newSpreadPct as number)).toFixed(2)} pp). Investidor recebe o par e precisa reinvestir em papéis com prêmio de risco menor.`
+                : `Call NÃO exercido — não há compressão suficiente do spread. Investidor continua recebendo CDI+${(r.cupomCallablePct as number).toFixed(2)}%.`}
             </div>
           </Panel>
           <Panel
             title="② Análise do prêmio de 50 bps"
-            className={(r.cdiFinal as number) < 10 ? 'bg-red-50 border-red-200' : 'bg-emerald-50 border-emerald-200'}
+            className={r.exercised ? 'bg-red-50 border-red-200' : 'bg-emerald-50 border-emerald-200'}
           >
             <div className="rounded-lg bg-surface-container-low p-3.5">
-              {(r.cdiFinal as number) < 10
-                ? `Juros caíram e a call foi exercida. O prêmio de 50 bps acumulado por ${r.callAno} anos (${(r.callAno as number) * 50} bps) compensou a perda de spread de 50 bps por ${(r.prazo as number) - (r.callAno as number)} anos (${((r.prazo as number) - (r.callAno as number)) * 50} bps): saldo líquido de +${(r.callAno as number) * 50 - ((r.prazo as number) - (r.callAno as number)) * 50} bps em spread. Porém, o verdadeiro custo é o reinvestimento em um ambiente de CDI muito mais baixo: antes, o investidor recebia ${((r.cdiFinal as number) + 2.5).toFixed(1)}% total; agora reinveste a ${((r.cdiFinal as number) + 2.0).toFixed(1)}% — uma queda de yield que vai além do spread. O risco de reinvestimento se materializou pelo nível dos juros, não pelo spread.`
-                : (r.cdiFinal as number) > 13
-                ? `Juros subiram e o call não foi exercido. O investidor recebeu o prêmio de 50 bps por todos os ${r.prazo} anos (${(r.prazo as number) * 50} bps acumulados). Excelente negócio — a call vendida expirou 'out of the money'.`
-                : `Juros estáveis, call não exercido. O investidor recebeu o prêmio integral de 50 bps/ano.`}
+              {r.exercised
+                ? `O spread de crédito do emissor comprimiu de ${(r.cupomPlainPct as number).toFixed(2)}% para ${(r.newSpreadPct as number).toFixed(2)}% e a call foi exercida. O prêmio de 50 bps acumulado por ${r.callAno} anos (${(r.callAno as number) * 50} bps) deixou de ser pago nos ${(r.prazo as number) - (r.callAno as number)} anos restantes. Mais grave: o investidor agora reinveste em emissões comparáveis a CDI+${(r.newSpreadPct as number).toFixed(2)}%, perdendo ${((r.cupomCallablePct as number) - (r.newSpreadPct as number)).toFixed(2)} pp de yield por ${(r.prazo as number) - (r.callAno as number)} anos. O risco de reinvestimento se materializou pela compressão do spread de crédito — não por movimento da Selic.`
+                : (r.newSpreadPct as number) > (r.cupomCallablePct as number)
+                ? `O spread de crédito se alargou para ${(r.newSpreadPct as number).toFixed(2)}% (>${(r.cupomCallablePct as number).toFixed(2)}%). A call expirou 'out of the money' — emissora não tem incentivo para refinanciar a custo maior. Investidor recebeu o prêmio de 50 bps por todos os ${r.prazo} anos (${(r.prazo as number) * 50} bps acumulados). Excelente negócio.`
+                : `Spread estável (${(r.newSpreadPct as number).toFixed(2)}%), próximo ao cupom callable. Compressão insuficiente para justificar custos de exercício — call não exercido. Investidor recebeu o prêmio integral de 50 bps/ano.`}
             </div>
           </Panel>
         </>

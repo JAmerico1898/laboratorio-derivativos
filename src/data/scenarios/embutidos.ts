@@ -41,14 +41,14 @@ export const EMBUTIDOS_SCENARIOS: Scenario[] = [
     theme: "Embutidos", themeId: "embutidos", instrument: "Call sobre dívida própria",
     difficulty: "Intermediário", embeddedStrategy: "prepayment",
     context: {
-      narrative: "A **Logística Express Ltda.** tem empréstimo de **R$ 50 milhões** a **CDI + 3,00%** por 5 anos (restam 3). O contrato permite **pré-pagamento** com multa de **2% sobre o saldo**. A Selic caiu e a empresa recebe oferta de novo empréstimo a **CDI + 2,00%**. A cláusula de pré-pagamento é uma **call sobre a própria dívida**: o direito de 'recomprar' o empréstimo antes do vencimento.",
+      narrative: "A **Logística Express Ltda.** tem empréstimo de **R$ 50 milhões** a **CDI + 3,00%** por 5 anos (restam 3). O contrato permite **pré-pagamento** com multa de **2% sobre o saldo**. A empresa **melhorou seu perfil de crédito** (rating subiu, alavancagem caiu) e recebe oferta de novo empréstimo a **CDI + 2,00%** — mesmo indexador (CDI flutuante), porém com spread 100 bps menor refletindo o **menor risco de crédito** percebido.",
       marketData: { saldo: 50000000, spreadAtual: 0.03, spreadNovo: 0.02, multa: 0.02, prazoRestante: 3 },
       displayFields: [["Empréstimo", "R$ 50M"], ["Taxa atual", "CDI + 3,00%"], ["Nova oferta", "CDI + 2,00%"], ["Multa", "2% do saldo"], ["Prazo restante", "3 anos"], ["Economia/ano", "R$ 500k"]],
       question: "Vale a pena exercer a opção de pré-pagamento?",
     },
     steps: [
       { id: "motivation", type: "choice", prompt: "Qual derivativo está embutido na cláusula de pré-pagamento?", choices: [
-        { id: "buy_usd", label: "Call sobre a dívida — a empresa tem o direito de 'recomprar' (liquidar) seu empréstimo antecipadamente", correct: true, score: 25, feedback: "A cláusula de pré-pagamento é economicamente uma call: a empresa pode 'chamar' a dívida pagando saldo + multa. Quando juros caem, essa opção ganha valor — assim como uma call sobre um bond sobe quando juros caem. O exercício permite refinanciar a taxa menor.", next: "contract_prepay" },
+        { id: "buy_usd", label: "Call sobre a dívida — a empresa tem o direito de 'recomprar' (liquidar) seu empréstimo antecipadamente", correct: true, score: 25, feedback: "A cláusula de pré-pagamento é economicamente uma call: a empresa pode 'chamar' a dívida pagando saldo + multa. Como o empréstimo já é CDI flutuante, oscilações da Selic afetam igualmente a taxa atual e qualquer nova oferta — não criam oportunidade. Neste caso, o que torna a opção valiosa é a **redução do spread de crédito** (de +3,00% para +2,00%): ao melhorar o rating, a empresa pode 'chamar' a dívida e refinanciar com prêmio de risco menor. (Em empréstimos prefixados, a opção também ganha valor quando juros caem — mas aqui o canal é o spread, não o CDI.)", next: "contract_prepay" },
         { id: "sell_usd", label: "Swap de taxa de juros", correct: false, score: 0, feedback: "Não há troca de indexadores. A cláusula dá à empresa o direito unilateral de liquidar — é uma opção, não um swap.", next: "contract_prepay" },
         { id: "sell_usd_teorico", label: "Put sobre taxa de juros", correct: false, score: 5, feedback: "É uma call (direito de comprar/liquidar), não uma put. A empresa exerce quando quer — não é obrigada.", next: "contract_prepay" },
       ]},
@@ -63,9 +63,9 @@ export const EMBUTIDOS_SCENARIOS: Scenario[] = [
         { id: "spot_rate_b", label: "Depende do valor da multa", correct: false, score: 0, feedback: "O critério não é o valor da multa, mas sim se o derivativo está intimamente relacionado ao hospedeiro.", next: "resolution_prepay" },
       ]},
       { id: "resolution_prepay", type: "resolution", prompt: "O que aconteceu após a decisão?", scenarios: [
-        { id: "exerceu", label: "Cenário A: Exerceu o pré-pagamento, refinanciou a CDI+2%", fixingRate: 1, description: "" },
-        { id: "juros_subiram", label: "Cenário B: Não exerceu. Juros voltaram a subir — a oferta de CDI+2% desapareceu", fixingRate: 0, description: "" },
-        { id: "juros_cairam_mais", label: "Cenário C: Exerceu. Juros caíram ainda mais — poderia ter refinanciado a CDI+1,50%", fixingRate: 2, description: "" },
+        { id: "exerceu", label: "Cenário A: Exerceu o pré-pagamento, refinanciou a CDI+2,00%", fixingRate: 1, description: "" },
+        { id: "spread_alargou", label: "Cenário B: Não exerceu. A janela fechou — o banco concorrente retirou a oferta e o spread de mercado para o setor voltou a CDI+3,00%", fixingRate: 0, description: "" },
+        { id: "spread_caiu_mais", label: "Cenário C: Exerceu a CDI+2,00%. Pouco depois, com a melhora adicional do rating, surgiram ofertas a CDI+1,50% — mas o contrato já estava fechado", fixingRate: 2, description: "" },
       ]},
     ],
   },
@@ -75,31 +75,31 @@ export const EMBUTIDOS_SCENARIOS: Scenario[] = [
     theme: "Embutidos", themeId: "embutidos", instrument: "Debênture Callable",
     difficulty: "Intermediário", embeddedStrategy: "callable",
     context: {
-      narrative: "Você é gestor(a) de renda fixa e avalia uma **debênture callable** da **Telecom Brasil S.A.**: cupom **CDI + 2,50%**, prazo 5 anos, com cláusula call a partir do ano 3 (ao par). Uma debênture **plain vanilla** comparável rende **CDI + 2,00%**. O spread adicional de **50 bps** é o prêmio que o investidor recebe por **vender implicitamente** a call ao emissor.",
+      narrative: "Você é gestor(a) de renda fixa e avalia uma **debênture callable** da **Telecom Brasil S.A.**: cupom **CDI + 2,50%**, prazo 5 anos, com cláusula call a partir do ano 3 (ao par). Uma debênture **plain vanilla** comparável (mesmo emissor, na data da emissão) rende **CDI + 2,00%**. O spread adicional de **50 bps** é o prêmio que o investidor recebe por **vender implicitamente** a call ao emissor.",
       marketData: { cupomCallable: 0.025, cupomPlain: 0.020, premio: 0.005, callAno: 3, prazo: 5 },
       displayFields: [["Callable", "CDI + 2,50%"], ["Plain vanilla", "CDI + 2,00%"], ["Prêmio implícito", "50 bps a.a."], ["Call a partir de", "Ano 3"], ["Prazo total", "5 anos"]],
       question: "O prêmio de 50 bps compensa o risco de resgate antecipado?",
     },
     steps: [
       { id: "motivation", type: "choice", prompt: "Qual derivativo está embutido na debênture callable?", choices: [
-        { id: "buy_usd", label: "Call vendida pelo investidor ao emissor — a emissora tem o direito de resgatar antecipadamente", correct: true, score: 25, feedback: "Ao comprar a callable, você implicitamente VENDE uma call ao emissor. O prêmio (50 bps/ano) está embutido no cupom mais alto. Se juros caírem, a emissora exercerá a call (refinancia mais barato) e você terá que reinvestir a taxas menores — o risco de reinvestimento.", next: "contract_callable" },
+        { id: "buy_usd", label: "Call vendida pelo investidor ao emissor — a emissora tem o direito de resgatar antecipadamente", correct: true, score: 25, feedback: "Ao comprar a callable, você implicitamente VENDE uma call ao emissor. O prêmio (50 bps/ano) está embutido no cupom mais alto. Como a debênture paga CDI flutuante, oscilações da Selic afetam igualmente a callable e qualquer nova emissão — não acionam a call. O gatilho é a **compressão do spread de crédito** do emissor: se o rating melhorar, a emissora exercerá a call e refinanciará com spread menor. Você receberá o par e terá que reinvestir em emissões com prêmio de risco menor — esse é o risco de reinvestimento aqui.", next: "contract_callable" },
         { id: "sell_usd", label: "Call comprada pelo investidor", correct: false, score: 0, feedback: "O investidor não tem o direito de exercer nada. É a EMISSORA que pode chamar o bond. O investidor vendeu a call.", next: "contract_callable" },
         { id: "sell_usd_teorico", label: "Put comprada pelo investidor", correct: false, score: 5, feedback: "Put seria o direito do investidor de devolver o bond (puttable bond). Aqui é o contrário: a emissora chama o bond (callable).", next: "contract_callable" },
       ]},
       { id: "contract_callable", type: "choice", prompt: "Quando a emissora provavelmente exercerá a call?", choices: [
-        { id: "above_fwd", label: "Quando os juros caírem significativamente — a emissora refinancia a custo menor", correct: true, score: 20, feedback: "Memória de cálculo: (1) Se CDI cair de 11,75% para 8% no ano 3, custo atual = 8% + 2,50% = 10,50%. (2) A emissora pode emitir nova debênture a 8% + 2,00% = 10,00%. (3) Economia = 0,50% a.a. por 2 anos (anos 4-5). (4) A call é exercida — o investidor recebe o par (100%) e precisa reinvestir a CDI+2,00% ao invés de CDI+2,50%. Perdeu 50 bps/ano por 2 anos de cupom.", next: "bifurcacao_callable" },
-        { id: "market_fwd", label: "Quando os juros subirem", correct: false, score: 0, feedback: "Se juros subirem, a dívida da emissora fica barata (abaixo do mercado). Ela NUNCA exerceria a call para refinanciar a taxas maiores.", next: "bifurcacao_callable" },
-        { id: "spot_rate", label: "A emissora sempre exerce no ano 3", correct: false, score: 5, feedback: "O exercício depende das condições de mercado. A emissora só exerce se for economicamente vantajoso — geralmente quando juros caem significativamente.", next: "bifurcacao_callable" },
+        { id: "above_fwd", label: "Quando o spread de crédito do emissor comprimir significativamente — refinancia com prêmio de risco menor", correct: true, score: 20, feedback: "Memória de cálculo: (1) No ano 3, suponha que o spread de mercado para o emissor caia de 2,00% para 1,50% (rating melhorou ou prêmio de risco do setor diminuiu). (2) Cupom atual da callable = CDI + 2,50%. (3) Nova emissão possível = CDI + 1,50%. (4) Economia = 1,00% a.a. por 2 anos (anos 4-5) sobre o nocional. (5) A call é exercida — o investidor recebe o par (100%) e precisa reinvestir em papéis comparáveis a CDI+1,50% ao invés de CDI+2,50%. Perdeu 100 bps/ano por 2 anos de cupom.", next: "bifurcacao_callable" },
+        { id: "market_fwd", label: "Quando os juros (Selic/CDI) subirem", correct: false, score: 0, feedback: "Como o cupom é CDI flutuante, oscilações da Selic não afetam o diferencial entre a callable e uma nova emissão — ambos os spreads se aplicam sobre o mesmo CDI. O nível de juros é irrelevante; o que importa é o spread de crédito.", next: "bifurcacao_callable" },
+        { id: "spot_rate", label: "A emissora sempre exerce no ano 3", correct: false, score: 5, feedback: "O exercício depende das condições de mercado. A emissora só exerce se for economicamente vantajoso — geralmente quando o spread de crédito do emissor comprime o suficiente para superar custos de transação.", next: "bifurcacao_callable" },
       ]},
       { id: "bifurcacao_callable", type: "choice", prompt: "Os 50 bps de prêmio compensam o risco do call em 3 anos?", choices: [
-        { id: "above_fwd_b", label: "Depende da expectativa de juros — se caírem forte, o call será exercido e o investidor perde 2 anos de cupom elevado", correct: true, score: 20, feedback: "Memória de cálculo: (1) Prêmio acumulado em 3 anos = 50 bps × 3 = 150 bps. (2) Se call exercido no ano 3: perde 50 bps/ano × 2 anos restantes = 100 bps de cupom. (3) Ganho líquido = 150 − 100 = 50 bps. (4) Porém, o reinvestimento será a taxas menores. Se CDI caiu de 11,75% para 8%, o custo de reinvestimento pode superar o prêmio acumulado. A análise exige modelar cenários de juros.", next: "resolution_callable" },
-        { id: "market_fwd_b", label: "Sim, sempre — 50 bps é prêmio suficiente", correct: false, score: 5, feedback: "50 bps pode ser insuficiente se juros caírem 300+ bps. O custo de reinvestimento a taxas menores pode superar o prêmio acumulado.", next: "resolution_callable" },
-        { id: "spot_rate_b", label: "Não, nunca — callable é sempre mau negócio", correct: false, score: 0, feedback: "Callable bonds podem ser atrativos se os juros subirem ou ficarem estáveis — o investidor recebe o prêmio e o call não é exercido.", next: "resolution_callable" },
+        { id: "above_fwd_b", label: "Depende da trajetória do spread de crédito — se comprimir forte, o call será exercido e o investidor perde 2 anos de cupom elevado", correct: true, score: 20, feedback: "Memória de cálculo: (1) Prêmio acumulado em 3 anos = 50 bps × 3 = 150 bps. (2) Se call exercido no ano 3: perde 50 bps/ano × 2 anos restantes = 100 bps de cupom. (3) Ganho líquido = 150 − 100 = 50 bps. (4) Porém, o reinvestimento será a spreads menores. Se o spread de mercado caiu de 2,00% para 1,50%, o custo de reinvestimento (50 bps/ano por 2 anos = 100 bps) pode superar o prêmio acumulado. A análise exige modelar cenários de spread, não de Selic.", next: "resolution_callable" },
+        { id: "market_fwd_b", label: "Sim, sempre — 50 bps é prêmio suficiente", correct: false, score: 5, feedback: "50 bps pode ser insuficiente se o spread de crédito comprimir 100+ bps. O custo de reinvestimento a spreads menores pode superar o prêmio acumulado.", next: "resolution_callable" },
+        { id: "spot_rate_b", label: "Não, nunca — callable é sempre mau negócio", correct: false, score: 0, feedback: "Callable bonds podem ser atrativos se o spread de crédito do emissor se alargar ou ficar estável — o investidor recebe o prêmio e o call não é exercido.", next: "resolution_callable" },
       ]},
-      { id: "resolution_callable", type: "resolution", prompt: "3 anos se passaram. O que a emissora decidiu?", scenarios: [
-        { id: "call_exercido", label: "Cenário A: CDI caiu para 8%. Emissora exerceu a call.", fixingRate: 8.0, description: "" },
-        { id: "call_nao", label: "Cenário B: CDI subiu para 14%. Call NÃO exercido.", fixingRate: 14.0, description: "" },
-        { id: "call_neutro", label: "Cenário C: CDI estável em 11,50%. Call não exercido.", fixingRate: 11.5, description: "" },
+      { id: "resolution_callable", type: "resolution", prompt: "3 anos se passaram. Como evoluiu o spread de crédito do emissor?", scenarios: [
+        { id: "call_exercido", label: "Cenário A: Spread de mercado para o emissor caiu para 1,50% (rating melhorou). Emissora exerceu a call.", fixingRate: 1.5, description: "" },
+        { id: "call_nao", label: "Cenário B: Spread subiu para 3,00% (estresse setorial). Call NÃO exercido.", fixingRate: 3.0, description: "" },
+        { id: "call_neutro", label: "Cenário C: Spread estável em 2,40%. Call não exercido (compressão insuficiente).", fixingRate: 2.4, description: "" },
       ]},
     ],
   },

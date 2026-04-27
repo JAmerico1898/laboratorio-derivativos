@@ -107,7 +107,7 @@ Feedback: "Segundo o CPC 48/IFRS 9, a bifurcação só é exigida quando o hospe
 
 ### Contexto
 
-A **Logística Express Ltda.** tomou um empréstimo de **R$ 50 milhões** a **CDI + 3,00% a.a.** por **5 anos** com o Banco Nacional. O contrato prevê cláusula de **pré-pagamento**: a empresa pode liquidar antecipadamente mediante pagamento de **multa de 2% sobre o saldo devedor**. A Selic caiu de 11,75% para 8,50% a.a. e a empresa recebe oferta de um novo empréstimo a **CDI + 2,00%**.
+A **Logística Express Ltda.** tomou um empréstimo de **R$ 50 milhões** a **CDI + 3,00% a.a.** por **5 anos** com o Banco Nacional. O contrato prevê cláusula de **pré-pagamento**: a empresa pode liquidar antecipadamente mediante pagamento de **multa de 2% sobre o saldo devedor**. Após a empresa **melhorar seu perfil de crédito** (rating elevado, alavancagem reduzida), um banco concorrente oferece refinanciamento a **CDI + 2,00%** — mesmo indexador pós-fixado, mas com **spread de crédito 100 bps menor**. Como ambos os contratos são CDI flutuante, o nível da Selic é irrelevante para a comparação: o gatilho da oportunidade é a **redução do spread**, não o movimento dos juros.
 
 A cláusula de pré-pagamento é um **derivativo embutido**: uma **opção de compra (call)** que a empresa detém sobre sua própria dívida.
 
@@ -129,7 +129,7 @@ A cláusula de pré-pagamento é um **derivativo embutido**: uma **opção de co
 - ❌ Swap de taxa de juros — não há troca de indexadores
 - ❌ Put sobre a taxa de juros — a empresa não está vendendo a dívida ao banco
 
-Feedback: "A cláusula de pré-pagamento é economicamente equivalente a uma call: a empresa pode 'chamar' (call) a dívida pagando o saldo + multa. Quando os juros caem, essa opção ganha valor — assim como uma call sobre um bond sobe quando os juros caem."
+Feedback: "A cláusula de pré-pagamento é economicamente equivalente a uma call: a empresa pode 'chamar' (call) a dívida pagando o saldo + multa. Em empréstimos prefixados, a opção ganha valor quando os juros caem. Em empréstimos pós-fixados em CDI (como este), o gatilho não é o nível de juros — é a **compressão do spread de crédito** do tomador, que permite refinanciar com prêmio de risco menor."
 
 **Etapa 2 — Análise econômica: vale a pena exercer?**
 - ✅ Sim — economia líquida de R$ 500 mil/ano por 3 anos, menos a multa de R$ 1M. Ganho líquido ≈ R$ 500 mil
@@ -147,7 +147,7 @@ Feedback: "Segundo CPC 48, opções de pré-pagamento cujo preço de exercício 
 
 **Etapa 4 — Resolução**
 
-Cenários: (A) empresa exerce e economiza; (B) juros voltam a subir e a opção ficou fora do dinheiro; (C) juros caem mais ainda — a economia seria ainda maior.
+Cenários: (A) empresa exerce e economiza; (B) o spread de crédito do setor volta a se alargar, a oferta concorrente é retirada e a opção fica fora do dinheiro; (C) o spread comprime ainda mais após o exercício — outros bancos passam a oferecer CDI+1,50%, mas o contrato a CDI+2,00% já estava fechado.
 
 ---
 
@@ -181,10 +181,10 @@ O spread adicional de 50 bps (2,50% vs 2,00%) é o **prêmio** que o investidor 
 - ❌ Call comprada pelo investidor
 - ❌ Put comprada pelo investidor
 
-Feedback: "Ao comprar o callable bond, você implicitamente VENDE uma call ao emissor. O prêmio dessa call (50 bps/ano) é embutido no cupom mais alto. Se os juros caírem, a emissora provavelmente exercerá a call (refinancia mais barato) e você terá que reinvestir em taxas menores — risco de reinvestimento."
+Feedback: "Ao comprar o callable bond, você implicitamente VENDE uma call ao emissor. O prêmio dessa call (50 bps/ano) é embutido no cupom mais alto. Como a debênture paga CDI flutuante, o gatilho do exercício não é o nível da Selic — é a **compressão do spread de crédito** do emissor. Se o rating melhorar (ou o prêmio de risco do setor cair), a emissora exercerá a call para refinanciar com spread menor; o investidor recebe o par e reinveste em emissões com prêmio de risco menor — esse é o risco de reinvestimento."
 
 **Etapa 2 — Análise: quando a emissora exerce a call?**
-- ✅ Quando os juros caem significativamente — a emissora refinancia a dívida a custo menor
+- ✅ Quando o spread de crédito do emissor comprimir significativamente — a emissora refinancia a dívida com prêmio de risco menor
 - ❌ Quando os juros sobem — incorreto, a emissora preferiria manter a dívida barata
 - ❌ A emissora sempre exerce no ano 3
 
@@ -193,7 +193,7 @@ Feedback com memória de cálculo: Se CDI cair de 11,75% para 8% no ano 3, a emi
 **Etapa 3 — Precificação do prêmio: os 50 bps compensam?**
 
 Pergunta: "O prêmio de 50 bps a.a. por 5 anos (ou até o call) compensa o risco de resgate antecipado no ano 3?"
-- ✅ Depende da expectativa de juros — se juros caírem forte, o call será exercido e o investidor perde 2 anos de cupom elevado. Os 50 bps acumulados em 3 anos (≈ 150 bps) podem não compensar o custo de reinvestimento.
+- ✅ Depende da trajetória do spread de crédito — se comprimir forte, o call será exercido e o investidor perde 2 anos de cupom elevado. Os 50 bps acumulados em 3 anos (≈ 150 bps) podem não compensar o custo de reinvestir em papéis com prêmio de risco menor.
 - ❌ Sim, sempre — 50 bps é prêmio suficiente
 - ❌ Não, nunca — callable bonds são sempre mau negócio para o investidor
 
@@ -485,8 +485,8 @@ O ResultPanel para derivativos embutidos deve ter 3 painéis:
 | # | Título | Derivativo embutido | Dificuldade | Conceito-chave |
 |---|--------|---------------------|-------------|----------------|
 | 1 | COE de Principal Garantido | Call sobre S&P 500 | Intermediário | Zero-cupom + call, custo de oportunidade |
-| 2 | Opção de Pré-pagamento | Call sobre própria dívida | Intermediário | Exercício quando juros caem, análise multa vs economia |
-| 3 | Callable Bond | Call vendida ao emissor | Intermediário | Risco de reinvestimento, prêmio de 50 bps |
+| 2 | Opção de Pré-pagamento | Call sobre própria dívida | Intermediário | Exercício quando o spread de crédito comprime (loan CDI flutuante), análise multa vs economia |
+| 3 | Callable Bond | Call vendida ao emissor | Intermediário | Exercício na compressão do spread de crédito (CDI flutuante), risco de reinvestimento, prêmio de 50 bps |
 | 4 | Indexação Cambial Implícita | Call digital de dólar | Avançado | Trigger cambial em empréstimo rural, bifurcação obrigatória |
 | 5 | TRS Sintético via COE | TRS embutido em COE | Avançado | Dupla camada de risco (portfólio + emissor) |
 | 6 | Derivativo de Crédito Implícito | CDS implícito (step-up) | Avançado | Efeito pró-cíclico, trigger de rating |
