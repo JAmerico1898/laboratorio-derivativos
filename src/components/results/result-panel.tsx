@@ -226,8 +226,15 @@ export function ResultPanel({
   // DI hedge: portfolio impact via duration approximation
   const diPortfolioValue = (md?.portfolioValue as number) || 0;
   const diPortfolioDuration = (md?.portfolioDuration as number) || 0;
-  const diRateChange = scenario.fixingRate - forwardChosen; // percentage points
-  const diPortfolioPnL = -diPortfolioDuration * (diRateChange / 100) * diPortfolioValue;
+  const diRateChange = scenario.fixingRate - forwardChosen; // percentage points (DI Jan/28)
+  // Carteira reprecificada via PU: yield carteira move paralelamente ao DI
+  const diPortfolioRate = (md?.portfolioRate as number) ?? forwardChosen;
+  const diPortfolioDu = (md?.portfolioDu as number) ?? diPortfolioDuration * 252;
+  const diPortfolioYieldNew = diPortfolioRate + diRateChange;
+  const diPu0 = 1 / Math.pow(1 + diPortfolioRate / 100, diPortfolioDu / 252);
+  const diPuT = 1 / Math.pow(1 + diPortfolioYieldNew / 100, diPortfolioDu / 252);
+  const diPortfolioReturnPct = diPuT / diPu0 - 1;
+  const diPortfolioPnL = diPortfolioReturnPct * diPortfolioValue;
   const diNetPnL = diPortfolioPnL + result.ndfPnL;
 
   // Speculation DI: stop loss and risk/reward context
@@ -658,14 +665,18 @@ export function ResultPanel({
                   <div className="space-y-2">
                     <p>
                       <strong>Operação original:</strong> o fundo detém R$ {(diPortfolioValue / 1e6).toFixed(0)}M em títulos
-                      prefixados (NTN-F e LTN) com duration média de {diPortfolioDuration} anos.
-                      Títulos prefixados perdem valor quando os juros sobem (preço e taxa se movem em direções opostas).
+                      prefixados (NTN-F e LTN) com yield médio de {fmtRate(diPortfolioRate)} e duration de {diPortfolioDuration} anos
+                      ({diPortfolioDu} d.u.). Títulos prefixados perdem valor quando os juros sobem (preço e taxa se movem em direções opostas).
                     </p>
                     <p>
-                      <strong>Impacto na carteira (aproximação por duration):</strong>{" "}
-                      ΔTaxa = {fmtRate(scenario.fixingRate)} − {fmtRate(forwardChosen)} ={" "}
-                      {diRateChange >= 0 ? "+" : ""}{diRateChange.toFixed(2)}pp.{" "}
-                      Variação ≈ −{diPortfolioDuration} × {diRateChange >= 0 ? "+" : ""}{(diRateChange / 100).toFixed(4)} × {fmt(diPortfolioValue)} ={" "}
+                      <strong>Impacto na carteira (reprecificação via PU):</strong>{" "}
+                      Premissa de movimento paralelo: yield novo = {fmtRate(diPortfolioRate)} {diRateChange >= 0 ? "+" : "−"} {Math.abs(diRateChange).toFixed(2)}pp = {fmtRate(diPortfolioYieldNew)}.
+                      <br />
+                      PU₀ = 1 ÷ (1+{fmtRate(diPortfolioRate)})^({diPortfolioDu}/252) = <strong>{diPu0.toFixed(6)}</strong>;
+                      PU_T = 1 ÷ (1+{fmtRate(diPortfolioYieldNew)})^({diPortfolioDu}/252) = <strong>{diPuT.toFixed(6)}</strong>.
+                      <br />
+                      Retorno = (PU_T ÷ PU₀ − 1) = <strong>{(diPortfolioReturnPct * 100).toFixed(2)}%</strong>;
+                      P&L carteira = {(diPortfolioReturnPct * 100).toFixed(2)}% × {fmt(diPortfolioValue)} ={" "}
                       <span className={diPortfolioPnL >= 0 ? "font-bold text-emerald-600" : "font-bold text-red-600"}>
                         {diPortfolioPnL >= 0 ? "+" : ""}{fmt(diPortfolioPnL)}
                       </span>.

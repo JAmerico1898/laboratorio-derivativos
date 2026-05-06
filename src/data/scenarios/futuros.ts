@@ -7,9 +7,9 @@ export const FUTUROS_SCENARIOS: Scenario[] = [
     theme: "Futuros", themeId: "futuros", instrument: "Futuro de DI",
     difficulty: "Intermediário",
     context: {
-      narrative: "Você é gestor(a) de um fundo de renda fixa com **R$ 500 milhões** em títulos prefixados (NTN-F e LTN) com duration média de **3 anos**. O CDI está em **11,75% a.a.** e o DI futuro de Jan/28 está em **12,50% a.a.**. São **630 d.u.** até o vencimento. O Copom se reúne em 2 semanas e o mercado está dividido entre manutenção e alta de 50bps. Se os juros subirem, seus títulos perdem valor.",
-      marketData: { spotRate: 11.75, forwardRate90d: 12.50, cdiRate: 0.1175, notional_usd: 13100000, tenor: 630, portfolioValue: 500000000, portfolioDuration: 3 },
-      displayFields: [["CDI atual", "11,75% a.a."], ["DI Jan/28", "12,50% a.a."], ["PU Jan/28", "74.493"], ["PL Fundo", "R$ 500M"], ["Duration", "3 anos"], ["DU até Jan/28", "630 d.u."]],
+      narrative: "Você é gestor(a) de um fundo de renda fixa com **R$ 500 milhões** em títulos prefixados (NTN-F e LTN) carregados a um **yield médio de 12,50% a.a.** (à mercado, igual ao DI Jan/28) e com duration média de **3 anos** (≈ **756 d.u.**). O CDI está em **11,75% a.a.** e o DI futuro de Jan/28 está em **12,50% a.a.**. São **630 d.u.** até o vencimento do DI. O Copom se reúne em 2 semanas e o mercado está dividido entre manutenção e alta de 50bps. Se os juros subirem, seus títulos perdem valor.",
+      marketData: { spotRate: 11.75, forwardRate90d: 12.50, cdiRate: 0.1175, notional_usd: 13100000, tenor: 630, portfolioValue: 500000000, portfolioDuration: 3, portfolioRate: 12.50, portfolioDu: 756 },
+      displayFields: [["CDI atual", "11,75% a.a."], ["DI Jan/28", "12,50% a.a."], ["Yield carteira", "12,50% a.a."], ["PL Fundo", "R$ 500M"], ["Duration", "3 anos (756 d.u.)"], ["PU Jan/28", "74.493"]],
       question: "Seus títulos prefixados perdem valor quando os juros sobem. Como proteger a carteira?",
     },
     steps: [
