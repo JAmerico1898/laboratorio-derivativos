@@ -41,6 +41,9 @@ export interface ResolutionScenario {
   label: string;
   fixingRate: number;
   description: string;
+  // Calendar spread (Jan/27 + Jan/28): rates de cada perna no cenário
+  rateShortNew?: number;
+  rateLongNew?: number;
 }
 
 export interface ResolutionStep {

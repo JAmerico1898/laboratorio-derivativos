@@ -20,10 +20,27 @@ export function calculateResult(
   const notional = marketData.notional_usd as number;
   const hedgedNotional = notional * hedgeRatio;
 
-  const ndfPnL =
-    position === "sell_usd"
-      ? (forwardRate - fixingRate) * hedgedNotional
-      : (fixingRate - forwardRate) * hedgedNotional;
+  // Cálculo por PU (DI futuro): captura convexidade para movimentos grandes de taxa.
+  // Ativado quando o cenário declara `pnlMethod: "di_pu"` em marketData.
+  const usePuMethod = marketData.pnlMethod === "di_pu";
+
+  let ndfPnL: number;
+  if (usePuMethod) {
+    const nContracts = (marketData.nContracts as number) ?? 0;
+    const du = (marketData.duDays as number) ?? 252;
+    const r0 = forwardRate / 100;
+    const rT = fixingRate / 100;
+    const pu0 = 100000 / Math.pow(1 + r0, du / 252);
+    const puT = pu0 * Math.pow(1 + rT, du / 252);
+    const pnlPerContract =
+      position === "sell_usd" ? 100000 - puT : puT - 100000;
+    ndfPnL = pnlPerContract * nContracts * hedgeRatio;
+  } else {
+    ndfPnL =
+      position === "sell_usd"
+        ? (forwardRate - fixingRate) * hedgedNotional
+        : (fixingRate - forwardRate) * hedgedNotional;
+  }
 
   const spotConversion = fixingRate * notional;
   const hedgedConversion =

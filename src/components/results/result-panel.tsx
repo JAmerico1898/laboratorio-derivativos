@@ -41,17 +41,29 @@ export function ResultPanel({
     const smd = scenarioData.context.marketData;
     const spreadInitial = (smd.spreadBps as number) || 80;
     const newSpread = scenario.fixingRate; // fixingRate stores new spread in bp
-    const dv01Short = (smd.dv01Short as number) || 14;
-    const dv01Long = (smd.dv01Long as number) || 20;
     const cShort = (smd.contractsShort as number) || 5000;
-    const cLong = (smd.contractsLong as number) || 3500;
-    const dv01TotalShort = cShort * dv01Short;
-    const dv01TotalLong = cLong * dv01Long;
-    const spreadChange = spreadInitial - newSpread;
-    const spreadPnl = spreadChange * dv01TotalLong;
-    const isGain = spreadPnl > 0;
+    const cLong = (smd.contractsLong as number) || 3840;
+    const duShort = (smd.duShort as number) || 504;
+    const duLong = (smd.duLong as number) || 756;
     const rateShort = smd.spotRate as number;
     const rateLong = smd.forwardRate90d as number;
+    const rateShortNew = (scenario.rateShortNew as number) ?? rateShort;
+    const rateLongNew = (scenario.rateLongNew as number) ?? rateLong;
+
+    // PU-based P&L
+    const pu0Short = 100000 / Math.pow(1 + rateShort / 100, duShort / 252);
+    const pu0Long = 100000 / Math.pow(1 + rateLong / 100, duLong / 252);
+    const puTShort = 100000 / Math.pow(1 + rateShortNew / 100, duShort / 252);
+    const puTLong = 100000 / Math.pow(1 + rateLongNew / 100, duLong / 252);
+    const dPuShort = puTShort - pu0Short;
+    const dPuLong = puTLong - pu0Long;
+    // Perna curta: comprou taxa = vendeu PU → P&L = -ΔPU × N
+    const pnlShort = -dPuShort * cShort;
+    // Perna longa: vendeu taxa = comprou PU → P&L = +ΔPU × N
+    const pnlLong = dPuLong * cLong;
+    const spreadPnl = pnlShort + pnlLong;
+    const spreadChange = spreadInitial - newSpread;
+    const isGain = spreadPnl > 0;
 
     return (
       <div className="flex flex-col gap-5">
@@ -76,9 +88,11 @@ export function ResultPanel({
             ① Perna curta — Comprar taxa Jan/27 ({cShort.toLocaleString("pt-BR")} contratos)
           </div>
           <div className="text-sm leading-relaxed text-on-surface">
-            <div>(1) Posição: comprar taxa (vender PU) no Jan/27 a {rateShort.toFixed(2)}%</div>
-            <div>(2) DV01 total = {cShort.toLocaleString("pt-BR")} × R$ {dv01Short} = <strong className="text-secondary">R$ {dv01TotalShort.toLocaleString("pt-BR")}/bp</strong></div>
-            <div>(3) Em um choque paralelo de +1bp, esta perna <strong className="text-emerald-600">ganha</strong> R$ {dv01TotalShort.toLocaleString("pt-BR")}</div>
+            <div>(1) Posição: comprar taxa (vender PU) no Jan/27. Taxa: {rateShort.toFixed(2)}% → {rateShortNew.toFixed(2)}%</div>
+            <div>(2) PU₀ = 100.000 ÷ (1+{rateShort.toFixed(2)}%)^({duShort}/252) = <strong className="text-secondary">{fmt(pu0Short)}</strong></div>
+            <div>(3) PU_T = 100.000 ÷ (1+{rateShortNew.toFixed(2)}%)^({duShort}/252) = <strong className="text-secondary">{fmt(puTShort)}</strong></div>
+            <div>(4) ΔPU = {fmt(puTShort)} − {fmt(pu0Short)} = <strong>{dPuShort >= 0 ? "+" : ""}{fmt(dPuShort)}</strong></div>
+            <div>(5) P&L curto = −ΔPU × {cShort.toLocaleString("pt-BR")} = <strong className={pnlShort >= 0 ? "text-emerald-600" : "text-red-600"}>{pnlShort >= 0 ? "+" : ""}{fmt(pnlShort)}</strong></div>
           </div>
         </div>
 
@@ -87,10 +101,11 @@ export function ResultPanel({
             ② Perna longa — Vender taxa Jan/28 ({cLong.toLocaleString("pt-BR")} contratos)
           </div>
           <div className="text-sm leading-relaxed text-on-surface">
-            <div>(1) Posição: vender taxa (comprar PU) no Jan/28 a {rateLong.toFixed(2)}%</div>
-            <div>(2) DV01 total = {cLong.toLocaleString("pt-BR")} × R$ {dv01Long} = <strong className="text-secondary">R$ {dv01TotalLong.toLocaleString("pt-BR")}/bp</strong></div>
-            <div>(3) Em um choque paralelo de +1bp, esta perna <strong className="text-red-600">perde</strong> R$ {dv01TotalLong.toLocaleString("pt-BR")}</div>
-            <div>(4) DV01 casado: {dv01TotalShort.toLocaleString("pt-BR")} ≈ {dv01TotalLong.toLocaleString("pt-BR")} → risco direcional neutralizado ✓</div>
+            <div>(1) Posição: vender taxa (comprar PU) no Jan/28. Taxa: {rateLong.toFixed(2)}% → {rateLongNew.toFixed(2)}%</div>
+            <div>(2) PU₀ = 100.000 ÷ (1+{rateLong.toFixed(2)}%)^({duLong}/252) = <strong className="text-secondary">{fmt(pu0Long)}</strong></div>
+            <div>(3) PU_T = 100.000 ÷ (1+{rateLongNew.toFixed(2)}%)^({duLong}/252) = <strong className="text-secondary">{fmt(puTLong)}</strong></div>
+            <div>(4) ΔPU = {fmt(puTLong)} − {fmt(pu0Long)} = <strong>{dPuLong >= 0 ? "+" : ""}{fmt(dPuLong)}</strong></div>
+            <div>(5) P&L longo = +ΔPU × {cLong.toLocaleString("pt-BR")} = <strong className={pnlLong >= 0 ? "text-emerald-600" : "text-red-600"}>{pnlLong >= 0 ? "+" : ""}{fmt(pnlLong)}</strong></div>
           </div>
         </div>
 
@@ -100,15 +115,15 @@ export function ResultPanel({
           </div>
           <div className="text-sm leading-relaxed text-on-surface">
             <div>(1) Spread inicial = {spreadInitial} bps (Jan/28 {rateLong.toFixed(2)}% − Jan/27 {rateShort.toFixed(2)}%)</div>
-            <div>(2) Spread final = {newSpread} bps</div>
+            <div>(2) Spread final = {newSpread} bps (Jan/28 {rateLongNew.toFixed(2)}% − Jan/27 {rateShortNew.toFixed(2)}%)</div>
             <div>(3) Compressão/alargamento = {spreadChange > 0 ? "+" : ""}{spreadChange} bps</div>
-            <div>(4) P&L = {Math.abs(spreadChange)} bps × R$ {dv01TotalLong.toLocaleString("pt-BR")}/bp = <strong className={isGain ? "text-emerald-600" : "text-red-600"}>{spreadPnl >= 0 ? "+" : ""}{fmt(spreadPnl)}</strong></div>
+            <div>(4) P&L total = P&L curto ({pnlShort >= 0 ? "+" : ""}{fmt(pnlShort)}) + P&L longo ({pnlLong >= 0 ? "+" : ""}{fmt(pnlLong)}) = <strong className={isGain ? "text-emerald-600" : "text-red-600"}>{spreadPnl >= 0 ? "+" : ""}{fmt(spreadPnl)}</strong></div>
             <div className="mt-3 rounded-lg bg-surface-container-lowest p-3.5">
               {spreadChange > 0
-                ? `O spread comprimiu de ${spreadInitial} para ${newSpread} bps como projetado. A perna longa (vender taxa Jan/28) ganhou mais do que a perna curta (comprar taxa Jan/27) perdeu, pois o vértice longo caiu mais. O flattener capturou a compressão da curva — resultado de +${fmt(spreadPnl)}.`
+                ? `O spread comprimiu de ${spreadInitial} para ${newSpread} bps como projetado. A variação de PU na perna longa (${dPuLong >= 0 ? "+" : ""}${fmt(dPuLong)}) superou em valor a da perna curta. O flattener capturou a compressão da curva — resultado de ${spreadPnl >= 0 ? "+" : ""}${fmt(spreadPnl)}.`
                 : spreadChange < 0
-                ? `O spread alargou de ${spreadInitial} para ${newSpread} bps — oposto da tese. A perna longa perdeu mais do que a perna curta ganhou. Embora o DV01 seja casado para choques paralelos, o alargamento do spread gera perda líquida de ${fmt(Math.abs(spreadPnl))}. O flattener sofre quando a curva inclina.`
-                : `O spread ficou praticamente estável. Sem variação relevante entre as pernas. Resultado marginal.`}
+                ? `O spread alargou de ${spreadInitial} para ${newSpread} bps — oposto da tese. A perna longa sofreu mais do que a curta protegeu. Mesmo com pernas calibradas pela sensibilidade do PU para choques paralelos, o alargamento do spread gera perda líquida de ${fmt(Math.abs(spreadPnl))}. O flattener sofre quando a curva inclina.`
+                : `O spread ficou praticamente estável. Sem variação relevante de formato entre as pernas. Resultado marginal.`}
             </div>
           </div>
         </div>
@@ -192,8 +207,9 @@ export function ResultPanel({
     : altPos === "sell_usd"
     ? "vendido"
     : "comprado";
-  const altPnL =
-    altPos === "sell_usd"
+  const altPnL = isSpecDI
+    ? -result.ndfPnL
+    : altPos === "sell_usd"
       ? (forwardChosen - scenario.fixingRate) * result.notional
       : (scenario.fixingRate - forwardChosen) * result.notional;
   const xLabel = isSwapCambial
@@ -217,10 +233,15 @@ export function ResultPanel({
   // Speculation DI: stop loss and risk/reward context
   const specStopLoss = 5000000; // R$ 5M
   const specTargetRate = 9.50;  // projected terminal rate
-  const specDV01 = 14;          // R$ per contract per bp
   const specRateChange = scenario.fixingRate - forwardChosen; // pp (negative = thesis correct)
   const specBpsChange = specRateChange * 100; // basis points
   const specStopPct = result.notional > 0 ? (Math.abs(result.ndfPnL) / specStopLoss) * 100 : 0;
+  const specNContracts = (md?.nContracts as number) || 0;
+  const specDuDays = (md?.duDays as number) || 252;
+  const specPu0 = 100000 / Math.pow(1 + forwardChosen / 100, specDuDays / 252);
+  const specPuT = specPu0 * Math.pow(1 + scenario.fixingRate / 100, specDuDays / 252);
+  const specPnlPerContract =
+    position === "sell_usd" ? 100000 - specPuT : specPuT - 100000;
 
   // Swap CDI hedge: rate-based comparison
   const swapSpread = (md?.debtSpread as number) || 0;
@@ -556,6 +577,7 @@ export function ResultPanel({
               notional={result.hedgedNotional}
               fixingRate={scenario.fixingRate}
               xLabel={xLabel}
+              overrideFixingPnL={isSpecDI ? result.ndfPnL : undefined}
             />
           </div>
           <div className="rounded-xl border border-outline-variant p-5 bg-surface-container-lowest">
@@ -687,6 +709,23 @@ export function ResultPanel({
                         {result.ndfPnL >= 0 ? "+" : ""}{fmt(result.ndfPnL)}
                       </span>.
                     </p>
+                    <div className="rounded-md bg-surface-container-lowest/60 p-3 text-[13px] leading-relaxed">
+                      <div className="mb-1 font-semibold text-secondary">Memória de cálculo (método PU)</div>
+                      <div>(1) PU₀ = 100.000 ÷ (1 + {fmtRate(forwardChosen)})^({specDuDays}/252) = <strong>{fmt(specPu0)}</strong></div>
+                      <div>(2) PU_T = {fmt(specPu0)} × (1 + {fmtRate(scenario.fixingRate)})^({specDuDays}/252) = <strong>{fmt(specPuT)}</strong></div>
+                      <div>
+                        (3) P&L por contrato ({position === "sell_usd" ? "vendido em taxa" : "comprado em taxa"}) ={" "}
+                        {position === "sell_usd"
+                          ? <>100.000 − {fmt(specPuT)}</>
+                          : <>{fmt(specPuT)} − 100.000</>}{" "}= <strong>{specPnlPerContract >= 0 ? "+" : ""}{fmt(specPnlPerContract)}</strong>
+                      </div>
+                      <div>
+                        (4) P&L total = {specPnlPerContract >= 0 ? "+" : ""}{fmt(specPnlPerContract)} × {specNContracts.toLocaleString("pt-BR")} contratos ={" "}
+                        <strong className={result.ndfPnL >= 0 ? "text-emerald-600" : "text-red-600"}>
+                          {result.ndfPnL >= 0 ? "+" : ""}{fmt(result.ndfPnL)}
+                        </strong>
+                      </div>
+                    </div>
                     <p>
                       <strong>Relação com o stop loss:</strong>{" "}
                       {result.ndfPnL >= 0
