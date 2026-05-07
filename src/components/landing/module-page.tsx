@@ -217,6 +217,27 @@ export function ModulePage({ themeId, heroPlayer }: ModulePageProps) {
                 );
               })}
             </div>
+
+            {themeId === 'opcoes' && (
+              <div className="mt-16 flex flex-col items-center text-center gap-4 rounded-2xl bg-surface-container-lowest shadow-sm p-8">
+                <h3 className="font-heading text-2xl md:text-3xl font-bold text-primary">
+                  Aprofunde-se em Black &amp; Scholes e Gregas
+                </h3>
+                <p className="text-on-surface-variant max-w-2xl leading-relaxed">
+                  Acesse o laboratório dedicado à precificação de opções pelo modelo de Black &amp; Scholes
+                  e à análise de sensibilidades (Delta, Gamma, Vega, Theta e Rho).
+                </p>
+                <a
+                  href="https://laboratorio-opcoes.vercel.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-primary text-on-primary font-bold text-sm hover:bg-primary-container transition-colors active:scale-95"
+                >
+                  Abrir Laboratório de Opções
+                  <span className="material-symbols-outlined text-sm">open_in_new</span>
+                </a>
+              </div>
+            )}
           </main>
         </>
       ) : (
