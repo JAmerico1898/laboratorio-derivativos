@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { strings } from "@/lib/strings";
 
@@ -22,9 +23,19 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-8 h-16 flex items-center justify-between gap-6">
         <Link
           href="/"
-          className="text-xl font-extrabold text-primary tracking-tighter font-heading shrink-0"
+          className="flex items-center gap-2.5 shrink-0"
         >
-          {strings.siteTitle}
+          <Image
+            src="/logo/finlab-logo-white.jpg"
+            alt="FinLab"
+            width={40}
+            height={33}
+            priority
+            className="h-9 w-auto rounded"
+          />
+          <span className="text-xl font-extrabold text-primary tracking-tighter font-heading">
+            {strings.siteTitle}
+          </span>
         </Link>
         <div className="flex items-center gap-1 overflow-x-auto scrollbar-none">
           {NAV_ITEMS.filter((item) => item.href !== pathname).map((item) => (
