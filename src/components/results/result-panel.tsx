@@ -236,22 +236,26 @@ export function ResultPanel({
   const diPu0 = 1 / Math.pow(1 + diPortfolioRate / 100, diPortfolioDu / 252);
   const diPuT = 1 / Math.pow(1 + diPortfolioYieldNew / 100, diPortfolioDu / 252);
   const diPortfolioReturnPct = diPuT / diPu0 - 1;
-  const diPortfolioPnL = diPortfolioReturnPct * diPortfolioValue;
-  const diNetPnL = diPortfolioPnL + result.ndfPnL;
-  // Perna do futuro: PU do vértice hedgeado, marcado a mercado
+  const diPortfolioPnLPv = diPortfolioReturnPct * diPortfolioValue;
+  // Perna do futuro: PU inicial atualizado pela nova taxa até o vencimento.
   const diRefContracts = (md?.nContracts as number) || 0;
   const diContracts = Math.round(diRefContracts * hedgeRatio);
   const diFutDu = (md?.duDays as number) || 252;
   const diFutPu0 = 100000 / Math.pow(1 + forwardChosen / 100, diFutDu / 252);
-  const diFutPuT = 100000 / Math.pow(1 + scenario.fixingRate / 100, diFutDu / 252);
+  // Fator que leva valores de hoje ao vencimento do DI pela nova taxa. As duas
+  // pernas (carteira e futuro) usam o mesmo fator para permanecerem comparáveis.
+  const diCapFactor = Math.pow(1 + scenario.fixingRate / 100, diFutDu / 252);
+  const diFutPuT = diFutPu0 * diCapFactor;
   const diFutPnlPerContract =
-    position === "buy_usd" ? diFutPu0 - diFutPuT : diFutPuT - diFutPu0;
+    position === "buy_usd" ? diFutPuT - 100000 : 100000 - diFutPuT;
+  const diPortfolioPnL = diPortfolioPnLPv * diCapFactor;
+  const diNetPnL = diPortfolioPnL + result.ndfPnL;
   const diHedgeCoverage =
     diPortfolioPnL !== 0 ? Math.abs(result.ndfPnL / diPortfolioPnL) : 1;
   // Nocional linear equivalente (DV01) para escalar o diagrama de payoff:
-  // P&L por 1pp de taxa = contratos × PU₀ × (du/252) ÷ (1+taxa)
+  // P&L por 1pp de taxa = contratos × 100.000 × (du/252) ÷ (1+taxa)
   const diChartNotional =
-    (diContracts * diFutPu0 * (diFutDu / 252)) / (1 + forwardChosen / 100) / 100;
+    (diContracts * 100000 * (diFutDu / 252)) / (1 + forwardChosen / 100) / 100;
 
   // Speculation DI: stop loss and risk/reward context
   const specStopLoss = 5000000; // R$ 5M
@@ -575,7 +579,9 @@ export function ResultPanel({
               ) : isFut ? (
                 <>
                   <br />
-                  {isHedgeDI ? "Marcação a mercado da posição:" : "Ajustes diários acumulados:"}{" "}
+                  {isHedgeDI || isSpecDI
+                    ? "Resultado da posição no vencimento:"
+                    : "Ajustes diários acumulados:"}{" "}
                   <strong className={colorClass}>
                     {result.ndfPnL > 0 ? "+" : ""}
                     {fmt(result.ndfPnL)}
@@ -693,24 +699,39 @@ export function ResultPanel({
                       PU_T = 1 ÷ (1+{fmtQ(diPortfolioYieldNew)})^({diPortfolioDu}/252) = <strong>{diPuT.toFixed(6).replace(".", ",")}</strong>.
                       <br />
                       Retorno = (PU_T ÷ PU₀ − 1) = <strong>{(diPortfolioReturnPct * 100).toFixed(2).replace(".", ",")}%</strong>;
-                      P&L carteira = {(diPortfolioReturnPct * 100).toFixed(2).replace(".", ",")}% × {fmt(diPortfolioValue)} ={" "}
+                      P&L hoje = {(diPortfolioReturnPct * 100).toFixed(2).replace(".", ",")}% × {fmt(diPortfolioValue)} ={" "}
+                      <strong>{diPortfolioPnLPv >= 0 ? "+" : ""}{fmt(diPortfolioPnLPv)}</strong>.
+                      <br />
+                      Levado ao vencimento do DI pela nova taxa: {fmt(diPortfolioPnLPv)} × (1+{fmtQ(scenario.fixingRate)})^({diFutDu}/252) ={" "}
                       <span className={diPortfolioPnL >= 0 ? "font-bold text-emerald-600" : "font-bold text-red-600"}>
                         {diPortfolioPnL >= 0 ? "+" : ""}{fmt(diPortfolioPnL)}
                       </span>.
                     </p>
                     <p>
                       <strong>Resultado do DI futuro ({position === "buy_usd" ? "comprou taxa" : "vendeu taxa"} a {fmtQ(forwardChosen)}, {diContracts.toLocaleString("pt-BR")} contratos):</strong>{" "}
-                      PU₀ = 100.000 ÷ (1+{fmtQ(forwardChosen)})^({diFutDu}/252) = <strong>{fmt(diFutPu0)}</strong>;
-                      PU_T = 100.000 ÷ (1+{fmtQ(scenario.fixingRate)})^({diFutDu}/252) = <strong>{fmt(diFutPuT)}</strong>.
-                      <br />
-                      P&L por contrato ({position === "buy_usd" ? "vendido em PU" : "comprado em PU"}) ={" "}
-                      <strong>{diFutPnlPerContract >= 0 ? "+" : ""}{fmt(diFutPnlPerContract)}</strong>; × {diContracts.toLocaleString("pt-BR")} contratos ={" "}
                       <span className={result.ndfPnL >= 0 ? "font-bold text-emerald-600" : "font-bold text-red-600"}>
                         {result.ndfPnL >= 0 ? "+" : ""}{fmt(result.ndfPnL)}
                       </span>.
                     </p>
+                    <div className="rounded-md bg-surface-container-lowest/60 p-3 text-[13px] leading-relaxed">
+                      <div className="mb-1 font-semibold text-secondary">Memória de cálculo (método PU)</div>
+                      <div>(1) PU₀ = 100.000 ÷ (1 + {fmtQ(forwardChosen)})^({diFutDu}/252) = <strong>{fmt(diFutPu0)}</strong></div>
+                      <div>(2) PU_T = {fmt(diFutPu0)} × (1 + {fmtQ(scenario.fixingRate)})^({diFutDu}/252) = <strong>{fmt(diFutPuT)}</strong></div>
+                      <div>
+                        (3) P&L por contrato ({position === "buy_usd" ? "comprado em taxa" : "vendido em taxa"}) ={" "}
+                        {position === "buy_usd"
+                          ? <>{fmt(diFutPuT)} − 100.000</>
+                          : <>100.000 − {fmt(diFutPuT)}</>}{" "}= <strong>{diFutPnlPerContract >= 0 ? "+" : ""}{fmt(diFutPnlPerContract)}</strong>
+                      </div>
+                      <div>
+                        (4) P&L total = {diFutPnlPerContract >= 0 ? "+" : ""}{fmt(diFutPnlPerContract)} × {diContracts.toLocaleString("pt-BR")} contratos ={" "}
+                        <strong className={result.ndfPnL >= 0 ? "text-emerald-600" : "text-red-600"}>
+                          {result.ndfPnL >= 0 ? "+" : ""}{fmt(result.ndfPnL)}
+                        </strong>
+                      </div>
+                    </div>
                     <p>
-                      <strong>Resultado combinado (carteira + DI futuro):</strong>{" "}
+                      <strong>Resultado combinado (carteira + DI futuro, ambos no vencimento do DI):</strong>{" "}
                       {fmt(diPortfolioPnL)} {result.ndfPnL >= 0 ? "+" : "−"} {fmt(Math.abs(result.ndfPnL))} ={" "}
                       <strong className="text-secondary">{diNetPnL >= 0 ? "+" : ""}{fmt(diNetPnL)}</strong>.
                     </p>
@@ -721,10 +742,10 @@ export function ResultPanel({
                         ? `Os juros caíram ${Math.abs(diRateChange).toFixed(2).replace(".", ",")}pp e os títulos prefixados valorizaram. O DI futuro gerou perda de ${fmt(result.ndfPnL)} — esse é o custo de oportunidade do hedge. Sem a proteção, o fundo teria capturado toda a valorização dos prefixados.`
                         : "A taxa ficou praticamente estável. Impacto marginal tanto na carteira quanto no DI futuro."}
                       {diContracts < diRefContracts
-                        ? ` Com ${diContracts.toLocaleString("pt-BR")} contratos ao invés dos ${diRefContracts.toLocaleString("pt-BR")} exigidos pelo casamento de duration, a posição está sub-hedgeada: sobra risco de taxa não protegido, e o resíduo de ${fmt(diNetPnL)} é exatamente essa exposição residual.`
+                        ? ` Com ${diContracts.toLocaleString("pt-BR")} contratos ao invés dos ${diRefContracts.toLocaleString("pt-BR")} exigidos pelo casamento nocional via PU, a posição está sub-hedgeada: sobra risco de taxa não protegido, e o resíduo de ${fmt(diNetPnL)} é exatamente essa exposição residual.`
                         : diContracts > diRefContracts
-                        ? ` Com ${diContracts.toLocaleString("pt-BR")} contratos ao invés dos ${diRefContracts.toLocaleString("pt-BR")} exigidos pelo casamento de duration, a posição está sobre-hedgeada — o excedente é exposição direcional, não proteção.`
-                        : ` Com o hedge dimensionado por duration (${diRefContracts.toLocaleString("pt-BR")} contratos), o resíduo de ${fmt(diNetPnL)} vem da convexidade e do descasamento entre a duration da carteira (${diPortfolioDuration}a) e a do vértice hedgeado (${(diFutDu / 252).toFixed(1).replace(".", ",")}a) — o hedge neutraliza a primeira ordem, não a segunda.`}
+                        ? ` Com ${diContracts.toLocaleString("pt-BR")} contratos ao invés dos ${diRefContracts.toLocaleString("pt-BR")} exigidos pelo casamento nocional via PU, a posição está sobre-hedgeada — o excedente é exposição direcional, não proteção.`
+                        : ` Como a duration da carteira (${diPortfolioDuration.toFixed(1).replace(".", ",")}a) é igual à do vértice hedgeado (${(diFutDu / 252).toFixed(1).replace(".", ",")}a), o casamento nocional pelo PU (${diRefContracts.toLocaleString("pt-BR")} contratos) neutraliza a exposição quase integralmente — o resíduo de ${fmt(diNetPnL)} vem apenas do arredondamento do número de contratos.`}
                     </p>
                   </div>
                 ) : isSpecDI ? (
