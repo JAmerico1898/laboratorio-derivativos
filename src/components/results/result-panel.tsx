@@ -207,7 +207,7 @@ export function ResultPanel({
     : altPos === "sell_usd"
     ? "vendido"
     : "comprado";
-  const altPnL = isSpecDI
+  const altPnL = isSpecDI || isHedgeDI
     ? -result.ndfPnL
     : altPos === "sell_usd"
       ? (forwardChosen - scenario.fixingRate) * result.notional
@@ -226,7 +226,7 @@ export function ResultPanel({
   // DI hedge: portfolio impact via duration approximation
   const diPortfolioValue = (md?.portfolioValue as number) || 0;
   const diPortfolioDuration = (md?.portfolioDuration as number) || 0;
-  const diRateChange = scenario.fixingRate - forwardChosen; // percentage points (DI Jan/28)
+  const diRateChange = scenario.fixingRate - forwardChosen; // percentage points (vértice do DI)
   // Carteira reprecificada via PU: yield carteira move paralelamente ao DI
   const diPortfolioRate = (md?.portfolioRate as number) ?? forwardChosen;
   const diPortfolioDu = (md?.portfolioDu as number) ?? diPortfolioDuration * 252;
@@ -236,6 +236,20 @@ export function ResultPanel({
   const diPortfolioReturnPct = diPuT / diPu0 - 1;
   const diPortfolioPnL = diPortfolioReturnPct * diPortfolioValue;
   const diNetPnL = diPortfolioPnL + result.ndfPnL;
+  // Perna do futuro: PU do vértice hedgeado, marcado a mercado
+  const diRefContracts = (md?.nContracts as number) || 0;
+  const diContracts = Math.round(diRefContracts * hedgeRatio);
+  const diFutDu = (md?.duDays as number) || 252;
+  const diFutPu0 = 100000 / Math.pow(1 + forwardChosen / 100, diFutDu / 252);
+  const diFutPuT = 100000 / Math.pow(1 + scenario.fixingRate / 100, diFutDu / 252);
+  const diFutPnlPerContract =
+    position === "buy_usd" ? diFutPu0 - diFutPuT : diFutPuT - diFutPu0;
+  const diHedgeCoverage =
+    diPortfolioPnL !== 0 ? Math.abs(result.ndfPnL / diPortfolioPnL) : 1;
+  // Nocional linear equivalente (DV01) para escalar o diagrama de payoff:
+  // P&L por 1pp de taxa = contratos × PU₀ × (du/252) ÷ (1+taxa)
+  const diChartNotional =
+    (diContracts * diFutPu0 * (diFutDu / 252)) / (1 + forwardChosen / 100) / 100;
 
   // Speculation DI: stop loss and risk/reward context
   const specStopLoss = 5000000; // R$ 5M
@@ -581,10 +595,10 @@ export function ResultPanel({
             <PayoffChart
               forwardRate={forwardChosen}
               position={position}
-              notional={result.hedgedNotional}
+              notional={isHedgeDI ? diChartNotional : result.hedgedNotional}
               fixingRate={scenario.fixingRate}
               xLabel={xLabel}
-              overrideFixingPnL={isSpecDI ? result.ndfPnL : undefined}
+              overrideFixingPnL={isSpecDI || isHedgeDI ? result.ndfPnL : undefined}
             />
           </div>
           <div className="rounded-xl border border-outline-variant p-5 bg-surface-container-lowest">
@@ -682,7 +696,12 @@ export function ResultPanel({
                       </span>.
                     </p>
                     <p>
-                      <strong>Resultado do DI futuro ({position === "buy_usd" ? "comprou taxa" : "vendeu taxa"} a {fmtRate(forwardChosen)}):</strong>{" "}
+                      <strong>Resultado do DI futuro ({position === "buy_usd" ? "comprou taxa" : "vendeu taxa"} a {fmtRate(forwardChosen)}, {diContracts.toLocaleString("pt-BR")} contratos):</strong>{" "}
+                      PU₀ = 100.000 ÷ (1+{fmtRate(forwardChosen)})^({diFutDu}/252) = <strong>{fmt(diFutPu0)}</strong>;
+                      PU_T = 100.000 ÷ (1+{fmtRate(scenario.fixingRate)})^({diFutDu}/252) = <strong>{fmt(diFutPuT)}</strong>.
+                      <br />
+                      P&L por contrato ({position === "buy_usd" ? "vendido em PU" : "comprado em PU"}) ={" "}
+                      <strong>{diFutPnlPerContract >= 0 ? "+" : ""}{fmt(diFutPnlPerContract)}</strong>; × {diContracts.toLocaleString("pt-BR")} contratos ={" "}
                       <span className={result.ndfPnL >= 0 ? "font-bold text-emerald-600" : "font-bold text-red-600"}>
                         {result.ndfPnL >= 0 ? "+" : ""}{fmt(result.ndfPnL)}
                       </span>.
@@ -694,10 +713,15 @@ export function ResultPanel({
                     </p>
                     <p>
                       {diRateChange > 0.1
-                        ? `Os juros subiram ${diRateChange.toFixed(2)}pp e os títulos prefixados perderam valor. O DI futuro gerou ganho de ${fmt(result.ndfPnL)}, compensando a maior parte da perda na carteira. O hedge cumpriu seu papel de proteção.`
+                        ? `Os juros subiram ${diRateChange.toFixed(2)}pp e os títulos prefixados perderam valor. O DI futuro gerou ganho de ${fmt(result.ndfPnL)}, cobrindo ${(diHedgeCoverage * 100).toFixed(0)}% da perda na carteira.`
                         : diRateChange < -0.1
                         ? `Os juros caíram ${Math.abs(diRateChange).toFixed(2)}pp e os títulos prefixados valorizaram. O DI futuro gerou perda de ${fmt(result.ndfPnL)} — esse é o custo de oportunidade do hedge. Sem a proteção, o fundo teria capturado toda a valorização dos prefixados.`
                         : "A taxa ficou praticamente estável. Impacto marginal tanto na carteira quanto no DI futuro."}
+                      {diContracts < diRefContracts
+                        ? ` Com ${diContracts.toLocaleString("pt-BR")} contratos ao invés dos ${diRefContracts.toLocaleString("pt-BR")} exigidos pelo casamento de duration, a posição está sub-hedgeada: sobra risco de taxa não protegido, e o resíduo de ${fmt(diNetPnL)} é exatamente essa exposição residual.`
+                        : diContracts > diRefContracts
+                        ? ` Com ${diContracts.toLocaleString("pt-BR")} contratos ao invés dos ${diRefContracts.toLocaleString("pt-BR")} exigidos pelo casamento de duration, a posição está sobre-hedgeada — o excedente é exposição direcional, não proteção.`
+                        : ` Com o hedge dimensionado por duration (${diRefContracts.toLocaleString("pt-BR")} contratos), o resíduo de ${fmt(diNetPnL)} vem da convexidade e do descasamento entre a duration da carteira (${diPortfolioDuration}a) e a do vértice hedgeado (${(diFutDu / 252).toFixed(1).replace(".", ",")}a) — o hedge neutraliza a primeira ordem, não a segunda.`}
                     </p>
                   </div>
                 ) : isSpecDI ? (

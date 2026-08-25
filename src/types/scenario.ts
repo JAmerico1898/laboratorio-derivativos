@@ -27,6 +27,8 @@ export interface Choice {
   score: number;
   feedback: string;
   next: string;
+  /** Nº de contratos que esta escolha implica — dimensiona o P&L do derivativo. */
+  contracts?: number;
 }
 
 export interface ChoiceStep {

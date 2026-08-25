@@ -189,6 +189,20 @@ export function useScenarioPlayer(
   };
 
   const getHedgeRatio = (): number => {
+    // Cenários que dimensionam a posição em contratos: a escolha do aluno define
+    // a proporção sobre o hedge de referência (`nContracts` do marketData).
+    const refContracts = currentScenario?.context.marketData.nContracts as
+      | number
+      | undefined;
+    if (refContracts) {
+      for (const a of answers) {
+        const step = currentScenario.steps.find(
+          (s) => s.id === a.stepId && s.type === "choice"
+        ) as ChoiceStep | undefined;
+        const chosen = step?.choices.find((ch) => ch.id === a.choiceId);
+        if (chosen?.contracts !== undefined) return chosen.contracts / refContracts;
+      }
+    }
     const c = answers.find((a) =>
       ["full_hedge", "partial_hedge", "no_hedge"].includes(a.choiceId)
     )?.choiceId;

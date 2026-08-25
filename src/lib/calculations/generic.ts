@@ -23,9 +23,22 @@ export function calculateResult(
   // Cálculo por PU (DI futuro): captura convexidade para movimentos grandes de taxa.
   // Ativado quando o cenário declara `pnlMethod: "di_pu"` em marketData.
   const usePuMethod = marketData.pnlMethod === "di_pu";
+  // Marcação a mercado por PU (DI futuro): P&L = variação do PU na data de hoje,
+  // já descontada. Usado quando o resultado precisa ser comparável ao de uma
+  // carteira reprecificada a valor presente (`pnlMethod: "di_pu_mtm"`).
+  const usePuMtmMethod = marketData.pnlMethod === "di_pu_mtm";
 
   let ndfPnL: number;
-  if (usePuMethod) {
+  if (usePuMtmMethod) {
+    const nContracts = (marketData.nContracts as number) ?? 0;
+    const du = (marketData.duDays as number) ?? 252;
+    const pu0 = 100000 / Math.pow(1 + forwardRate / 100, du / 252);
+    const puT = 100000 / Math.pow(1 + fixingRate / 100, du / 252);
+    // comprar taxa = vender PU (ganha quando o PU cai); vender taxa = comprar PU
+    const pnlPerContract =
+      position === "buy_usd" ? pu0 - puT : puT - pu0;
+    ndfPnL = pnlPerContract * nContracts * hedgeRatio;
+  } else if (usePuMethod) {
     const nContracts = (marketData.nContracts as number) ?? 0;
     const du = (marketData.duDays as number) ?? 252;
     const r0 = forwardRate / 100;
