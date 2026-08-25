@@ -1,4 +1,4 @@
-import { fmt, fmtRate } from "@/lib/formatters";
+import { fmt, fmtRate, fmtPct } from "@/lib/formatters";
 import { strings, resultOf } from "@/lib/strings";
 import { PayoffChart } from "@/components/charts/payoff-chart";
 import { EmbeddedResultPanel } from "./embedded-result-panel";
@@ -149,6 +149,8 @@ export function ResultPanel({
   const isSwap = instrument?.includes("Swap");
   const isSwapCambial = instrument?.includes("USD");
   const isSwapCDI = isSwap && !isSwapCambial;
+  // Cenários de juros cotam taxa em % a.a.; os de câmbio, em R$/USD.
+  const fmtQ = (v: number) => (isDI || isSwapCDI ? fmtPct(v) : fmtRate(v));
 
   // Hedge scenario detection and combined result
   const isHedgeExportador = scenarioData?.id === "ndf_hedge_exportador";
@@ -498,7 +500,7 @@ export function ResultPanel({
               +{fmt(arbGain)}
             </div>
             <div className="mt-2 text-sm leading-relaxed text-on-surface-variant">
-              Lucro travado na montagem: ({fmtRate(arbFwdMercado)} − {fmtRate(arbFwdTeorico)}) × USD {(arbNotional / 1e6).toFixed(0)}M = <strong className="text-emerald-600">+{fmt(arbGain)}</strong>
+              Lucro travado na montagem: ({fmtQ(arbFwdMercado)} − {fmtQ(arbFwdTeorico)}) × USD {(arbNotional / 1e6).toFixed(0)}M = <strong className="text-emerald-600">+{fmt(arbGain)}</strong>
             </div>
           </div>
 
@@ -507,9 +509,9 @@ export function ResultPanel({
               ① NDF vendido (perna de mercado)
             </div>
             <div className="text-sm leading-relaxed text-on-surface">
-              <div>(1) Vendeu USD a termo a <strong className="text-secondary">{fmtRate(arbFwdMercado)}</strong></div>
-              <div>(2) Fixing = {fmtRate(scenario.fixingRate)}</div>
-              <div>(3) Resultado da perna NDF = ({fmtRate(arbFwdMercado)} − {fmtRate(scenario.fixingRate)}) × USD {(arbNotional / 1e6).toFixed(0)}M = <strong className={arbNdfPnl >= 0 ? "text-emerald-600" : "text-red-600"}>{arbNdfPnl >= 0 ? "+" : ""}{fmt(arbNdfPnl)}</strong></div>
+              <div>(1) Vendeu USD a termo a <strong className="text-secondary">{fmtQ(arbFwdMercado)}</strong></div>
+              <div>(2) Fixing = {fmtQ(scenario.fixingRate)}</div>
+              <div>(3) Resultado da perna NDF = ({fmtQ(arbFwdMercado)} − {fmtQ(scenario.fixingRate)}) × USD {(arbNotional / 1e6).toFixed(0)}M = <strong className={arbNdfPnl >= 0 ? "text-emerald-600" : "text-red-600"}>{arbNdfPnl >= 0 ? "+" : ""}{fmt(arbNdfPnl)}</strong></div>
             </div>
           </div>
 
@@ -518,10 +520,10 @@ export function ResultPanel({
               ② Sintético comprado (perna de paridade coberta)
             </div>
             <div className="text-sm leading-relaxed text-on-surface">
-              <div>(1) Tomou CDI emprestado, comprou USD spot a {fmtRate(md?.spotRate as number)}, aplicou no cupom cambial</div>
-              <div>(2) Taxa forward implícita do sintético = <strong className="text-secondary">{fmtRate(arbFwdTeorico)}</strong></div>
-              <div>(3) Fixing = {fmtRate(scenario.fixingRate)}</div>
-              <div>(4) Resultado da perna sintética = ({fmtRate(scenario.fixingRate)} − {fmtRate(arbFwdTeorico)}) × USD {(arbNotional / 1e6).toFixed(0)}M = <strong className={arbSyntheticPnl >= 0 ? "text-emerald-600" : "text-red-600"}>{arbSyntheticPnl >= 0 ? "+" : ""}{fmt(arbSyntheticPnl)}</strong></div>
+              <div>(1) Tomou CDI emprestado, comprou USD spot a {fmtQ(md?.spotRate as number)}, aplicou no cupom cambial</div>
+              <div>(2) Taxa forward implícita do sintético = <strong className="text-secondary">{fmtQ(arbFwdTeorico)}</strong></div>
+              <div>(3) Fixing = {fmtQ(scenario.fixingRate)}</div>
+              <div>(4) Resultado da perna sintética = ({fmtQ(scenario.fixingRate)} − {fmtQ(arbFwdTeorico)}) × USD {(arbNotional / 1e6).toFixed(0)}M = <strong className={arbSyntheticPnl >= 0 ? "text-emerald-600" : "text-red-600"}>{arbSyntheticPnl >= 0 ? "+" : ""}{fmt(arbSyntheticPnl)}</strong></div>
             </div>
           </div>
 
@@ -534,7 +536,7 @@ export function ResultPanel({
               <div>(2) Sintético comprado = {arbSyntheticPnl >= 0 ? "+" : ""}{fmt(arbSyntheticPnl)}</div>
               <div>(3) Total = {fmt(arbNdfPnl)} + {fmt(arbSyntheticPnl)} = <strong className="text-emerald-600">+{fmt(arbGain)}</strong></div>
               <div className="mt-3 rounded-lg bg-surface-container-lowest p-3.5">
-                Independente do fixing ({fmtRate(scenario.fixingRate)}), o lucro é sempre R$ {(arbSpread).toFixed(2)}/USD × USD {(arbNotional / 1e6).toFixed(0)}M = {fmt(arbGain)}.
+                Independente do fixing ({fmtQ(scenario.fixingRate)}), o lucro é sempre R$ {(arbSpread).toFixed(2)}/USD × USD {(arbNotional / 1e6).toFixed(0)}M = {fmt(arbGain)}.
                 As duas pernas se cancelam em relação ao mercado: o que a perna NDF perde/ganha com o fixing, a perna sintética ganha/perde exatamente o oposto.
                 O lucro foi travado na montagem da operação — por isso se chama arbitragem.
               </div>
@@ -558,9 +560,9 @@ export function ResultPanel({
             </div>
             <div className="mt-2 text-xs leading-relaxed text-on-surface-variant">
               Você {posVerb} a{" "}
-              <strong className="text-secondary">{fmtRate(forwardChosen)}</strong>.
+              <strong className="text-secondary">{fmtQ(forwardChosen)}</strong>.
               {isSwapCDI ? " CDI médio: " : isFut ? " Liquidação: " : " Fixing: "}
-              <strong className={colorClass}>{fmtRate(scenario.fixingRate)}</strong>.
+              <strong className={colorClass}>{fmtQ(scenario.fixingRate)}</strong>.
               {isSwapCDI ? (
                 <>
                   <br />
@@ -573,7 +575,7 @@ export function ResultPanel({
               ) : isFut ? (
                 <>
                   <br />
-                  Ajustes diários acumulados:{" "}
+                  {isHedgeDI ? "Marcação a mercado da posição:" : "Ajustes diários acumulados:"}{" "}
                   <strong className={colorClass}>
                     {result.ndfPnL > 0 ? "+" : ""}
                     {fmt(result.ndfPnL)}
@@ -596,6 +598,7 @@ export function ResultPanel({
               forwardRate={forwardChosen}
               position={position}
               notional={isHedgeDI ? diChartNotional : result.hedgedNotional}
+              ratePct={isDI || isSwapCDI}
               fixingRate={scenario.fixingRate}
               xLabel={xLabel}
               overrideFixingPnL={isSpecDI || isHedgeDI ? result.ndfPnL : undefined}
@@ -616,7 +619,7 @@ export function ResultPanel({
                     : isFut
                     ? "vender o futuro"
                     : "vender a termo"}{" "}
-                  a {fmtRate(forwardChosen)}, você travou posição que lucra{" "}
+                  a {fmtQ(forwardChosen)}, você travou posição que lucra{" "}
                   {isSwapCDI
                     ? "quando o CDI fica abaixo da taxa fixa"
                     : isDI
@@ -626,14 +629,14 @@ export function ResultPanel({
                   {result.ndfPnL > 0
                     ? ` ${
                         isSwapCDI
-                          ? `O CDI médio (${fmtRate(scenario.fixingRate)}) ficou abaixo da taxa fixa`
-                          : `A taxa de liquidação (${fmtRate(scenario.fixingRate)}) ficou abaixo da entrada`
+                          ? `O CDI médio (${fmtQ(scenario.fixingRate)}) ficou abaixo da taxa fixa`
+                          : `A taxa de liquidação (${fmtQ(scenario.fixingRate)}) ficou abaixo da entrada`
                       } — resultado positivo.`
                     : result.ndfPnL < 0
                     ? ` ${
                         isSwapCDI
-                          ? `O CDI médio (${fmtRate(scenario.fixingRate)}) ficou acima da taxa fixa`
-                          : `A taxa de liquidação (${fmtRate(scenario.fixingRate)}) ficou acima da entrada`
+                          ? `O CDI médio (${fmtQ(scenario.fixingRate)}) ficou acima da taxa fixa`
+                          : `A taxa de liquidação (${fmtQ(scenario.fixingRate)}) ficou acima da entrada`
                       } — resultado negativo.`
                     : " Resultado neutro."}
                 </>
@@ -647,7 +650,7 @@ export function ResultPanel({
                     : isFut
                     ? "comprar o futuro"
                     : "comprar a termo"}{" "}
-                  a {fmtRate(forwardChosen)}, você travou posição que lucra{" "}
+                  a {fmtQ(forwardChosen)}, você travou posição que lucra{" "}
                   {isSwapCDI
                     ? "quando o CDI fica acima da taxa fixa"
                     : isDI
@@ -657,14 +660,14 @@ export function ResultPanel({
                   {result.ndfPnL > 0
                     ? ` ${
                         isSwapCDI
-                          ? `O CDI médio (${fmtRate(scenario.fixingRate)}) ficou acima da taxa fixa`
-                          : `A taxa de liquidação (${fmtRate(scenario.fixingRate)}) ficou acima da entrada`
+                          ? `O CDI médio (${fmtQ(scenario.fixingRate)}) ficou acima da taxa fixa`
+                          : `A taxa de liquidação (${fmtQ(scenario.fixingRate)}) ficou acima da entrada`
                       } — resultado positivo.`
                     : result.ndfPnL < 0
                     ? ` ${
                         isSwapCDI
-                          ? `O CDI médio (${fmtRate(scenario.fixingRate)}) ficou abaixo da taxa fixa`
-                          : `A taxa de liquidação (${fmtRate(scenario.fixingRate)}) ficou abaixo da entrada`
+                          ? `O CDI médio (${fmtQ(scenario.fixingRate)}) ficou abaixo da taxa fixa`
+                          : `A taxa de liquidação (${fmtQ(scenario.fixingRate)}) ficou abaixo da entrada`
                       } — resultado negativo.`
                     : " Resultado neutro."}
                 </>
@@ -679,26 +682,26 @@ export function ResultPanel({
                   <div className="space-y-2">
                     <p>
                       <strong>Operação original:</strong> o fundo detém R$ {(diPortfolioValue / 1e6).toFixed(0)}M em títulos
-                      prefixados (NTN-F e LTN) com yield médio de {fmtRate(diPortfolioRate)} e duration de {diPortfolioDuration} anos
+                      prefixados (NTN-F e LTN) com yield médio de {fmtQ(diPortfolioRate)} e duration de {diPortfolioDuration} anos
                       ({diPortfolioDu} d.u.). Títulos prefixados perdem valor quando os juros sobem (preço e taxa se movem em direções opostas).
                     </p>
                     <p>
                       <strong>Impacto na carteira (reprecificação via PU):</strong>{" "}
-                      Premissa de movimento paralelo: yield novo = {fmtRate(diPortfolioRate)} {diRateChange >= 0 ? "+" : "−"} {Math.abs(diRateChange).toFixed(2)}pp = {fmtRate(diPortfolioYieldNew)}.
+                      Premissa de movimento paralelo: yield novo = {fmtQ(diPortfolioRate)} {diRateChange >= 0 ? "+" : "−"} {Math.abs(diRateChange).toFixed(2).replace(".", ",")}pp = {fmtQ(diPortfolioYieldNew)}.
                       <br />
-                      PU₀ = 1 ÷ (1+{fmtRate(diPortfolioRate)})^({diPortfolioDu}/252) = <strong>{diPu0.toFixed(6)}</strong>;
-                      PU_T = 1 ÷ (1+{fmtRate(diPortfolioYieldNew)})^({diPortfolioDu}/252) = <strong>{diPuT.toFixed(6)}</strong>.
+                      PU₀ = 1 ÷ (1+{fmtQ(diPortfolioRate)})^({diPortfolioDu}/252) = <strong>{diPu0.toFixed(6).replace(".", ",")}</strong>;
+                      PU_T = 1 ÷ (1+{fmtQ(diPortfolioYieldNew)})^({diPortfolioDu}/252) = <strong>{diPuT.toFixed(6).replace(".", ",")}</strong>.
                       <br />
-                      Retorno = (PU_T ÷ PU₀ − 1) = <strong>{(diPortfolioReturnPct * 100).toFixed(2)}%</strong>;
-                      P&L carteira = {(diPortfolioReturnPct * 100).toFixed(2)}% × {fmt(diPortfolioValue)} ={" "}
+                      Retorno = (PU_T ÷ PU₀ − 1) = <strong>{(diPortfolioReturnPct * 100).toFixed(2).replace(".", ",")}%</strong>;
+                      P&L carteira = {(diPortfolioReturnPct * 100).toFixed(2).replace(".", ",")}% × {fmt(diPortfolioValue)} ={" "}
                       <span className={diPortfolioPnL >= 0 ? "font-bold text-emerald-600" : "font-bold text-red-600"}>
                         {diPortfolioPnL >= 0 ? "+" : ""}{fmt(diPortfolioPnL)}
                       </span>.
                     </p>
                     <p>
-                      <strong>Resultado do DI futuro ({position === "buy_usd" ? "comprou taxa" : "vendeu taxa"} a {fmtRate(forwardChosen)}, {diContracts.toLocaleString("pt-BR")} contratos):</strong>{" "}
-                      PU₀ = 100.000 ÷ (1+{fmtRate(forwardChosen)})^({diFutDu}/252) = <strong>{fmt(diFutPu0)}</strong>;
-                      PU_T = 100.000 ÷ (1+{fmtRate(scenario.fixingRate)})^({diFutDu}/252) = <strong>{fmt(diFutPuT)}</strong>.
+                      <strong>Resultado do DI futuro ({position === "buy_usd" ? "comprou taxa" : "vendeu taxa"} a {fmtQ(forwardChosen)}, {diContracts.toLocaleString("pt-BR")} contratos):</strong>{" "}
+                      PU₀ = 100.000 ÷ (1+{fmtQ(forwardChosen)})^({diFutDu}/252) = <strong>{fmt(diFutPu0)}</strong>;
+                      PU_T = 100.000 ÷ (1+{fmtQ(scenario.fixingRate)})^({diFutDu}/252) = <strong>{fmt(diFutPuT)}</strong>.
                       <br />
                       P&L por contrato ({position === "buy_usd" ? "vendido em PU" : "comprado em PU"}) ={" "}
                       <strong>{diFutPnlPerContract >= 0 ? "+" : ""}{fmt(diFutPnlPerContract)}</strong>; × {diContracts.toLocaleString("pt-BR")} contratos ={" "}
@@ -713,9 +716,9 @@ export function ResultPanel({
                     </p>
                     <p>
                       {diRateChange > 0.1
-                        ? `Os juros subiram ${diRateChange.toFixed(2)}pp e os títulos prefixados perderam valor. O DI futuro gerou ganho de ${fmt(result.ndfPnL)}, cobrindo ${(diHedgeCoverage * 100).toFixed(0)}% da perda na carteira.`
+                        ? `Os juros subiram ${diRateChange.toFixed(2).replace(".", ",")}pp e os títulos prefixados perderam valor. O DI futuro gerou ganho de ${fmt(result.ndfPnL)}, cobrindo ${(diHedgeCoverage * 100).toFixed(0)}% da perda na carteira.`
                         : diRateChange < -0.1
-                        ? `Os juros caíram ${Math.abs(diRateChange).toFixed(2)}pp e os títulos prefixados valorizaram. O DI futuro gerou perda de ${fmt(result.ndfPnL)} — esse é o custo de oportunidade do hedge. Sem a proteção, o fundo teria capturado toda a valorização dos prefixados.`
+                        ? `Os juros caíram ${Math.abs(diRateChange).toFixed(2).replace(".", ",")}pp e os títulos prefixados valorizaram. O DI futuro gerou perda de ${fmt(result.ndfPnL)} — esse é o custo de oportunidade do hedge. Sem a proteção, o fundo teria capturado toda a valorização dos prefixados.`
                         : "A taxa ficou praticamente estável. Impacto marginal tanto na carteira quanto no DI futuro."}
                       {diContracts < diRefContracts
                         ? ` Com ${diContracts.toLocaleString("pt-BR")} contratos ao invés dos ${diRefContracts.toLocaleString("pt-BR")} exigidos pelo casamento de duration, a posição está sub-hedgeada: sobra risco de taxa não protegido, e o resíduo de ${fmt(diNetPnL)} é exatamente essa exposição residual.`
@@ -728,14 +731,14 @@ export function ResultPanel({
                   <div className="space-y-2">
                     <p>
                       <strong>Tese original:</strong> a mesa proprietária projetava queda do DI Jan/27
-                      de {fmtRate(forwardChosen)} para {fmtRate(specTargetRate)} (corte de{" "}
+                      de {fmtQ(forwardChosen)} para {fmtQ(specTargetRate)} (corte de{" "}
                       {((forwardChosen - specTargetRate) * 100).toFixed(0)}bps). Posição:{" "}
                       {position === "sell_usd" ? "vendeu taxa" : "comprou taxa"} no DI futuro.
                       Stop loss da mesa: {fmt(specStopLoss)}.
                     </p>
                     <p>
-                      <strong>O que aconteceu:</strong> DI Jan/27 foi de {fmtRate(forwardChosen)} para{" "}
-                      {fmtRate(scenario.fixingRate)} — variação de{" "}
+                      <strong>O que aconteceu:</strong> DI Jan/27 foi de {fmtQ(forwardChosen)} para{" "}
+                      {fmtQ(scenario.fixingRate)} — variação de{" "}
                       {specBpsChange >= 0 ? "+" : ""}{specBpsChange.toFixed(0)}bps.
                     </p>
                     <p>
@@ -746,8 +749,8 @@ export function ResultPanel({
                     </p>
                     <div className="rounded-md bg-surface-container-lowest/60 p-3 text-[13px] leading-relaxed">
                       <div className="mb-1 font-semibold text-secondary">Memória de cálculo (método PU)</div>
-                      <div>(1) PU₀ = 100.000 ÷ (1 + {fmtRate(forwardChosen)})^({specDuDays}/252) = <strong>{fmt(specPu0)}</strong></div>
-                      <div>(2) PU_T = {fmt(specPu0)} × (1 + {fmtRate(scenario.fixingRate)})^({specDuDays}/252) = <strong>{fmt(specPuT)}</strong></div>
+                      <div>(1) PU₀ = 100.000 ÷ (1 + {fmtQ(forwardChosen)})^({specDuDays}/252) = <strong>{fmt(specPu0)}</strong></div>
+                      <div>(2) PU_T = {fmt(specPu0)} × (1 + {fmtQ(scenario.fixingRate)})^({specDuDays}/252) = <strong>{fmt(specPuT)}</strong></div>
                       <div>
                         (3) P&L por contrato ({position === "sell_usd" ? "vendido em taxa" : "comprado em taxa"}) ={" "}
                         {position === "sell_usd"
@@ -776,34 +779,34 @@ export function ResultPanel({
                   <div className="space-y-2">
                     <p>
                       <strong>Operação original:</strong> a Infralog tem dívida de{" "}
-                      R$ 200M a CDI + {swapSpread.toFixed(2)}% a.a.
+                      R$ 200M a CDI + {swapSpread.toFixed(2).replace(".", ",")}% a.a.
                       Se o CDI subir, o custo financeiro sobe junto.
                     </p>
                     <p>
-                      <strong>Sem swap:</strong> custo = CDI ({fmtRate(scenario.fixingRate)}) +{" "}
-                      {swapSpread.toFixed(2)}% ={" "}
-                      <strong>{swapCostWithout.toFixed(2)}% a.a.</strong>
+                      <strong>Sem swap:</strong> custo = CDI ({fmtQ(scenario.fixingRate)}) +{" "}
+                      {swapSpread.toFixed(2).replace(".", ",")}% ={" "}
+                      <strong>{swapCostWithout.toFixed(2).replace(".", ",")}% a.a.</strong>
                     </p>
                     <p>
                       <strong>Com swap:</strong> o swap trocou CDI por taxa fixa de{" "}
-                      {fmtRate(forwardChosen)}. Custo fixo = {fmtRate(forwardChosen)} +{" "}
-                      {swapSpread.toFixed(2)}% ={" "}
-                      <strong className="text-secondary">{swapCostWith.toFixed(2)}% a.a.</strong>
+                      {fmtQ(forwardChosen)}. Custo fixo = {fmtQ(forwardChosen)} +{" "}
+                      {swapSpread.toFixed(2).replace(".", ",")}% ={" "}
+                      <strong className="text-secondary">{swapCostWith.toFixed(2).replace(".", ",")}% a.a.</strong>
                     </p>
                     <p>
                       <strong>Diferença:</strong>{" "}
                       {swapSavings > 0.01
                         ? <>
                             economia de{" "}
-                            <strong className="text-emerald-600">{swapSavings.toFixed(2)}% a.a.</strong>{" "}
-                            O hedge protegeu a empresa: sem o swap, pagaria {swapCostWithout.toFixed(2)}%; com o swap, pagou {swapCostWith.toFixed(2)}%.
+                            <strong className="text-emerald-600">{swapSavings.toFixed(2).replace(".", ",")}% a.a.</strong>{" "}
+                            O hedge protegeu a empresa: sem o swap, pagaria {swapCostWithout.toFixed(2).replace(".", ",")}%; com o swap, pagou {swapCostWith.toFixed(2).replace(".", ",")}%.
                           </>
                         : swapSavings < -0.01
                         ? <>
                             custo extra de{" "}
-                            <strong className="text-red-600">{Math.abs(swapSavings).toFixed(2)}% a.a.</strong>{" "}
-                            O CDI caiu e a dívida flutuante teria custado apenas {swapCostWithout.toFixed(2)}%.
-                            Com o swap travado em {swapCostWith.toFixed(2)}%, a empresa pagou a mais — esse é o custo de oportunidade do hedge (o preço da previsibilidade).
+                            <strong className="text-red-600">{Math.abs(swapSavings).toFixed(2).replace(".", ",")}% a.a.</strong>{" "}
+                            O CDI caiu e a dívida flutuante teria custado apenas {swapCostWithout.toFixed(2).replace(".", ",")}%.
+                            Com o swap travado em {swapCostWith.toFixed(2).replace(".", ",")}%, a empresa pagou a mais — esse é o custo de oportunidade do hedge (o preço da previsibilidade).
                           </>
                         : <>resultado praticamente neutro. O custo com e sem swap ficou muito próximo.</>}
                     </p>
@@ -817,12 +820,12 @@ export function ResultPanel({
                     </p>
                     <p>
                       <strong>Sem hedge:</strong> compraria os dólares a{" "}
-                      {fmtRate(scenario.fixingRate)} no spot, pagando{" "}
+                      {fmtQ(scenario.fixingRate)} no spot, pagando{" "}
                       {fmt(result.spotConversion)}.
                     </p>
                     <p>
                       <strong>Com o DOL futuro {position === "buy_usd" ? "comprado" : "vendido"} a{" "}
-                      {fmtRate(forwardChosen)}:</strong> os ajustes diários acumulados geraram resultado de{" "}
+                      {fmtQ(forwardChosen)}:</strong> os ajustes diários acumulados geraram resultado de{" "}
                       <span className={result.ndfPnL >= 0 ? "font-bold text-emerald-600" : "font-bold text-red-600"}>
                         {result.ndfPnL >= 0 ? "+" : ""}{fmt(result.ndfPnL)}
                       </span>.
@@ -835,7 +838,7 @@ export function ResultPanel({
                     </p>
                     <p>
                       <strong>Taxa efetiva de compra:</strong>{" "}
-                      <strong className="text-secondary">R$ {hedgeEffRate.toFixed(4)}/USD</strong>.{" "}
+                      <strong className="text-secondary">R$ {fmtRate(hedgeEffRate)}/USD</strong>.{" "}
                       {Math.abs(hedgeEffRate - forwardChosen) < 0.01
                         ? "O hedge cumpriu seu papel: independente do cenário de câmbio, o custo do cupom em reais ficou travado na cotação do DOL futuro contratada."
                         : "A taxa efetiva divergiu da cotação contratada porque a posição no DOL futuro não corresponde ao hedge natural de um devedor em dólar (comprar DOL)."}
@@ -849,12 +852,12 @@ export function ResultPanel({
                     </p>
                     <p>
                       <strong>Sem hedge:</strong> converteria os dólares a{" "}
-                      {fmtRate(scenario.fixingRate)} no spot, recebendo{" "}
+                      {fmtQ(scenario.fixingRate)} no spot, recebendo{" "}
                       {fmt(result.spotConversion)}.
                     </p>
                     <p>
                       <strong>Com o NDF {position === "sell_usd" ? "vendido" : "comprado"} a{" "}
-                      {fmtRate(forwardChosen)}:</strong> o derivativo gerou resultado de{" "}
+                      {fmtQ(forwardChosen)}:</strong> o derivativo gerou resultado de{" "}
                       <span className={result.ndfPnL >= 0 ? "font-bold text-emerald-600" : "font-bold text-red-600"}>
                         {result.ndfPnL >= 0 ? "+" : ""}{fmt(result.ndfPnL)}
                       </span>.
@@ -867,7 +870,7 @@ export function ResultPanel({
                     </p>
                     <p>
                       <strong>Taxa efetiva de conversão:</strong>{" "}
-                      <strong className="text-secondary">R$ {hedgeEffRate.toFixed(4)}/USD</strong>.{" "}
+                      <strong className="text-secondary">R$ {fmtRate(hedgeEffRate)}/USD</strong>.{" "}
                       {Math.abs(hedgeEffRate - forwardChosen) < 0.01
                         ? "O hedge cumpriu seu papel: independente do cenário de câmbio, a receita em reais ficou travada na taxa forward contratada."
                         : "A taxa efetiva divergiu da forward porque a posição no NDF não corresponde ao hedge natural de um exportador (vender USD a termo)."}
@@ -882,7 +885,7 @@ export function ResultPanel({
                     <p>
                       Como nenhuma parcela foi protegida com NDF, o custo total da importação é{" "}
                       <strong className="text-secondary">{fmt(result.spotConversion)}</strong>{" "}
-                      (USD {(result.notional / 1e6).toFixed(0)}M × R$ {fmtRate(scenario.fixingRate)}),
+                      (USD {(result.notional / 1e6).toFixed(0)}M × R$ {fmtQ(scenario.fixingRate)}),
                       integralmente exposto ao câmbio.
                     </p>
                   </div>
@@ -894,12 +897,12 @@ export function ResultPanel({
                     </p>
                     <p>
                       <strong>Sem hedge:</strong> compraria os dólares a{" "}
-                      {fmtRate(scenario.fixingRate)} no spot, desembolsando{" "}
+                      {fmtQ(scenario.fixingRate)} no spot, desembolsando{" "}
                       {fmt(result.spotConversion)}.
                     </p>
                     <p>
                       <strong>Com o NDF {position === "buy_usd" ? "comprado" : "vendido"} a{" "}
-                      {fmtRate(forwardChosen)}
+                      {fmtQ(forwardChosen)}
                       {hedgeRatio < 1
                         ? ` sobre ${(hedgeRatio * 100).toFixed(0)}% do nocional (USD ${(result.hedgedNotional / 1e6).toFixed(1)}M)`
                         : ""}
@@ -916,11 +919,11 @@ export function ResultPanel({
                     </p>
                     <p>
                       <strong>Taxa efetiva de compra:</strong>{" "}
-                      <strong className="text-secondary">R$ {hedgeEffRate.toFixed(4)}/USD</strong>.{" "}
+                      <strong className="text-secondary">R$ {fmtRate(hedgeEffRate)}/USD</strong>.{" "}
                       {hedgeRatio === 1 && Math.abs(hedgeEffRate - forwardChosen) < 0.01
                         ? "O hedge cumpriu seu papel: independente do cenário de câmbio, o custo em reais ficou travado na taxa forward contratada."
                         : hedgeRatio < 1
-                        ? `O hedge parcial travou ${(hedgeRatio * 100).toFixed(0)}% do nocional a R$ ${fmtRate(forwardChosen)}. Os ${((1 - hedgeRatio) * 100).toFixed(0)}% restantes ficaram expostos ao câmbio.`
+                        ? `O hedge parcial travou ${(hedgeRatio * 100).toFixed(0)}% do nocional a R$ ${fmtQ(forwardChosen)}. Os ${((1 - hedgeRatio) * 100).toFixed(0)}% restantes ficaram expostos ao câmbio.`
                         : "A taxa efetiva divergiu da forward porque a posição no NDF não corresponde ao hedge natural de um importador (comprar USD a termo)."}
                     </p>
                   </div>

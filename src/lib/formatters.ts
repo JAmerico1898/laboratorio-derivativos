@@ -19,6 +19,16 @@ export const fmtRate = (v: number): string =>
   }).format(v);
 
 /**
+ * Formata uma taxa de juros em percentual no padrão pt-BR.
+ * Exemplo: fmtPct(12.5) → "12,50%"
+ */
+export const fmtPct = (v: number): string =>
+  new Intl.NumberFormat("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(v) + "%";
+
+/**
  * Formata um valor como moeda USD (Dólar americano).
  * Exemplo: fmtUSD(1234567) → "USD 1,234,567"
  */

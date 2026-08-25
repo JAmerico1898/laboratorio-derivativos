@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { COLORS } from "@/lib/constants";
-import { fmt, fmtRate } from "@/lib/formatters";
+import { fmt, fmtRate, fmtPct } from "@/lib/formatters";
 import { FixingDot } from "./fixing-dot";
 
 interface PayoffChartProps {
@@ -21,6 +21,8 @@ interface PayoffChartProps {
   fixingRate?: number;
   xLabel?: string;
   overrideFixingPnL?: number;
+  /** Cota o eixo X em % a.a. (juros) ao inves de R$/USD (cambio). */
+  ratePct?: boolean;
 }
 
 export function PayoffChart({
@@ -30,7 +32,9 @@ export function PayoffChart({
   fixingRate,
   xLabel,
   overrideFixingPnL,
+  ratePct,
 }: PayoffChartProps) {
+  const fmtX = (v: number) => (ratePct ? fmtPct(v) : fmtRate(v));
   let min = forwardRate * 0.85;
   let max = forwardRate * 1.15;
   if (fixingRate) {
@@ -85,6 +89,7 @@ export function PayoffChart({
           <XAxis
             dataKey="fixing"
             stroke={COLORS.textDim}
+            tickFormatter={(v) => fmtX(v as number)}
             tick={{ fontSize: 11, fill: COLORS.textMuted }}
             label={{
               value: xLabel || "Taxa de Liquidação",
@@ -116,7 +121,7 @@ export function PayoffChart({
               fontFamily: "'JetBrains Mono', monospace",
             }}
             formatter={(v: unknown) => [fmt(v as number), "P&L"]}
-            labelFormatter={(v: unknown) => `${fmtRate(v as number)}`}
+            labelFormatter={(v: unknown) => `${fmtX(v as number)}`}
           />
           <ReferenceLine y={0} stroke={COLORS.textDim} strokeDasharray="4 4" />
           {fixingRate && (
@@ -125,7 +130,7 @@ export function PayoffChart({
               stroke={COLORS.gold}
               strokeWidth={2}
               label={{
-                value: `Liquidação: ${fmtRate(fixingRate)}`,
+                value: `Liquidação: ${fmtX(fixingRate)}`,
                 fill: COLORS.gold,
                 fontSize: 12,
                 fontWeight: 700,
@@ -138,7 +143,7 @@ export function PayoffChart({
             stroke={COLORS.accent}
             strokeDasharray="4 4"
             label={{
-              value: `Entrada: ${fmtRate(forwardRate)}`,
+              value: `Entrada: ${fmtX(forwardRate)}`,
               fill: COLORS.accent,
               fontSize: 11,
               position: "top",
